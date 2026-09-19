@@ -1,0 +1,61 @@
+{
+    "name": "web-kontal",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev --turbopack",
+        "build": "next build --turbopack",
+        "start": "next start",
+        "lint": "eslint",
+        "typecheck": "tsc --noEmit",
+        "format": "prettier --write \"**/*.{css,scss,yaml,yml,ts,js,jsx,tsx,json,md}\"",
+        "format:check": "prettier --check \"**/*.{css,scss,yaml,yml,ts,js,jsx,tsx,json,md}\"",
+        "release": "standard-version",
+        "commit": "cz",
+        "prepare": "husky"
+    },
+    "dependencies": {
+        "axios": "^1.13.1",
+        "flowbite": "^3.1.2",
+        "flowbite-react": "^0.12.7",
+        "framer-motion": "^12.23.24",
+        "js-cookie": "^3.0.5",
+        "lucide-react": "^0.553.0",
+        "next": "15.5.2",
+        "react": "19.1.0",
+        "react-dom": "19.1.0",
+        "react-icons": "^5.5.0",
+        "react-input-mask": "^2.0.4"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^20.1.0",
+        "@commitlint/config-conventional": "^20.0.0",
+        "@eslint/eslintrc": "^3",
+        "@tailwindcss/postcss": "^4",
+        "@types/js-cookie": "^3.0.6",
+        "@types/node": "^20",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "@types/react-input-mask": "^3.0.6",
+        "commitizen": "^4.3.1",
+        "cz-conventional-changelog": "^3.3.0",
+        "eslint": "^9",
+        "eslint-config-next": "15.5.2",
+        "husky": "^9.1.7",
+        "lint-staged": "^15.5.2",
+        "prettier": "^3.6.2",
+        "prettier-plugin-organize-imports": "^4.3.0",
+        "prettier-plugin-tailwindcss": "^0.7.1",
+        "standard-version": "^9.5.0",
+        "tailwindcss": "^4.1.6",
+        "typescript": "5.8.3"
+    },
+    "lint-staged": {
+        "**/*.{css,scss,yaml,yml,ts,js,jsx,tsx,json,md}": "prettier --write"
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
+    }
+}
