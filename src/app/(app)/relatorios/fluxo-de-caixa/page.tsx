@@ -1,3 +1,4 @@
+import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import {
     Table,
     TableBody,
@@ -33,21 +34,18 @@ export default async function CashFlowPage({
         <div className="space-y-6">
             <h1 className="text-2xl font-bold">Fluxo de caixa</h1>
             <ReportFilters mode="period" start={start} end={end}>
-                <label className="space-y-1 text-sm">
+                <div className="space-y-1 text-sm">
                     <span className="text-muted-foreground">Agrupar</span>
-                    <select
+                    <DropdownSelect
                         name="groupBy"
                         defaultValue={groupBy ?? ''}
-                        className="border-input bg-background block h-10 rounded-md border px-3"
-                    >
-                        <option value="">Sem agrupamento</option>
-                        {Object.entries(GROUPS).map(([value, label]) => (
-                            <option key={value} value={value}>
-                                {label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+                        className="w-48"
+                        options={[
+                            { value: '', label: 'Sem agrupamento' },
+                            ...Object.entries(GROUPS).map(([value, label]) => ({ value, label })),
+                        ]}
+                    />
+                </div>
             </ReportFilters>
 
             <p className="text-sm">

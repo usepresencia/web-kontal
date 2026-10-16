@@ -1,5 +1,6 @@
 'use client';
 
+import { DatePickerField } from '@/lib/_components/date-picker-field';
 import {
     Select,
     SelectContent,
@@ -50,23 +51,33 @@ export function PillInput({
             >
                 {label}
             </label>
-            <div className="relative">
-                <input
+            {props.type === 'date' ? (
+                <DatePickerField
                     id={fieldId}
-                    name={name}
+                    name={name ?? fieldId ?? 'date'}
+                    defaultValue={typeof props.defaultValue === 'string' ? props.defaultValue : ''}
                     aria-invalid={errors ? true : undefined}
-                    className={cn(PILL_CLASS, 'w-full', suffix && 'pr-9', className)}
-                    {...props}
+                    className={cn(PILL_CLASS, 'w-full justify-between', className)}
                 />
-                {suffix && (
-                    <span
-                        className="text-muted-foreground pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm"
-                        aria-hidden="true"
-                    >
-                        {suffix}
-                    </span>
-                )}
-            </div>
+            ) : (
+                <div className="relative">
+                    <input
+                        id={fieldId}
+                        name={name}
+                        aria-invalid={errors ? true : undefined}
+                        className={cn(PILL_CLASS, 'w-full', suffix && 'pr-9', className)}
+                        {...props}
+                    />
+                    {suffix && (
+                        <span
+                            className="text-muted-foreground pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm"
+                            aria-hidden="true"
+                        >
+                            {suffix}
+                        </span>
+                    )}
+                </div>
+            )}
             <FieldError errors={errors} />
         </div>
     );

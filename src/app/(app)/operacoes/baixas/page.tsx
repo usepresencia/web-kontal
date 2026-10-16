@@ -1,3 +1,5 @@
+import { DatePickerField } from '@/lib/_components/date-picker-field';
+import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
 import { parseIsoDate } from '@/lib/_utils/dates';
@@ -9,7 +11,6 @@ import { entryPageSchema } from '@/lib/api/schemas/title';
 import { z } from 'zod';
 import { BaixasTable } from './_components/baixas-table';
 
-const inputClass = 'border-input bg-background block h-10 rounded-md border px-3';
 const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
 
 export default async function EntriesPage({
@@ -46,50 +47,54 @@ export default async function EntriesPage({
             <h1 className="text-2xl font-bold">Baixas</h1>
 
             <form method="get" className="flex flex-wrap items-end gap-3">
-                <label className="space-y-1 text-sm">
+                <div className="space-y-1 text-sm">
                     <span className="text-muted-foreground">Pago de</span>
-                    <input
-                        type="date"
+                    <DatePickerField
                         name="paidFrom"
                         defaultValue={paidFrom ?? ''}
-                        className={inputClass}
+                        clearable
+                        className="w-44"
                     />
-                </label>
-                <label className="space-y-1 text-sm">
+                </div>
+                <div className="space-y-1 text-sm">
                     <span className="text-muted-foreground">até</span>
-                    <input
-                        type="date"
+                    <DatePickerField
                         name="paidTo"
                         defaultValue={paidTo ?? ''}
-                        className={inputClass}
+                        clearable
+                        className="w-44"
                     />
-                </label>
-                <label className="space-y-1 text-sm">
+                </div>
+                <div className="space-y-1 text-sm">
                     <span className="text-muted-foreground">Tipo</span>
-                    <select name="titleType" defaultValue={titleType ?? ''} className={inputClass}>
-                        <option value="">Todos</option>
-                        {Object.entries(TITLE_TYPE_LABELS).map(([value, label]) => (
-                            <option key={value} value={value}>
-                                {label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <label className="space-y-1 text-sm">
+                    <DropdownSelect
+                        name="titleType"
+                        defaultValue={titleType ?? ''}
+                        className="w-40"
+                        options={[
+                            { value: '', label: 'Todos' },
+                            ...Object.entries(TITLE_TYPE_LABELS).map(([value, label]) => ({
+                                value,
+                                label,
+                            })),
+                        ]}
+                    />
+                </div>
+                <div className="space-y-1 text-sm">
                     <span className="text-muted-foreground">Conta financeira</span>
-                    <select
+                    <DropdownSelect
                         name="billingAccountId"
                         defaultValue={accountId.success ? accountId.data : ''}
-                        className={`${inputClass} max-w-xs`}
-                    >
-                        <option value="">Todas</option>
-                        {financial.map(account => (
-                            <option key={account.id} value={account.id}>
-                                {account.code} {account.name}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+                        className="w-64"
+                        options={[
+                            { value: '', label: 'Todas' },
+                            ...financial.map(account => ({
+                                value: account.id,
+                                label: `${account.code} ${account.name}`,
+                            })),
+                        ]}
+                    />
+                </div>
                 <FilterButton />
             </form>
 
