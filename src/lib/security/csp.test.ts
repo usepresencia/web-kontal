@@ -15,6 +15,11 @@ describe('buildCsp', () => {
         expect(d['default-src']).toBe("default-src 'self'");
     });
 
+    it('libera o envio de imagens só ao Cloudinary', () => {
+        const d = directives(buildCsp({ nonce: 'abc', isDev: false }));
+        expect(d['connect-src']).toBe("connect-src 'self' https://api.cloudinary.com");
+    });
+
     it('não permite eval nem inline em produção', () => {
         const csp = buildCsp({ nonce: 'abc', isDev: false });
         expect(csp).not.toContain('unsafe-eval');

@@ -1,0 +1,102 @@
+'use client';
+
+import { deactivateCompanyAction } from '@/actions/companies';
+import { selectCompanyAction } from '@/actions/session';
+import { Pagination } from '@/lib/_components/pagination';
+import { Button } from '@/lib/_components/ui/button';
+import { ConfirmationDialog } from '@/lib/_components/ui/confirmation-dialog';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/lib/_components/ui/table';
+import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
+import type { Page } from '@/lib/_utils/pagination';
+import type { Company } from '@/lib/api/schemas/company';
+import { useState, useTransition } from 'react';
+
+/** Lista paginada de empresas com as ações de abrir e desativar. */
+export function CompaniesTable({ page }: { page: Page<Company> }) {
+    const pagination = usePaginationQuery();
+    const [, startTransition] = useTransition();
+    const [toDeactivate, setToDeactivate] = useState<Company | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    return (
+        <div className="space-y-4">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>CNPJ</TableHead>
+                        <TableHead>Cidade</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {page.items.map(company => (
+                        <TableRow key={company.id}>
+                            <TableCell className="font-medium">{company.name}</TableCell>
+                            <TableCell>{company.cnpj}</TableCell>
+                            <TableCell>
+                                {company.address.city}/{company.address.state}
+                            </TableCell>
+                            <TableCell className="space-x-2 text-right">
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() =>
+                                        startTransition(async () => {
+                                            await selectCompanyAction(company.id);
+                                        })
+                                    }
+                                >
+                                    Abrir
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => setToDeactivate(company)}
+                                >
+                                    Desativar
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+
+            {error && (
+                <p role="alert" className="text-negative text-sm">
+                    {error}
+                </p>
+            )}
+
+            <Pagination
+                page={page.page}
+                pageSize={page.pageSize}
+                total={page.total}
+                onPageChange={pagination.onPageChange}
+                onPageSizeChange={pagination.onPageSizeChange}
+            />
+
+            <ConfirmationDialog
+                open={toDeactivate !== null}
+                onOpenChange={open => !open && setToDeactivate(null)}
+                title="Desativar empresa"
+                description={`Desativar ${toDeactivate?.name ?? ''}? Ela deixa de aparecer para os usuários.`}
+                confirmLabel="Desativar"
+                variant="destructive"
+                onConfirm={async () => {
+                    if (!toDeactivate) return;
+                    const result = await deactivateCompanyAction(toDeactivate.id);
+                    setError(result.ok ? null : (result.message ?? 'Não foi possível desativar.'));
+                    setToDeactivate(null);
+                }}
+            />
+        </div>
+    );
+}
