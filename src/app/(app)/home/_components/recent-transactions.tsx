@@ -1,7 +1,7 @@
 import { daysAgoLabel } from '@/lib/_utils/dates';
 import type { Title } from '@/lib/api/schemas/title';
 import Link from 'next/link';
-import { NewTransactionMenu } from './new-transaction-menu';
+import { NewTransactionDialog } from './new-transaction-dialog';
 import { TransactionList } from './transaction-list';
 
 type RecentTransactionsProps = {
@@ -32,7 +32,7 @@ export function RecentTransactions({ titles, openCount, query }: RecentTransacti
                     >
                         Ver todas
                     </Link>
-                    <NewTransactionMenu />
+                    <NewTransactionDialog />
                 </div>
             </div>
 
