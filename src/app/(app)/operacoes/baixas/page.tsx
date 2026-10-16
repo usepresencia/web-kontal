@@ -45,7 +45,12 @@ export default async function EntriesPage({
 
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Baixas</h1>
+            <header>
+                <h1 className="text-2xl font-bold">Baixas</h1>
+                <p className="text-muted-foreground text-sm">
+                    Acompanhe os pagamentos e recebimentos registrados
+                </p>
+            </header>
 
             <form method="get" className="flex flex-wrap items-end gap-3">
                 <FilterField label="Pago de">
