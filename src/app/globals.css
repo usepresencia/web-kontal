@@ -85,6 +85,13 @@
 }
 
 @layer base {
+    /* Tailwind v4 usa currentColor nas bordas; o tema define a cor padrão. */
+    *,
+    ::after,
+    ::before {
+        border-color: var(--color-border);
+    }
+
     html {
         scroll-behavior: smooth;
     }
