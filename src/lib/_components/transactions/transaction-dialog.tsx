@@ -1,8 +1,12 @@
 'use client';
 
-import { getTitleEntriesAction } from '@/actions/titles';
+import { getTitleEntriesAction, getTitlePaymentAccountsAction } from '@/actions/titles';
+import { EntryForm } from '@/lib/_components/transactions/entry-form';
+import { Button } from '@/lib/_components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/lib/_components/ui/dialog';
+import { toLocalIsoDate } from '@/lib/_utils/dates';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
+import { ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { TransactionDetailsBody } from './transaction-details-body';
 
@@ -18,6 +22,8 @@ type TransactionDialogProps = {
 export function TransactionDialog({ title, ago, onClose }: TransactionDialogProps) {
     const [entries, setEntries] = useState<TitleEntry[] | null>(null);
     const [copied, setCopied] = useState(false);
+    const [step, setStep] = useState<'details' | 'pay'>('details');
+    const [accounts, setAccounts] = useState<{ value: string; label: string }[] | null>(null);
     const titleId = title?.id;
 
     useEffect(() => {
@@ -25,6 +31,8 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
         let active = true;
         setEntries(null);
         setCopied(false);
+        setStep('details');
+        setAccounts(null);
         getTitleEntriesAction(titleId)
             .then(items => active && setEntries(items))
             .catch(() => active && setEntries([]));
@@ -32,6 +40,14 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
             active = false;
         };
     }, [titleId]);
+
+    const startPayment = () => {
+        if (!titleId) return;
+        setStep('pay');
+        getTitlePaymentAccountsAction(titleId)
+            .then(setAccounts)
+            .catch(() => setAccounts([]));
+    };
 
     const copy = () => {
         if (!titleId) return;
@@ -48,16 +64,48 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
         <Dialog open={title !== null} onOpenChange={open => !open && onClose()}>
             <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Detalhes da transação</DialogTitle>
+                    <DialogTitle>
+                        {step === 'details' ? 'Detalhes da transação' : 'Baixar título'}
+                    </DialogTitle>
                 </DialogHeader>
-                {title && (
+                {title && step === 'details' && (
                     <TransactionDetailsBody
                         title={title}
                         ago={ago}
                         entries={entries}
                         copied={copied}
                         onCopy={copy}
+                        onPay={startPayment}
                     />
+                )}
+                {title && step === 'pay' && (
+                    <div className="space-y-4">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setStep('details')}
+                        >
+                            <ArrowLeft aria-hidden="true" />
+                            Voltar
+                        </Button>
+                        <p className="text-foreground text-sm font-medium">{title.description}</p>
+                        {accounts === null ? (
+                            <p className="text-muted-foreground text-sm">Carregando…</p>
+                        ) : accounts.length === 0 ? (
+                            <p className="text-muted-foreground text-sm">
+                                Nenhuma conta financeira disponível no plano deste título.
+                            </p>
+                        ) : (
+                            <EntryForm
+                                titleId={title.id}
+                                accounts={accounts}
+                                today={toLocalIsoDate(new Date())}
+                                paying={title.type === 'EXPENSE'}
+                                onSuccess={onClose}
+                            />
+                        )}
+                    </div>
                 )}
             </DialogContent>
         </Dialog>

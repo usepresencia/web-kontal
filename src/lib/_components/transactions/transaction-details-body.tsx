@@ -11,7 +11,6 @@ import {
 } from '@/lib/_utils/title-labels';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
 import { Check, Copy } from 'lucide-react';
-import Link from 'next/link';
 
 type TransactionDetailsBodyProps = {
     title: Title;
@@ -20,6 +19,8 @@ type TransactionDetailsBodyProps = {
     entries: TitleEntry[] | null;
     copied: boolean;
     onCopy: () => void;
+    /** Avança para a etapa de baixa. */
+    onPay: () => void;
 };
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -38,6 +39,7 @@ export function TransactionDetailsBody({
     entries,
     copied,
     onCopy,
+    onPay,
 }: TransactionDetailsBodyProps) {
     const income = title.type === 'INCOME';
 
@@ -134,11 +136,13 @@ export function TransactionDetailsBody({
                 )}
             </section>
 
-            <div className="flex justify-end">
-                <Button asChild>
-                    <Link href={`/operacoes/titulos/${title.id}`}>Abrir título completo</Link>
-                </Button>
-            </div>
+            {title.status === 'OPEN' && (
+                <div className="flex justify-end">
+                    <Button type="button" onClick={onPay}>
+                        Baixar título
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }

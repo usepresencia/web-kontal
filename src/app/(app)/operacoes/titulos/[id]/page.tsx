@@ -1,3 +1,4 @@
+import { EntryForm } from '@/lib/_components/transactions/entry-form';
 import { formatAmount } from '@/lib/_utils/money';
 import { TITLE_TYPE_LABELS, formatDate } from '@/lib/_utils/title-labels';
 import { apiFetch } from '@/lib/api/client';
@@ -7,7 +8,6 @@ import { entryPageSchema, titleSchema } from '@/lib/api/schemas/title';
 import Link from 'next/link';
 import { z } from 'zod';
 import { StatusBadge } from '../../_components/status-badge';
-import { EntryForm } from './_components/entry-form';
 import { DeleteTitleButton, EntriesTable, WriteOffForm } from './_components/title-actions';
 import { TitleEditForm } from './_components/title-edit-form';
 
