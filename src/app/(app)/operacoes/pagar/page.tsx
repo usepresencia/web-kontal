@@ -10,6 +10,7 @@ export default async function Page({
             type="EXPENSE"
             basePath="/operacoes/pagar"
             heading="Contas a pagar"
+            subtitle="Gerencie suas contas a pagar"
             searchParams={await searchParams}
         />
     );

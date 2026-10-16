@@ -12,6 +12,7 @@ type TitlesViewProps = {
     type: 'INCOME' | 'EXPENSE';
     basePath: string;
     heading: string;
+    subtitle: string;
     searchParams: Record<string, string | string[] | undefined>;
 };
 
@@ -20,7 +21,13 @@ const isoDate = (value: string | undefined) =>
     value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined;
 
 /** Listagem de títulos de um tipo, com filtros de situação e vencimento e paginação. */
-export async function TitlesView({ type, basePath, heading, searchParams }: TitlesViewProps) {
+export async function TitlesView({
+    type,
+    basePath,
+    heading,
+    subtitle,
+    searchParams,
+}: TitlesViewProps) {
     const { page, pageSize } = parsePageParams(searchParams);
     const status = TITLE_STATUSES.find(item => item === first(searchParams.status));
     const dueFrom = isoDate(first(searchParams.dueFrom));
@@ -42,7 +49,10 @@ export async function TitlesView({ type, basePath, heading, searchParams }: Titl
     return (
         <div className="space-y-6">
             <header className="flex items-center justify-between gap-4">
-                <h1 className="text-2xl font-bold">{heading}</h1>
+                <div>
+                    <h1 className="text-2xl font-bold">{heading}</h1>
+                    <p className="text-muted-foreground text-sm">{subtitle}</p>
+                </div>
                 <Button asChild>
                     <Link href={`${basePath}/novo`}>Novo título</Link>
                 </Button>
