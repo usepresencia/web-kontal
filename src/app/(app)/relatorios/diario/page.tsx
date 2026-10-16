@@ -1,8 +1,8 @@
+import { getFullJournalReportAction } from '@/actions/reports';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { ReportPage } from '@/lib/_components/reports/report-page';
-import type { ReportSection } from '@/lib/_components/reports/report-types';
 import { parsePeriodParams } from '@/lib/_utils/dates';
-import { formatAmount } from '@/lib/_utils/money';
+import { journalSections } from '@/lib/_utils/report-builders';
 import { formatDate } from '@/lib/_utils/title-labels';
 import { apiFetch } from '@/lib/api/client';
 import { dailyJournalSchema } from '@/lib/api/schemas/reports';
@@ -27,28 +27,7 @@ export default async function DailyJournalPage({
         dailyJournalSchema,
     );
 
-    const sections: ReportSection[] = journal.items.map(day => ({
-        title: `${formatDate(day.date)} · Débitos ${formatAmount(day.totalDebits)} · Créditos ${formatAmount(day.totalCredits)}`,
-        columns: [
-            { label: 'Conta' },
-            { label: 'Débito', align: 'right' },
-            { label: 'Crédito', align: 'right' },
-        ],
-        rows: day.entries.flatMap(entry => [
-            {
-                cells: [`Nº ${entry.number} · ${entry.description}`, '', ''],
-                kind: 'group' as const,
-            },
-            ...entry.lines.map(line => ({
-                cells: [
-                    `${line.accountCode} ${line.accountName}`,
-                    formatAmount(line.debit),
-                    formatAmount(line.credit),
-                ],
-                indent: 1,
-            })),
-        ]),
-    }));
+    const sections = journalSections(journal.items);
 
     return (
         <ReportPage
@@ -56,10 +35,11 @@ export default async function DailyJournalPage({
             report={{
                 title: 'Livro diário',
                 period: periodLabel(start, end, formatDate),
-                filename: `livro-diario-${start}-a-${end}-pagina-${journal.page}`,
+                filename: `livro-diario-${start}-a-${end}`,
                 sections,
             }}
             filters={<ReportFilters mode="period" start={start} end={end} />}
+            loadFullReport={getFullJournalReportAction.bind(null, start, end)}
             empty={<EmptyState title="Nenhum lançamento no período" />}
             footer={
                 <SimplePagination
