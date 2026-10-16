@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildPageWindow, pageCount, pageRange, parsePageParams } from './pagination';
+import { buildPageWindow, pageCount, parsePageParams } from './pagination';
 
 describe('buildPageWindow', () => {
     it.each([
@@ -21,14 +21,6 @@ describe('pageCount', () => {
         expect(pageCount(0, 10)).toBe(1);
         expect(pageCount(10, 10)).toBe(1);
         expect(pageCount(11, 10)).toBe(2);
-    });
-});
-
-describe('pageRange', () => {
-    it('informa o intervalo mostrado', () => {
-        expect(pageRange(1, 10, 25)).toEqual({ from: 1, to: 10 });
-        expect(pageRange(3, 10, 25)).toEqual({ from: 21, to: 25 });
-        expect(pageRange(1, 10, 0)).toEqual({ from: 0, to: 0 });
     });
 });
 
