@@ -1,0 +1,65 @@
+'use client';
+
+import { getTitleEntriesAction } from '@/actions/titles';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/lib/_components/ui/dialog';
+import type { Title, TitleEntry } from '@/lib/api/schemas/title';
+import { useEffect, useState } from 'react';
+import { TransactionDetailsBody } from './transaction-details-body';
+
+const COPIED_FEEDBACK_MS = 1500;
+
+type TransactionDialogProps = {
+    title: Title | null;
+    ago: string;
+    onClose: () => void;
+};
+
+/** Modal de detalhes da transação: dados do título e as baixas, carregadas ao abrir. */
+export function TransactionDialog({ title, ago, onClose }: TransactionDialogProps) {
+    const [entries, setEntries] = useState<TitleEntry[] | null>(null);
+    const [copied, setCopied] = useState(false);
+    const titleId = title?.id;
+
+    useEffect(() => {
+        if (!titleId) return;
+        let active = true;
+        setEntries(null);
+        setCopied(false);
+        getTitleEntriesAction(titleId)
+            .then(items => active && setEntries(items))
+            .catch(() => active && setEntries([]));
+        return () => {
+            active = false;
+        };
+    }, [titleId]);
+
+    const copy = () => {
+        if (!titleId) return;
+        navigator.clipboard
+            .writeText(titleId)
+            .then(() => {
+                setCopied(true);
+                setTimeout(() => setCopied(false), COPIED_FEEDBACK_MS);
+            })
+            .catch(() => setCopied(false));
+    };
+
+    return (
+        <Dialog open={title !== null} onOpenChange={open => !open && onClose()}>
+            <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>Detalhes da transação</DialogTitle>
+                </DialogHeader>
+                {title && (
+                    <TransactionDetailsBody
+                        title={title}
+                        ago={ago}
+                        entries={entries}
+                        copied={copied}
+                        onCopy={copy}
+                    />
+                )}
+            </DialogContent>
+        </Dialog>
+    );
+}
