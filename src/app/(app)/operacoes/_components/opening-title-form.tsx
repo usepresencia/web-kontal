@@ -6,20 +6,22 @@ import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
+import { entryLabels } from '@/lib/_utils/title-labels';
 import { useActionState, useEffect, useState } from 'react';
 
 type OpeningTitleFormProps = {
     action: (state: FormState, formData: FormData) => Promise<FormState>;
     type: 'INCOME' | 'EXPENSE';
     presets: { value: string; label: string }[];
-    /** Chamado depois que o saldo inicial é registrado. */
+    /** Chamado depois que o registro inicial é feito. */
     onSuccess?: () => void;
 };
 
-/** Cadastro de saldo inicial (título de implantação), com a data de implantação e o valor já baixado. */
+/** Cadastro de saldo ou despesa inicial (título de implantação), com a data de implantação e o valor já baixado. */
 export function OpeningTitleForm({ action, type, presets, onSuccess }: OpeningTitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
     const [preset, setPreset] = useState(presets[0]?.value ?? '');
+    const label = entryLabels(type).opening;
     const errors = (field: string) => state.fieldErrors?.[field];
 
     useEffect(() => {
@@ -28,7 +30,7 @@ export function OpeningTitleForm({ action, type, presets, onSuccess }: OpeningTi
 
     return (
         <form action={formAction} className="space-y-4">
-            <FormPendingOverlay message="Salvando saldo inicial…" />
+            <FormPendingOverlay message={`Salvando ${label.toLowerCase()}…`} />
             <input type="hidden" name="type" value={type} />
             <input type="hidden" name="isOpening" value="true" />
 
@@ -103,7 +105,7 @@ export function OpeningTitleForm({ action, type, presets, onSuccess }: OpeningTi
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending ? 'Salvando…' : 'Registrar saldo'}
+                    {pending ? 'Salvando…' : `Registrar ${label.toLowerCase()}`}
                 </Button>
             </div>
         </form>
