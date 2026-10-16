@@ -84,3 +84,8 @@ const MONTH_ABBREVIATIONS = [
 export function monthAbbreviation(monthIndex: number): string {
     return MONTH_ABBREVIATIONS[monthIndex];
 }
+
+/** Data local no formato `YYYY-MM-DD` (diferente de `toISOString`, que usa UTC). */
+export function toLocalIsoDate(date: Date): string {
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
