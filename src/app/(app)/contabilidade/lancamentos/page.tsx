@@ -1,4 +1,5 @@
 import { EmptyState } from '@/lib/_components/empty-state';
+import { FilterButton } from '@/lib/_components/filter-button';
 import { Button } from '@/lib/_components/ui/button';
 import { parseIsoDate } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
@@ -50,9 +51,7 @@ export default async function JournalEntriesPage({
                         className="border-input bg-background block h-10 rounded-md border px-3"
                     />
                 </label>
-                <Button type="submit" variant="outline">
-                    Filtrar
-                </Button>
+                <FilterButton />
             </form>
 
             {entries.items.length === 0 ? (

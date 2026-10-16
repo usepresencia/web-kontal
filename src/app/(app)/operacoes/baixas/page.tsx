@@ -1,5 +1,5 @@
 import { EmptyState } from '@/lib/_components/empty-state';
-import { Button } from '@/lib/_components/ui/button';
+import { FilterButton } from '@/lib/_components/filter-button';
 import { parseIsoDate } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
 import { TITLE_TYPE_LABELS } from '@/lib/_utils/title-labels';
@@ -90,9 +90,7 @@ export default async function EntriesPage({
                         ))}
                     </select>
                 </label>
-                <Button type="submit" variant="outline">
-                    Filtrar
-                </Button>
+                <FilterButton />
             </form>
 
             {entries.items.length === 0 ? (
