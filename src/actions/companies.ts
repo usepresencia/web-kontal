@@ -96,7 +96,7 @@ export async function saveLogoAction(url: string): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas/atual');
+    revalidatePath('/empresas');
     return { ok: true };
 }
 
@@ -107,7 +107,7 @@ export async function removeLogoAction(): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas/atual');
+    revalidatePath('/empresas');
     return { ok: true };
 }
 

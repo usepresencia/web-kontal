@@ -1,162 +1,96 @@
 'use client';
 
 import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
-import { FormField } from '@/lib/_components/form-field';
+import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
+import { FieldError, PillInput } from '@/lib/_components/pill-fields';
 import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import type { Company } from '@/lib/api/schemas/company';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 
 type CompanyFormProps = {
     action: (state: FormState, formData: FormData) => Promise<FormState>;
     company?: Company;
-    submitLabel: string;
+    /** Chamado depois que a empresa é salva. */
+    onSuccess?: () => void;
 };
 
-/** Formulário de empresa usado no cadastro e na edição. */
-export function CompanyForm({ action, company, submitLabel }: CompanyFormProps) {
+const SECTION_CLASS = 'text-muted-foreground pl-4 text-xs font-semibold tracking-wide uppercase';
+
+/** Empresa nos campos em pílula, usada no cadastro e na edição; dados e endereço em dois blocos. */
+export function CompanyForm({ action, company, onSuccess }: CompanyFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
     useActionToast(state);
     const errors = (field: string) => state.fieldErrors?.[field];
+    const field = (
+        label: string,
+        name: string,
+        value: string | undefined,
+        extra: Partial<React.ComponentProps<typeof PillInput>> = {},
+    ) => (
+        <PillInput
+            className={FILTER_PILL_CLASS}
+            label={label}
+            name={name}
+            defaultValue={value}
+            errors={errors(name)}
+            {...extra}
+        />
+    );
+
+    useEffect(() => {
+        if (state.ok) onSuccess?.();
+    }, [state, onSuccess]);
 
     return (
-        <form action={formAction} className="space-y-6">
+        <form action={formAction} className="space-y-4">
             <FormPendingOverlay message="Salvando empresa…" />
-            <fieldset className="grid gap-4 md:grid-cols-2">
-                <legend className="font-display mb-2 text-lg font-semibold">
-                    Dados da empresa
-                </legend>
-                <FormField
-                    label="Nome fantasia"
-                    name="name"
-                    defaultValue={company?.name}
-                    errors={errors('name')}
-                    required
-                />
-                <FormField
-                    label="Razão social"
-                    name="socialReason"
-                    defaultValue={company?.socialReason}
-                    errors={errors('socialReason')}
-                    required
-                />
-                <FormField
-                    label="CNPJ"
-                    name="cnpj"
-                    defaultValue={company?.cnpj}
-                    errors={errors('cnpj')}
-                    inputMode="numeric"
-                    required
-                />
-                <FormField
-                    label="Data de abertura"
-                    name="openingDate"
-                    type="date"
-                    defaultValue={company?.openingDate}
-                    errors={errors('openingDate')}
-                    required
-                />
-                <FormField
-                    label="CNAE"
-                    name="cnae"
-                    defaultValue={company?.cnae}
-                    errors={errors('cnae')}
-                    required
-                />
-                <FormField
-                    label="Regime tributário"
-                    name="taxRegime"
-                    defaultValue={company?.taxRegime}
-                    errors={errors('taxRegime')}
-                    required
-                />
-                <FormField
-                    label="E-mail"
-                    name="email"
-                    type="email"
-                    defaultValue={company?.email}
-                    errors={errors('email')}
-                    required
-                />
-                <FormField
-                    label="Telefone"
-                    name="phone"
-                    type="tel"
-                    defaultValue={company?.phone}
-                    errors={errors('phone')}
-                    required
-                />
-            </fieldset>
 
-            <fieldset className="grid gap-4 md:grid-cols-2">
-                <legend className="font-display mb-2 text-lg font-semibold">Endereço</legend>
-                <FormField
-                    label="CEP"
-                    name="address.zipCode"
-                    defaultValue={company?.address.zipCode}
-                    errors={errors('address.zipCode')}
-                    inputMode="numeric"
-                    required
-                />
-                <FormField
-                    label="Rua"
-                    name="address.street"
-                    defaultValue={company?.address.street}
-                    errors={errors('address.street')}
-                    required
-                />
-                <FormField
-                    label="Número"
-                    name="address.number"
-                    defaultValue={company?.address.number}
-                    errors={errors('address.number')}
-                    required
-                />
-                <FormField
-                    label="Complemento"
-                    name="address.complement"
-                    defaultValue={company?.address.complement ?? ''}
-                    errors={errors('address.complement')}
-                />
-                <FormField
-                    label="Bairro"
-                    name="address.neighborhood"
-                    defaultValue={company?.address.neighborhood}
-                    errors={errors('address.neighborhood')}
-                    required
-                />
-                <FormField
-                    label="Cidade"
-                    name="address.city"
-                    defaultValue={company?.address.city}
-                    errors={errors('address.city')}
-                    required
-                />
-                <FormField
-                    label="UF"
-                    name="address.state"
-                    defaultValue={company?.address.state}
-                    errors={errors('address.state')}
-                    maxLength={2}
-                    required
-                />
-            </fieldset>
+            <p className={SECTION_CLASS}>Dados da empresa</p>
+            <div className="grid grid-cols-2 gap-3">
+                {field('Nome fantasia', 'name', company?.name, { required: true })}
+                {field('Razão social', 'socialReason', company?.socialReason, { required: true })}
+                {field('CNPJ', 'cnpj', company?.cnpj, { inputMode: 'numeric', required: true })}
+                {field('Data de abertura', 'openingDate', company?.openingDate, { type: 'date' })}
+                {field('CNAE', 'cnae', company?.cnae, { required: true })}
+                {field('Regime tributário', 'taxRegime', company?.taxRegime, { required: true })}
+                {field('E-mail', 'email', company?.email, { type: 'email', required: true })}
+                {field('Telefone', 'phone', company?.phone, { type: 'tel', required: true })}
+            </div>
 
-            {state.fieldErrors?.address && (
-                <p role="alert" className="text-negative text-sm">
-                    Endereço: {state.fieldErrors.address.join(' ')}
-                </p>
-            )}
+            <p className={SECTION_CLASS}>Endereço</p>
+            <div className="grid grid-cols-2 gap-3">
+                {field('CEP', 'address.zipCode', company?.address.zipCode, {
+                    inputMode: 'numeric',
+                    required: true,
+                })}
+                {field('Rua', 'address.street', company?.address.street, { required: true })}
+                {field('Número', 'address.number', company?.address.number, { required: true })}
+                {field('Complemento', 'address.complement', company?.address.complement ?? '')}
+                {field('Bairro', 'address.neighborhood', company?.address.neighborhood, {
+                    required: true,
+                })}
+                {field('Cidade', 'address.city', company?.address.city, { required: true })}
+                {field('UF', 'address.state', company?.address.state, {
+                    maxLength: 2,
+                    required: true,
+                })}
+            </div>
+            <FieldError errors={errors('address')} />
+            {state.fieldErrors?.openingDate && <FieldError errors={errors('openingDate')} />}
 
-            <ConfirmSubmitButton
-                confirmTitle={submitLabel}
-                confirmDescription="Confirmar e salvar as informações da empresa?"
-                confirmLabel="Confirmar"
-                disabled={pending}
-            >
-                {pending ? 'Salvando…' : submitLabel}
-            </ConfirmSubmitButton>
+            <div className="flex justify-end">
+                <ConfirmSubmitButton
+                    confirmTitle={company ? 'Salvar empresa' : 'Cadastrar empresa'}
+                    confirmDescription="Confirmar e salvar as informações da empresa?"
+                    confirmLabel="Confirmar"
+                    disabled={pending}
+                    className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
+                >
+                    {pending ? 'Salvando…' : company ? 'Salvar empresa' : 'Cadastrar empresa'}
+                </ConfirmSubmitButton>
+            </div>
         </form>
     );
 }

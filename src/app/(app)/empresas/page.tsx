@@ -1,10 +1,10 @@
 import { EmptyState } from '@/lib/_components/empty-state';
-import { Button } from '@/lib/_components/ui/button';
 import { parsePageParams } from '@/lib/_utils/pagination';
 import { apiFetch } from '@/lib/api/client';
 import { companyPageSchema } from '@/lib/api/schemas/company';
-import Link from 'next/link';
 import { CompaniesTable } from './_components/companies-table';
+import { CurrentCompanyDialog } from './_components/current-company-dialog';
+import { NewCompanyDialog } from './_components/new-company-dialog';
 
 export default async function CompaniesPage({
     searchParams,
@@ -23,15 +23,13 @@ export default async function CompaniesPage({
             <header className="flex items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold">Empresas</h1>
-                    <p className="text-muted-foreground text-sm">Empresas que você pode acessar.</p>
+                    <p className="text-muted-foreground text-sm">
+                        Gerencie as empresas que você pode acessar
+                    </p>
                 </div>
                 <div className="flex gap-2">
-                    <Button asChild variant="outline">
-                        <Link href="/empresas/atual">Editar empresa atual</Link>
-                    </Button>
-                    <Button asChild>
-                        <Link href="/empresas/nova">Nova empresa</Link>
-                    </Button>
+                    <CurrentCompanyDialog />
+                    <NewCompanyDialog />
                 </div>
             </header>
 
