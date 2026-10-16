@@ -6,13 +6,13 @@ type EmptyStateProps = {
     action?: ReactNode;
 };
 
-/** Mensagem exibida quando uma listagem não tem itens. */
+/** Mensagem exibida quando uma listagem não tem itens, no mesmo cartão das listas. */
 export function EmptyState({ title, description, action }: EmptyStateProps) {
     return (
-        <div className="border-border bg-card flex flex-col items-center gap-2 rounded-lg border p-8 text-center">
-            <h3 className="text-lg font-semibold">{title}</h3>
+        <section className="bg-card flex flex-col items-center gap-2 rounded-2xl px-5 py-10 text-center shadow-sm">
+            <h3 className="font-display text-base font-semibold">{title}</h3>
             {description && <p className="text-muted-foreground text-sm">{description}</p>}
             {action}
-        </div>
+        </section>
     );
 }
