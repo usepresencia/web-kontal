@@ -1,6 +1,10 @@
 'use client';
 
-import { createTitleAction, getTitleFormOptionsAction } from '@/actions/titles';
+import {
+    createTitleAction,
+    getTitleFormOptionsAction,
+    type TitleFormOptions,
+} from '@/actions/titles';
 import { Button } from '@/lib/_components/ui/button';
 import {
     Dialog,
@@ -10,55 +14,64 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/lib/_components/ui/dialog';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/lib/_components/ui/select';
 import { cn } from '@/lib/_utils/cn';
 import { toLocalIsoDate } from '@/lib/_utils/dates';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
-import { ArrowDownCircle, ArrowUpCircle, Plus } from 'lucide-react';
+import { ArrowDownCircle, ArrowUpCircle, ChevronDown, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useActionState, useEffect, useState } from 'react';
+import { AdvancedFields } from './new-transaction-advanced';
+import { FieldError, PILL_CLASS, PillInput, PillSelect } from './pill-fields';
 
 type TitleType = 'INCOME' | 'EXPENSE';
-type Category = { value: string; label: string };
 
 const TYPES: { type: TitleType; label: string; icon: typeof ArrowUpCircle }[] = [
     { type: 'INCOME', label: 'Receita', icon: ArrowUpCircle },
     { type: 'EXPENSE', label: 'Despesa', icon: ArrowDownCircle },
 ];
 
-const pillField =
-    'bg-background border-border h-12 rounded-full border px-5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring';
+const ADVANCED_FIELDS = [
+    'issueDate',
+    'feesPercentageMonthly',
+    'destinationAccountId',
+    'isOpening',
+    'openingDate',
+    'settledAmount',
+    'repeat',
+    'frequency',
+    'count',
+    'until',
+];
 
-type FormProps = { categories: Category[]; onDone: () => void };
+type FormProps = { options: TitleFormOptions; onDone: () => void };
 
-function NewTransactionForm({ categories, onDone }: FormProps) {
+function NewTransactionForm({ options, onDone }: FormProps) {
     const [state, formAction, pending] = useActionState(createTitleAction, INITIAL_FORM_STATE);
     const [type, setType] = useState<TitleType>('INCOME');
     const [category, setCategory] = useState('');
+    const [advancedOpen, setAdvancedOpen] = useState(false);
     const errors = (field: string) => state.fieldErrors?.[field];
 
     useEffect(() => {
         if (state.ok) onDone();
     }, [state, onDone]);
 
+    // Erro num campo escondido: abre as opções para o usuário ver onde corrigir.
+    useEffect(() => {
+        if (ADVANCED_FIELDS.some(field => state.fieldErrors?.[field])) setAdvancedOpen(true);
+    }, [state]);
+
     const amountTone = type === 'INCOME' ? 'text-positive' : 'text-negative';
 
     return (
-        <form action={formAction} className="space-y-6">
+        <form action={formAction} className="space-y-4">
             <input type="hidden" name="type" value={type} />
-            <input type="hidden" name="presetId" value={category} />
             <input type="hidden" name="returnTo" value="/home" />
 
             <div
                 role="radiogroup"
                 aria-label="Tipo da transação"
-                className="bg-muted/70 flex rounded-full p-1.5"
+                className="bg-muted/70 flex rounded-full p-1"
             >
                 {TYPES.map(({ type: value, label, icon: Icon }) => (
                     <button
@@ -68,7 +81,7 @@ function NewTransactionForm({ categories, onDone }: FormProps) {
                         aria-checked={type === value}
                         onClick={() => setType(value)}
                         className={cn(
-                            'flex h-12 flex-1 items-center justify-center gap-2 rounded-full text-base font-semibold transition-colors',
+                            'flex h-10 flex-1 items-center justify-center gap-2 rounded-full text-sm font-semibold transition-colors',
                             type === value
                                 ? cn(
                                       'bg-card shadow-sm',
@@ -77,7 +90,7 @@ function NewTransactionForm({ categories, onDone }: FormProps) {
                                 : 'text-muted-foreground',
                         )}
                     >
-                        <Icon className="size-5" aria-hidden="true" />
+                        <Icon className="size-4" aria-hidden="true" />
                         {label}
                     </button>
                 ))}
@@ -86,12 +99,12 @@ function NewTransactionForm({ categories, onDone }: FormProps) {
             <div>
                 <label
                     htmlFor="amount"
-                    className="text-muted-foreground text-sm font-semibold tracking-wide uppercase"
+                    className="text-muted-foreground text-xs font-semibold tracking-wide uppercase"
                 >
                     Valor
                 </label>
-                <div className="border-border mt-2 flex items-baseline gap-2 border-b pb-2">
-                    <span className={cn('font-display text-3xl font-bold', amountTone)}>R$</span>
+                <div className="border-border mt-1 flex items-baseline gap-2 border-b pb-1.5">
+                    <span className={cn('font-display text-2xl font-bold', amountTone)}>R$</span>
                     <input
                         id="amount"
                         name="amount"
@@ -100,14 +113,10 @@ function NewTransactionForm({ categories, onDone }: FormProps) {
                         autoComplete="off"
                         required
                         aria-invalid={errors('amount') ? true : undefined}
-                        className="font-display placeholder:text-muted-foreground/40 w-full bg-transparent text-5xl font-bold outline-none"
+                        className="font-display placeholder:text-muted-foreground/40 w-full bg-transparent text-4xl font-bold outline-none"
                     />
                 </div>
-                {errors('amount') && (
-                    <p role="alert" className="text-negative mt-1 text-sm">
-                        {errors('amount')?.join(' ')}
-                    </p>
-                )}
+                <FieldError errors={errors('amount')} />
             </div>
 
             <div>
@@ -116,53 +125,51 @@ function NewTransactionForm({ categories, onDone }: FormProps) {
                     placeholder="Descrição (ex: Venda de bolos)"
                     aria-label="Descrição"
                     required
-                    className={cn(pillField, 'w-full')}
+                    className={cn(PILL_CLASS, 'w-full')}
                 />
-                {errors('description') && (
-                    <p role="alert" className="text-negative mt-1 text-sm">
-                        {errors('description')?.join(' ')}
-                    </p>
-                )}
+                <FieldError errors={errors('description')} />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-                <div>
-                    <Select value={category} onValueChange={setCategory}>
-                        <SelectTrigger
-                            aria-label="Categoria"
-                            className={cn(pillField, 'border-border justify-between')}
-                        >
-                            <SelectValue placeholder="Categoria" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {categories.map(item => (
-                                <SelectItem key={item.value} value={item.value}>
-                                    {item.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    {errors('presetId') && (
-                        <p role="alert" className="text-negative mt-1 text-sm">
-                            {errors('presetId')?.join(' ')}
-                        </p>
-                    )}
-                </div>
-                <div>
-                    <input
-                        type="date"
-                        name="expirationDate"
-                        aria-label="Data de vencimento"
-                        defaultValue={toLocalIsoDate(new Date())}
-                        required
-                        className={cn(pillField, 'w-full')}
-                    />
-                    {errors('expirationDate') && (
-                        <p role="alert" className="text-negative mt-1 text-sm">
-                            {errors('expirationDate')?.join(' ')}
-                        </p>
-                    )}
-                </div>
+                <PillSelect
+                    label="Categoria"
+                    name="presetId"
+                    value={category}
+                    onChange={setCategory}
+                    options={options.presets}
+                    placeholder="Categoria"
+                    errors={errors('presetId')}
+                />
+                <PillInput
+                    label="Vencimento"
+                    name="expirationDate"
+                    type="date"
+                    defaultValue={toLocalIsoDate(new Date())}
+                    required
+                    errors={errors('expirationDate')}
+                />
+            </div>
+
+            <button
+                type="button"
+                onClick={() => setAdvancedOpen(open => !open)}
+                aria-expanded={advancedOpen}
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm font-medium"
+            >
+                Mais opções
+                <ChevronDown
+                    className={cn('size-4 transition-transform', advancedOpen && 'rotate-180')}
+                    aria-hidden="true"
+                />
+            </button>
+
+            {/* Fica montado (só escondido) para não perder o que foi digitado ao recolher. */}
+            <div hidden={!advancedOpen}>
+                <AdvancedFields
+                    isExpense={type === 'EXPENSE'}
+                    destinationAccounts={options.destinationAccounts}
+                    errors={errors}
+                />
             </div>
 
             {state.message && !state.ok && (
@@ -171,11 +178,11 @@ function NewTransactionForm({ categories, onDone }: FormProps) {
                 </p>
             )}
 
-            <div className="flex items-center justify-end gap-3">
+            <div className="flex items-center justify-end gap-2">
                 <Button
                     type="button"
                     variant="ghost"
-                    className="h-12 rounded-full px-6 text-base"
+                    className="h-10 rounded-full px-5"
                     onClick={onDone}
                 >
                     Cancelar
@@ -183,7 +190,7 @@ function NewTransactionForm({ categories, onDone }: FormProps) {
                 <Button
                     type="submit"
                     disabled={pending}
-                    className="bg-accent text-accent-foreground hover:bg-accent/90 h-12 rounded-full px-8 text-base font-semibold"
+                    className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
                     {pending ? 'Salvando…' : 'Salvar transação'}
                 </Button>
@@ -192,22 +199,22 @@ function NewTransactionForm({ categories, onDone }: FormProps) {
     );
 }
 
-/** Botão "Nova" que abre o modal de cadastro rápido de uma receita ou despesa. */
+/** Botão "Nova" que abre o modal de cadastro de uma receita ou despesa, com todos os campos do título. */
 export function NewTransactionDialog() {
     const [open, setOpen] = useState(false);
-    const [categories, setCategories] = useState<Category[] | null>(null);
+    const [options, setOptions] = useState<TitleFormOptions | null>(null);
 
-    // As categorias (presets ativos) são pedidas na primeira vez que o modal abre.
+    // Presets e contas de destino são pedidos na primeira vez que o modal abre.
     useEffect(() => {
-        if (!open || categories !== null) return;
+        if (!open || options !== null) return;
         let active = true;
-        getTitleFormOptionsAction('INCOME')
-            .then(options => active && setCategories(options.presets))
-            .catch(() => active && setCategories([]));
+        getTitleFormOptionsAction('EXPENSE')
+            .then(result => active && setOptions(result))
+            .catch(() => active && setOptions({ presets: [], destinationAccounts: [] }));
         return () => {
             active = false;
         };
-    }, [open, categories]);
+    }, [open, options]);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -217,19 +224,19 @@ export function NewTransactionDialog() {
                     Nova
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-h-[92vh] max-w-xl overflow-y-auto rounded-3xl p-8">
-                <DialogHeader className="space-y-1">
-                    <DialogTitle className="font-display text-3xl font-bold tracking-tight">
+            <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto rounded-3xl p-6">
+                <DialogHeader className="space-y-0.5">
+                    <DialogTitle className="font-display text-xl font-bold tracking-tight">
                         Nova transação
                     </DialogTitle>
-                    <DialogDescription className="text-base">
+                    <DialogDescription className="text-sm">
                         Registre uma entrada ou saída.
                     </DialogDescription>
                 </DialogHeader>
 
-                {categories === null ? (
+                {options === null ? (
                     <p className="text-muted-foreground text-sm">Carregando…</p>
-                ) : categories.length === 0 ? (
+                ) : options.presets.length === 0 ? (
                     <div className="space-y-3">
                         <p className="text-muted-foreground text-sm">
                             Cadastre uma categoria (preset ativo) antes de criar transações.
@@ -239,7 +246,7 @@ export function NewTransactionDialog() {
                         </Button>
                     </div>
                 ) : (
-                    <NewTransactionForm categories={categories} onDone={() => setOpen(false)} />
+                    <NewTransactionForm options={options} onDone={() => setOpen(false)} />
                 )}
             </DialogContent>
         </Dialog>
