@@ -121,3 +121,13 @@
         appearance: textfield;
     }
 }
+
+/* Rolagem sem barra visível (a área continua rolável). */
+@utility scrollbar-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}

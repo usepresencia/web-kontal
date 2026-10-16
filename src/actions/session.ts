@@ -25,17 +25,26 @@ export async function createSessionAction(token: string): Promise<CreateSessionR
     return { ok: true };
 }
 
-/** Define a empresa ativa, depois de conferir que o usuário a acessa, e abre a home. */
-export async function selectCompanyAction(companyId: string): Promise<{ ok: false }> {
-    if (companyId.length === 0 || companyId.length > MAX_COMPANY_ID_LENGTH) return { ok: false };
+/** Confere que o usuário acessa a empresa ativa informada e a grava no cookie. */
+async function activateCompany(companyId: string): Promise<boolean> {
+    if (companyId.length === 0 || companyId.length > MAX_COMPANY_ID_LENGTH) return false;
 
     const tenants = await apiFetch('/auth/tenants', tenantsSchema, { tenant: false });
-    if (!tenants.some(tenant => tenant.companyId === companyId && tenant.isActive)) {
-        return { ok: false };
-    }
+    if (!tenants.some(tenant => tenant.companyId === companyId && tenant.isActive)) return false;
 
     await writeTenantId(companyId);
+    return true;
+}
+
+/** Define a empresa ativa, depois de conferir que o usuário a acessa, e abre a home. */
+export async function selectCompanyAction(companyId: string): Promise<{ ok: false }> {
+    if (!(await activateCompany(companyId))) return { ok: false };
     redirect('/home');
+}
+
+/** Troca a empresa ativa sem sair da tela atual; o cliente recarrega a página em seguida. */
+export async function switchCompanyAction(companyId: string): Promise<{ ok: boolean }> {
+    return { ok: await activateCompany(companyId) };
 }
 
 /** Apaga a sessão do Kontal e leva ao login do Presencia. */

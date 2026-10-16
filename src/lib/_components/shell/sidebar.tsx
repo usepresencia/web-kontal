@@ -1,13 +1,15 @@
 'use client';
 
-import { logoutAction } from '@/actions/session';
+import { logoutAction, switchCompanyAction } from '@/actions/session';
 import { SidebarBody, useSidebar } from '@/lib/_components/ui/sidebar';
 import { cn } from '@/lib/_utils/cn';
+import type { Tenant } from '@/lib/api/schemas/tenant';
 import { NAV_SECTIONS, type NavItem } from '@/lib/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { LogOut } from 'lucide-react';
+import { ChevronDown, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
 import { LogoMark } from './logo';
 
 /** Mostra o conteúdo só quando a sidebar está expandida (ou fixa, na gaveta do mobile). */
@@ -39,12 +41,80 @@ function NavLinkButton({ title, href, icon: Icon }: NavItem) {
     );
 }
 
-function SidebarContent({ userName }: { userName: string }) {
+type CompanyProps = { companies: Tenant[]; currentCompanyId: string };
+
+/** Empresa ativa sob o nome da marca; com mais de uma, abre a lista para trocar. */
+function SidebarCompany({ companies, currentCompanyId }: CompanyProps) {
+    const router = useRouter();
+    const [open, setOpen] = useState(false);
+    const [pending, startTransition] = useTransition();
+
+    const current = companies.find(company => company.companyId === currentCompanyId);
+    const others = companies.filter(company => company.companyId !== currentCompanyId);
+
+    const switchTo = (companyId: string) => {
+        setOpen(false);
+        startTransition(async () => {
+            const result = await switchCompanyAction(companyId);
+            if (result.ok) router.refresh();
+        });
+    };
+
+    if (others.length === 0) {
+        return <p className="text-sidebar-foreground/60 truncate text-xs">{current?.name}</p>;
+    }
+
+    return (
+        <div className="relative">
+            <button
+                type="button"
+                onClick={() => setOpen(previous => !previous)}
+                disabled={pending}
+                aria-expanded={open}
+                title="Trocar empresa"
+                className="text-sidebar-foreground/60 hover:text-sidebar-foreground flex w-full items-center gap-0.5 text-left text-xs"
+            >
+                <span className="truncate">{current?.name}</span>
+                <ChevronDown
+                    className={cn('size-3.5 shrink-0 transition-transform', open && 'rotate-180')}
+                    aria-hidden="true"
+                />
+            </button>
+            {open && (
+                <>
+                    <div
+                        className="fixed inset-0 z-10"
+                        aria-hidden
+                        onClick={() => setOpen(false)}
+                    />
+                    <div className="border-sidebar-border bg-sidebar absolute top-full left-0 z-20 mt-1 max-h-40 min-w-40 overflow-y-auto rounded-lg border py-1 shadow-lg">
+                        {others.map(company => (
+                            <button
+                                key={company.companyId}
+                                type="button"
+                                onClick={() => switchTo(company.companyId)}
+                                className="hover:bg-sidebar-muted w-full px-3 py-2 text-left text-xs"
+                            >
+                                {company.name}
+                            </button>
+                        ))}
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}
+
+function SidebarContent({
+    userName,
+    companies,
+    currentCompanyId,
+}: CompanyProps & { userName: string }) {
     const showLabels = useShowLabels();
 
     return (
         <div className="flex h-full flex-col justify-between gap-4">
-            <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
+            <div className="scrollbar-hidden flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
                 <div
                     className={cn(
                         'border-sidebar-border flex items-center gap-3 border-b pb-4',
@@ -54,14 +124,20 @@ function SidebarContent({ userName }: { userName: string }) {
                     <LogoMark />
                     <AnimatePresence>
                         {showLabels && (
-                            <motion.span
+                            <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="font-display text-xl font-bold tracking-tight"
+                                className="flex min-w-0 flex-1 flex-col items-start gap-0.5"
                             >
-                                Kontal
-                            </motion.span>
+                                <span className="font-display text-xl leading-tight font-bold tracking-tight">
+                                    Kontal
+                                </span>
+                                <SidebarCompany
+                                    companies={companies}
+                                    currentCompanyId={currentCompanyId}
+                                />
+                            </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
@@ -115,10 +191,18 @@ function SidebarContent({ userName }: { userName: string }) {
 }
 
 /** Menu lateral em grupos: recolhido em ícones no desktop, gaveta no mobile. */
-export function Sidebar({ userName }: { userName: string }) {
+export function Sidebar({
+    userName,
+    companies,
+    currentCompanyId,
+}: CompanyProps & { userName: string }) {
     return (
         <SidebarBody>
-            <SidebarContent userName={userName} />
+            <SidebarContent
+                userName={userName}
+                companies={companies}
+                currentCompanyId={currentCompanyId}
+            />
         </SidebarBody>
     );
 }
