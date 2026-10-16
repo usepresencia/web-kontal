@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TITLE_STATUS_LABELS, formatDate } from './title-labels';
+import { TITLE_STATUS_LABELS, entryLabels, formatDate } from './title-labels';
 
 describe('formatDate', () => {
     it('converte YYYY-MM-DD em DD/MM/YYYY', () => {
@@ -15,5 +15,25 @@ describe('TITLE_STATUS_LABELS', () => {
     it('mantém os demais rótulos de situação', () => {
         expect(TITLE_STATUS_LABELS.OPEN).toBe('Em aberto');
         expect(TITLE_STATUS_LABELS.SETTLED).toBe('Quitado');
+    });
+});
+
+describe('entryLabels', () => {
+    it('usa pagamento no título a pagar', () => {
+        expect(entryLabels('EXPENSE')).toEqual({
+            action: 'Pagar título',
+            submit: 'Pagar',
+            pending: 'Pagando…',
+            overlay: 'Registrando pagamento…',
+        });
+    });
+
+    it('usa recebimento no título a receber', () => {
+        expect(entryLabels('INCOME')).toEqual({
+            action: 'Receber título',
+            submit: 'Receber',
+            pending: 'Recebendo…',
+            overlay: 'Registrando recebimento…',
+        });
     });
 });

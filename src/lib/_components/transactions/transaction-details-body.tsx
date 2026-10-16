@@ -7,6 +7,7 @@ import {
     PAYMENT_METHOD_LABELS,
     TITLE_STATUS_LABELS,
     TITLE_TYPE_LABELS,
+    entryLabels,
     formatDate,
 } from '@/lib/_utils/title-labels';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
@@ -139,7 +140,7 @@ export function TransactionDetailsBody({
             {title.status === 'OPEN' && (
                 <div className="flex justify-end">
                     <Button type="button" onClick={onPay}>
-                        Baixar título
+                        {entryLabels(title.type).action}
                     </Button>
                 </div>
             )}

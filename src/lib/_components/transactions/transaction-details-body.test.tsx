@@ -61,14 +61,24 @@ describe('TransactionDetailsBody', () => {
         expect(html).not.toContain('Abrir título completo');
     });
 
-    it('oferece "Baixar título" quando o título está em aberto', () => {
-        expect(render([])).toContain('Baixar título');
+    it('oferece "Pagar título" no título a pagar em aberto', () => {
+        const html = render([]);
+        expect(html).toContain('Pagar título');
+        expect(html).not.toContain('Baixar título');
+    });
+
+    it('oferece "Receber título" no título a receber em aberto', () => {
+        const html = render([], { type: 'INCOME' });
+        expect(html).toContain('Receber título');
+        expect(html).not.toContain('Baixar título');
     });
 
     it.each(['SETTLED', 'WRITTEN_OFF'] as const)(
         'não oferece baixa quando o título está %s',
         status => {
-            expect(render([], { status })).not.toContain('Baixar título');
+            const html = render([], { status });
+            expect(html).not.toContain('Pagar título');
+            expect(html).not.toContain('Receber título');
         },
     );
 

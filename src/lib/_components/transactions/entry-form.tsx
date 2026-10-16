@@ -1,11 +1,12 @@
 'use client';
 
 import { createEntryAction } from '@/actions/titles';
+import { AmountInput } from '@/lib/_components/amount-input';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
-import { PAYMENT_METHOD_LABELS } from '@/lib/_utils/title-labels';
+import { PAYMENT_METHOD_LABELS, entryLabels } from '@/lib/_utils/title-labels';
 import { useActionState, useEffect, useState } from 'react';
 
 const PAYMENT_METHODS = Object.entries(PAYMENT_METHOD_LABELS).map(([value, label]) => ({
@@ -22,7 +23,7 @@ type EntryFormProps = {
     onSuccess?: () => void;
 };
 
-/** Registro de baixa nos campos em pílula: pagamento (título a pagar) ou recebimento (a receber). */
+/** Baixa do título nos campos em pílula: pagamento (a pagar) ou recebimento (a receber). */
 export function EntryForm({ titleId, accounts, today, paying, onSuccess }: EntryFormProps) {
     const [state, formAction, pending] = useActionState(
         createEntryAction.bind(null, titleId),
@@ -31,6 +32,7 @@ export function EntryForm({ titleId, accounts, today, paying, onSuccess }: Entry
     const [account, setAccount] = useState('');
     const [method, setMethod] = useState('PIX');
     const errors = (field: string) => state.fieldErrors?.[field];
+    const labels = entryLabels(paying ? 'EXPENSE' : 'INCOME');
 
     useEffect(() => {
         if (state.ok) onSuccess?.();
@@ -38,10 +40,13 @@ export function EntryForm({ titleId, accounts, today, paying, onSuccess }: Entry
 
     return (
         <form action={formAction} className="space-y-4">
-            <FormPendingOverlay message="Registrando baixa…" />
-            <h2 className="font-display text-base font-semibold">
-                {paying ? 'Registrar pagamento' : 'Registrar recebimento'}
-            </h2>
+            <FormPendingOverlay message={labels.overlay} />
+            <AmountInput
+                name="principalAmount"
+                label="Valor"
+                tone={paying ? 'negative' : 'positive'}
+                errors={errors('principalAmount')}
+            />
             <div className="grid grid-cols-2 gap-3">
                 <PillSelect
                     label="Conta"
@@ -51,13 +56,6 @@ export function EntryForm({ titleId, accounts, today, paying, onSuccess }: Entry
                     options={accounts}
                     placeholder="Conta"
                     errors={errors('billingAccountId')}
-                />
-                <PillInput
-                    label="Valor principal (R$)"
-                    name="principalAmount"
-                    inputMode="decimal"
-                    placeholder="0,00"
-                    errors={errors('principalAmount')}
                 />
                 <PillInput
                     label="Data"
@@ -108,7 +106,7 @@ export function EntryForm({ titleId, accounts, today, paying, onSuccess }: Entry
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending ? 'Registrando…' : 'Registrar'}
+                    {pending ? labels.pending : labels.submit}
                 </Button>
             </div>
         </form>

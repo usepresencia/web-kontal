@@ -5,6 +5,7 @@ import {
     getTitleFormOptionsAction,
     type TitleFormOptions,
 } from '@/actions/titles';
+import { AmountInput } from '@/lib/_components/amount-input';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { FieldError, PILL_CLASS, PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { Button } from '@/lib/_components/ui/button';
@@ -62,7 +63,7 @@ function NewTransactionForm({ options, onDone }: FormProps) {
         if (ADVANCED_FIELDS.some(field => state.fieldErrors?.[field])) setAdvancedOpen(true);
     }, [state]);
 
-    const amountTone = type === 'INCOME' ? 'text-positive' : 'text-negative';
+    const amountTone = type === 'INCOME' ? 'positive' : 'negative';
 
     return (
         <form action={formAction} className="space-y-4">
@@ -98,28 +99,7 @@ function NewTransactionForm({ options, onDone }: FormProps) {
                 ))}
             </div>
 
-            <div>
-                <label
-                    htmlFor="amount"
-                    className="text-muted-foreground text-xs font-semibold tracking-wide uppercase"
-                >
-                    Valor
-                </label>
-                <div className="border-border mt-1 flex items-baseline gap-2 border-b pb-1.5">
-                    <span className={cn('font-display text-2xl font-bold', amountTone)}>R$</span>
-                    <input
-                        id="amount"
-                        name="amount"
-                        inputMode="decimal"
-                        placeholder="0,00"
-                        autoComplete="off"
-                        required
-                        aria-invalid={errors('amount') ? true : undefined}
-                        className="font-display placeholder:text-muted-foreground/40 w-full bg-transparent text-4xl font-bold outline-none"
-                    />
-                </div>
-                <FieldError errors={errors('amount')} />
-            </div>
+            <AmountInput name="amount" label="Valor" tone={amountTone} errors={errors('amount')} />
 
             <div>
                 <input
