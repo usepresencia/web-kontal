@@ -2,12 +2,11 @@
 
 import { getTitleEntriesAction, getTitlePaymentAccountsAction } from '@/actions/titles';
 import { EntryForm } from '@/lib/_components/transactions/entry-form';
-import { Button } from '@/lib/_components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/lib/_components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader } from '@/lib/_components/ui/dialog';
 import { toLocalIsoDate } from '@/lib/_utils/dates';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
-import { ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { StepTitle } from './step-title';
 import { TransactionDetailsBody } from './transaction-details-body';
 
 const COPIED_FEEDBACK_MS = 1500;
@@ -64,9 +63,11 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
         <Dialog open={title !== null} onOpenChange={open => !open && onClose()}>
             <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>
-                        {step === 'details' ? 'Detalhes da transação' : 'Baixar título'}
-                    </DialogTitle>
+                    {step === 'details' ? (
+                        <StepTitle>Detalhes da transação</StepTitle>
+                    ) : (
+                        <StepTitle onBack={() => setStep('details')}>Baixar título</StepTitle>
+                    )}
                 </DialogHeader>
                 {title && step === 'details' && (
                     <TransactionDetailsBody
@@ -80,15 +81,6 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
                 )}
                 {title && step === 'pay' && (
                     <div className="space-y-4">
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setStep('details')}
-                        >
-                            <ArrowLeft aria-hidden="true" />
-                            Voltar
-                        </Button>
                         <p className="text-foreground text-sm font-medium">{title.description}</p>
                         {accounts === null ? (
                             <p className="text-muted-foreground text-sm">Carregando…</p>
