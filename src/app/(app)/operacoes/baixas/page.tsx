@@ -2,6 +2,7 @@ import { DatePickerField } from '@/lib/_components/date-picker-field';
 import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
+import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
 import { parseIsoDate } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
 import { TITLE_TYPE_LABELS } from '@/lib/_utils/title-labels';
@@ -47,30 +48,27 @@ export default async function EntriesPage({
             <h1 className="text-2xl font-bold">Baixas</h1>
 
             <form method="get" className="flex flex-wrap items-end gap-3">
-                <div className="space-y-1 text-sm">
-                    <span className="text-muted-foreground">Pago de</span>
+                <FilterField label="Pago de">
                     <DatePickerField
                         name="paidFrom"
                         defaultValue={paidFrom ?? ''}
                         clearable
-                        className="w-44"
+                        className={`${FILTER_PILL_CLASS} w-44`}
                     />
-                </div>
-                <div className="space-y-1 text-sm">
-                    <span className="text-muted-foreground">até</span>
+                </FilterField>
+                <FilterField label="até">
                     <DatePickerField
                         name="paidTo"
                         defaultValue={paidTo ?? ''}
                         clearable
-                        className="w-44"
+                        className={`${FILTER_PILL_CLASS} w-44`}
                     />
-                </div>
-                <div className="space-y-1 text-sm">
-                    <span className="text-muted-foreground">Tipo</span>
+                </FilterField>
+                <FilterField label="Tipo">
                     <DropdownSelect
                         name="titleType"
                         defaultValue={titleType ?? ''}
-                        className="w-40"
+                        className={`${FILTER_PILL_CLASS} w-40`}
                         options={[
                             { value: '', label: 'Todos' },
                             ...Object.entries(TITLE_TYPE_LABELS).map(([value, label]) => ({
@@ -79,13 +77,12 @@ export default async function EntriesPage({
                             })),
                         ]}
                     />
-                </div>
-                <div className="space-y-1 text-sm">
-                    <span className="text-muted-foreground">Conta financeira</span>
+                </FilterField>
+                <FilterField label="Conta financeira">
                     <DropdownSelect
                         name="billingAccountId"
                         defaultValue={accountId.success ? accountId.data : ''}
-                        className="w-64"
+                        className={`${FILTER_PILL_CLASS} w-64`}
                         options={[
                             { value: '', label: 'Todas' },
                             ...financial.map(account => ({
@@ -94,7 +91,7 @@ export default async function EntriesPage({
                             })),
                         ]}
                     />
-                </div>
+                </FilterField>
                 <FilterButton />
             </form>
 

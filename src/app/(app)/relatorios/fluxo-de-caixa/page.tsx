@@ -1,4 +1,5 @@
 import { DropdownSelect } from '@/lib/_components/dropdown-select';
+import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
 import {
     Table,
     TableBody,
@@ -34,18 +35,17 @@ export default async function CashFlowPage({
         <div className="space-y-6">
             <h1 className="text-2xl font-bold">Fluxo de caixa</h1>
             <ReportFilters mode="period" start={start} end={end}>
-                <div className="space-y-1 text-sm">
-                    <span className="text-muted-foreground">Agrupar</span>
+                <FilterField label="Agrupar">
                     <DropdownSelect
                         name="groupBy"
                         defaultValue={groupBy ?? ''}
-                        className="w-48"
+                        className={`${FILTER_PILL_CLASS} w-48`}
                         options={[
                             { value: '', label: 'Sem agrupamento' },
                             ...Object.entries(GROUPS).map(([value, label]) => ({ value, label })),
                         ]}
                     />
-                </div>
+                </FilterField>
             </ReportFilters>
 
             <p className="text-sm">

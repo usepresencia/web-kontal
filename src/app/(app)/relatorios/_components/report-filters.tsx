@@ -1,5 +1,6 @@
 import { DatePickerField } from '@/lib/_components/date-picker-field';
 import { FilterButton } from '@/lib/_components/filter-button';
+import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
 import type { ReactNode } from 'react';
 
 type ReportFiltersProps = {
@@ -15,19 +16,21 @@ export function ReportFilters({ mode, start, end, children }: ReportFiltersProps
     return (
         <form method="get" className="flex flex-wrap items-end gap-3">
             {mode === 'period' && (
-                <div className="space-y-1 text-sm">
-                    <span className="text-muted-foreground">De</span>
-                    <DatePickerField name="start" defaultValue={start} className="w-44" />
-                </div>
+                <FilterField label="De">
+                    <DatePickerField
+                        name="start"
+                        defaultValue={start}
+                        className={`${FILTER_PILL_CLASS} w-44`}
+                    />
+                </FilterField>
             )}
-            <div className="space-y-1 text-sm">
-                <span className="text-muted-foreground">{mode === 'period' ? 'Até' : 'Data'}</span>
+            <FilterField label={mode === 'period' ? 'Até' : 'Data'}>
                 <DatePickerField
                     name={mode === 'period' ? 'end' : 'date'}
                     defaultValue={end}
-                    className="w-44"
+                    className={`${FILTER_PILL_CLASS} w-44`}
                 />
-            </div>
+            </FilterField>
             {children}
             <FilterButton label="Gerar" />
         </form>
