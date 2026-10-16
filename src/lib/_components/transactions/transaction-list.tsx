@@ -2,10 +2,9 @@
 
 import { cn } from '@/lib/_utils/cn';
 import { formatAmount } from '@/lib/_utils/money';
-import { initials } from '@/lib/_utils/text';
 import { TITLE_STATUS_LABELS, TITLE_TYPE_LABELS } from '@/lib/_utils/title-labels';
 import type { Title } from '@/lib/api/schemas/title';
-import { ChevronRight, Clock } from 'lucide-react';
+import { ChevronRight, Clock, CreditCard } from 'lucide-react';
 import { useState } from 'react';
 import { TransactionDialog } from './transaction-dialog';
 
@@ -27,7 +26,7 @@ export function TransactionList({ rows }: { rows: TransactionRow[] }) {
                             {index > 0 && (
                                 <div
                                     role="separator"
-                                    className="from-primary/30 mx-3 my-0.5 h-px bg-gradient-to-r from-50% to-transparent"
+                                    className="from-primary/10 mr-3 ml-12 h-px bg-gradient-to-r from-50% to-transparent"
                                 />
                             )}
                             <button
@@ -44,7 +43,7 @@ export function TransactionList({ rows }: { rows: TransactionRow[] }) {
                                             : 'bg-negative/10 text-negative',
                                     )}
                                 >
-                                    {initials(title.description)}
+                                    <CreditCard className="size-4" aria-hidden="true" />
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <p className="text-foreground truncate text-sm font-medium">

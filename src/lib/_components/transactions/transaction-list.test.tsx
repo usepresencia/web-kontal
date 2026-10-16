@@ -41,8 +41,20 @@ describe('TransactionList', () => {
         const html = renderToStaticMarkup(<TransactionList rows={rows(3)} />);
         expect(separators(html)).toBe(2);
         expect(html).toContain('bg-gradient-to-r');
-        expect(html).toContain('from-primary/30');
+        expect(html).toContain('from-primary/10');
         expect(html).toContain('to-transparent');
+    });
+
+    it('começa o divisor no início do título, alinhado depois do ícone', () => {
+        const html = renderToStaticMarkup(<TransactionList rows={rows(2)} />);
+        const separator = html.match(/<div role="separator"[^>]*>/)?.[0] ?? '';
+        expect(separator).toContain('ml-12');
+    });
+
+    it('mostra o ícone de pagamento no lugar das iniciais', () => {
+        const html = renderToStaticMarkup(<TransactionList rows={rows(2)} />);
+        expect(html).toContain('lucide-credit-card');
+        expect(html).not.toContain('>CO<');
     });
 
     it('não põe divisor numa lista de um item só', () => {
