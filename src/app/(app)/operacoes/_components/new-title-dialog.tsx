@@ -20,7 +20,6 @@ import { entryLabels } from '@/lib/_utils/title-labels';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { OpeningTitleForm } from './opening-title-form';
 import { TitleForm } from './title-form';
 
 type NewTitleDialogProps = {
@@ -85,13 +84,6 @@ export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
                             </Button>
                         }
                     />
-                ) : opening ? (
-                    <OpeningTitleForm
-                        action={createTitleAction}
-                        type={type}
-                        presets={options.presets}
-                        onSuccess={() => setOpen(false)}
-                    />
                 ) : (
                     <TitleForm
                         action={createTitleAction}
@@ -99,6 +91,7 @@ export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
                         presets={options.presets}
                         destinationAccounts={options.destinationAccounts}
                         financialAccounts={options.financialAccounts}
+                        opening={opening}
                         onSuccess={() => setOpen(false)}
                     />
                 )}
