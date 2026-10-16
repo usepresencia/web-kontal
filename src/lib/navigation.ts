@@ -3,7 +3,6 @@ import {
     ArrowUpCircle,
     BookOpen,
     BookPlus,
-    Building2,
     Coins,
     Home,
     Landmark,
@@ -15,6 +14,7 @@ import {
     Repeat,
     Scale,
     SlidersHorizontal,
+    Users,
     type LucideIcon,
 } from 'lucide-react';
 
@@ -59,7 +59,11 @@ export const NAV_SECTIONS: NavSection[] = [
     {
         title: 'Cadastros',
         items: [
-            { title: 'Empresas', href: '/plataforma/empresas', icon: Building2 },
+            {
+                title: 'Clientes e fornecedores',
+                href: '/cadastros/clientes-fornecedores',
+                icon: Users,
+            },
             { title: 'Plano de contas', href: '/cadastros/plano-de-contas', icon: ListTree },
             { title: 'Presets', href: '/cadastros/presets', icon: SlidersHorizontal },
         ],
