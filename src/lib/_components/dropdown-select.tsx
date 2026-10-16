@@ -71,7 +71,7 @@ export function DropdownSelect({
                     </button>
                 </PopoverTrigger>
                 <PopoverContent
-                    className="max-h-60 min-w-(--radix-popover-trigger-width) overflow-y-auto py-1"
+                    className="max-h-60 min-w-(--radix-popover-trigger-width) space-y-0.5 overflow-y-auto p-1.5"
                     role="listbox"
                 >
                     {options.map(option => (
@@ -81,7 +81,7 @@ export function DropdownSelect({
                             role="option"
                             aria-selected={option.value === current}
                             onClick={() => choose(option.value)}
-                            className="hover:bg-muted flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm"
+                            className="hover:bg-muted/50 flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2 text-left text-sm"
                         >
                             <span className="truncate">{option.label}</span>
                             {option.value === current && (

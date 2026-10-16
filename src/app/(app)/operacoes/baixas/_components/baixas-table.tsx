@@ -73,6 +73,7 @@ export function BaixasTable({ page }: { page: Page<TitleEntry> }) {
                 pageSize={page.pageSize}
                 total={page.total}
                 onPageChange={pagination.onPageChange}
+                onPageSizeChange={pagination.onPageSizeChange}
             />
         </div>
     );

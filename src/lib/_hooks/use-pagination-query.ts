@@ -23,5 +23,6 @@ export function usePaginationQuery() {
 
     return {
         onPageChange: (page: number) => update({ page: String(page) }),
+        onPageSizeChange: (pageSize: number) => update({ pageSize: String(pageSize), page: '1' }),
     };
 }
