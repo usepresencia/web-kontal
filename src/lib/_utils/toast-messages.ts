@@ -27,6 +27,12 @@ export const SUCCESS = {
     presetCreated: done('Preset criado', 'O preset foi criado com sucesso.'),
     presetUpdated: done('Preset atualizado', 'O preset foi atualizado com sucesso.'),
     presetDeleted: done('Preset excluído', 'O preset foi excluído com sucesso.'),
+    partyCreated: done('Cadastro criado', 'O cliente ou fornecedor foi criado com sucesso.'),
+    partyUpdated: done(
+        'Cadastro atualizado',
+        'O cliente ou fornecedor foi atualizado com sucesso.',
+    ),
+    partyDeleted: done('Cadastro excluído', 'O cliente ou fornecedor foi excluído com sucesso.'),
     companyCreated: done('Empresa criada', 'A empresa foi criada com sucesso.'),
     companyUpdated: done('Empresa atualizada', 'A empresa foi atualizada com sucesso.'),
     companyDeactivated: done('Empresa desativada', 'A empresa foi desativada com sucesso.'),

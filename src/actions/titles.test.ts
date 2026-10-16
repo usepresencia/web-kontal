@@ -206,6 +206,7 @@ describe('createTitleAction', () => {
         const data = new FormData();
         const fields = {
             type: 'EXPENSE',
+            partyId: '5b2c3d4e-6a7d-4e7f-8a9b-0c1d2e3f4a5b',
             presetId: '3f1c2b4e-5a6d-4e7f-8a9b-0c1d2e3f4a5b',
             description: 'Aluguel',
             amount: '1.234,50',
@@ -238,6 +239,7 @@ describe('createTitleAction com pagamento ou recebimento na hora', () => {
         const data = new FormData();
         const fields = {
             type: 'INCOME',
+            partyId: '5b2c3d4e-6a7d-4e7f-8a9b-0c1d2e3f4a5b',
             presetId: '3f1c2b4e-5a6d-4e7f-8a9b-0c1d2e3f4a5b',
             description: 'Venda',
             amount: '500,00',

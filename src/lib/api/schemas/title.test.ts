@@ -8,13 +8,31 @@ import {
 
 const PRESET = '3f1c2b4e-5a6d-4e7f-8a9b-0c1d2e3f4a5b';
 
+const PARTY = '5b2c3d4e-6a7d-4e7f-8a9b-0c1d2e3f4a5b';
+
 const base = {
+    partyId: PARTY,
     presetId: PRESET,
     type: 'EXPENSE',
     description: ' Aluguel ',
     amount: '1.234,50',
     expirationDate: '2026-11-10',
 };
+
+describe('titleCreateSchema: contraparte e preset', () => {
+    it('exige o cliente ou fornecedor', () => {
+        const { partyId: _partyId, ...withoutParty } = base;
+        expect(titleCreateSchema.safeParse(withoutParty).success).toBe(false);
+        expect(titleCreateSchema.safeParse({ ...base, partyId: 'x' }).success).toBe(false);
+    });
+
+    it('aceita o preset vazio ou ausente, para valer o padrão da contraparte', () => {
+        expect(titleCreateSchema.parse({ ...base, presetId: '' }).presetId).toBeUndefined();
+        const { presetId: _presetId, ...withoutPreset } = base;
+        expect(titleCreateSchema.parse(withoutPreset).presetId).toBeUndefined();
+        expect(titleCreateSchema.safeParse({ ...base, presetId: 'x' }).success).toBe(false);
+    });
+});
 
 describe('titleCreateSchema', () => {
     it('normaliza o valor e apara a descrição', () => {

@@ -15,6 +15,8 @@ const title = (id: string, description: string): Title => ({
     id,
     presetId: 'p',
     presetName: 'Padrão',
+    partyId: 'pt1',
+    partyName: 'Copel',
     seriesId: null,
     seriesIndex: null,
     type: 'EXPENSE',
