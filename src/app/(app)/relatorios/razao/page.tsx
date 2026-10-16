@@ -1,5 +1,6 @@
 import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { EmptyState } from '@/lib/_components/empty-state';
+import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
 import {
     Table,
     TableBody,
@@ -47,19 +48,18 @@ export default async function AccountLedgerPage({
         <div className="space-y-6">
             <h1 className="text-2xl font-bold">Razão da conta</h1>
             <ReportFilters mode="period" start={start} end={end}>
-                <div className="space-y-1 text-sm">
-                    <span className="text-muted-foreground">Conta</span>
+                <FilterField label="Conta">
                     <DropdownSelect
                         name="accountId"
                         defaultValue={accountId.success ? accountId.data : ''}
                         placeholder="Selecione"
-                        className="w-72"
+                        className={`${FILTER_PILL_CLASS} w-72`}
                         options={options.map(account => ({
                             value: account.id,
                             label: `${account.code} ${account.name}`,
                         }))}
                     />
-                </div>
+                </FilterField>
             </ReportFilters>
 
             {!ledger ? (
