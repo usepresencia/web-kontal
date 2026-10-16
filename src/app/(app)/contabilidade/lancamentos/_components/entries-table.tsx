@@ -77,6 +77,7 @@ export function EntriesTable({ page }: { page: Page<JournalDetail> }) {
                 total={page.total}
                 onPageChange={pagination.onPageChange}
                 onPageSizeChange={pagination.onPageSizeChange}
+                pageSizeLabel="Lançamentos por página:"
             />
         </div>
     );

@@ -68,6 +68,7 @@ export function PlansTable({ page }: { page: Page<BillingPlan> }) {
                 total={page.total}
                 onPageChange={pagination.onPageChange}
                 onPageSizeChange={pagination.onPageSizeChange}
+                pageSizeLabel="Planos por página:"
             />
 
             <ConfirmationDialog
