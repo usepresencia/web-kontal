@@ -1,6 +1,7 @@
 'use server';
 
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { apiFetch } from '@/lib/api/client';
 import { stateFromApiError } from '@/lib/api/form-state';
 import { closePeriodSchema } from '@/lib/api/schemas/period-closing';
@@ -20,7 +21,7 @@ export async function closePeriodAction(_prev: FormState, formData: FormData): P
         return stateFromApiError(error);
     }
     revalidatePath(PATH);
-    return { ok: true, message: 'Período fechado.' };
+    return { ok: true, ...SUCCESS.periodClosed };
 }
 
 /** Reabre o último período fechado, estornando a apuração quando houver. */

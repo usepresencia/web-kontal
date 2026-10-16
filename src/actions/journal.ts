@@ -1,6 +1,7 @@
 'use server';
 
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
 import { stateFromApiError } from '@/lib/api/form-state';
@@ -31,7 +32,7 @@ export async function createManualEntryAction(
         return stateFromApiError(error);
     }
     revalidatePath('/contabilidade/lancamentos');
-    return { ok: true, message: 'Lançamento registrado.' };
+    return { ok: true, ...SUCCESS.entryCreated };
 }
 
 /** Estorna um lançamento manual, gerando o lançamento inverso. */
@@ -54,7 +55,7 @@ export async function reverseEntryAction(
         return stateFromApiError(error);
     }
     revalidatePath('/contabilidade/lancamentos');
-    return { ok: true, message: 'Lançamento estornado.' };
+    return { ok: true, ...SUCCESS.entryReversed };
 }
 
 /** Busca um lançamento contábil com as linhas, para os detalhes; `null` se não existir. */

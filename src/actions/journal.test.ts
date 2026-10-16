@@ -32,7 +32,11 @@ describe('createManualEntryAction', () => {
     it('registra o lançamento e devolve ok, sem redirecionar, para o modal fechar', async () => {
         apiFetch.mockResolvedValue({ id: ENTRY_ID });
         const result = await createManualEntryAction({ ok: false }, form());
-        expect(result).toEqual({ ok: true, message: 'Lançamento registrado.' });
+        expect(result).toEqual({
+            ok: true,
+            title: 'Lançamento registrado',
+            message: 'O lançamento foi registrado com sucesso.',
+        });
     });
 });
 
@@ -40,7 +44,11 @@ describe('reverseEntryAction', () => {
     it('estorna e devolve ok, sem redirecionar', async () => {
         apiFetch.mockResolvedValue({ id: ENTRY_ID });
         const result = await reverseEntryAction(ENTRY_ID, { ok: false }, new FormData());
-        expect(result).toEqual({ ok: true, message: 'Lançamento estornado.' });
+        expect(result).toEqual({
+            ok: true,
+            title: 'Lançamento estornado',
+            message: 'O lançamento foi estornado com sucesso.',
+        });
     });
 });
 

@@ -2,6 +2,7 @@
 
 import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { apiFetch } from '@/lib/api/client';
 import { stateFromApiError } from '@/lib/api/form-state';
 import {
@@ -32,7 +33,7 @@ export async function createPlanAction(_prev: FormState, formData: FormData): Pr
         return stateFromApiError(error);
     }
     revalidatePath('/configuracoes/planos');
-    await flash('Plano criado.');
+    await flash(SUCCESS.planCreated);
     redirect(`/configuracoes/planos/${planId}`);
 }
 
@@ -55,7 +56,7 @@ export async function updatePlanAction(
         return stateFromApiError(error);
     }
     revalidatePath('/configuracoes/planos');
-    return { ok: true, message: 'Plano atualizado.' };
+    return { ok: true, ...SUCCESS.planUpdated };
 }
 
 /** Exclui um plano de contas. */
@@ -89,7 +90,7 @@ export async function createAccountAction(
         return stateFromApiError(error);
     }
     revalidatePath(`/configuracoes/planos/${planId}`);
-    return { ok: true, message: 'Conta criada.' };
+    return { ok: true, ...SUCCESS.accountCreated };
 }
 
 /** Atualiza nome, tipo, categorias e status de uma conta. */
@@ -112,7 +113,7 @@ export async function updateAccountAction(
         return stateFromApiError(error);
     }
     revalidatePath(`/configuracoes/planos/${planId}`);
-    return { ok: true, message: 'Conta atualizada.' };
+    return { ok: true, ...SUCCESS.accountUpdated };
 }
 
 /** Exclui uma conta do plano. */

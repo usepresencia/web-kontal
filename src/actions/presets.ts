@@ -2,6 +2,7 @@
 
 import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { apiFetch } from '@/lib/api/client';
 import { stateFromApiError } from '@/lib/api/form-state';
 import { presetCreateSchema, presetSchema, presetUpdateSchema } from '@/lib/api/schemas/preset';
@@ -23,7 +24,7 @@ export async function createPresetAction(_prev: FormState, formData: FormData): 
         return stateFromApiError(error);
     }
     revalidatePath('/configuracoes/presets');
-    await flash('Preset criado.');
+    await flash(SUCCESS.presetCreated);
     redirect('/configuracoes/presets');
 }
 
@@ -43,7 +44,7 @@ export async function updatePresetAction(
         return stateFromApiError(error);
     }
     revalidatePath('/configuracoes/presets');
-    return { ok: true, message: 'Preset atualizado.' };
+    return { ok: true, ...SUCCESS.presetUpdated };
 }
 
 /** Exclui um preset. */

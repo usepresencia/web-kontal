@@ -276,7 +276,8 @@ describe('createTitleAction com pagamento ou recebimento na hora', () => {
             .mockRejectedValueOnce(new ApiError(422, 'INVALID', 'Conta inválida'));
         const result = await createTitleAction({ ok: false }, form());
         expect(result.ok).toBe(false);
-        expect(result.message).toContain('Título criado, mas a transação não foi registrada');
+        expect(result.title).toBe('Título criado, sem transação');
+        expect(result.message).toContain('a transação não foi registrada');
     });
 
     it('exige conta, forma e data quando marcado', async () => {

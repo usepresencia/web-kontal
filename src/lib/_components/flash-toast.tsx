@@ -10,10 +10,10 @@ export function FlashToast() {
     const pathname = usePathname();
 
     useEffect(() => {
-        const message = readFlash(document.cookie);
-        if (!message) return;
+        const toast = readFlash(document.cookie);
+        if (!toast) return;
         document.cookie = `${FLASH_COOKIE}=; path=/; max-age=0`;
-        notify('success', message);
+        notify('success', toast.message, toast.title);
     }, [pathname]);
 
     return null;

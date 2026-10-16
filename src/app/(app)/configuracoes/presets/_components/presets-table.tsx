@@ -17,6 +17,7 @@ import {
 import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
 import { notifyResult } from '@/lib/_utils/notify';
 import type { Page } from '@/lib/_utils/pagination';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import type { Preset } from '@/lib/api/schemas/preset';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -87,7 +88,7 @@ export function PresetsTable({ page }: { page: Page<Preset> }) {
                         () => deletePresetAction(toDelete.id),
                         'Excluindo preset…',
                     );
-                    notifyResult(result, 'Preset excluído.', 'Não foi possível excluir.');
+                    notifyResult(result, SUCCESS.presetDeleted, 'Não foi possível excluir.');
                     setToDelete(null);
                 }}
             />

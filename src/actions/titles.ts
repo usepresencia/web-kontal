@@ -2,6 +2,7 @@
 
 import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
 import { stateFromApiError } from '@/lib/api/form-state';
@@ -72,7 +73,7 @@ export async function createTitleAction(_prev: FormState, formData: FormData): P
 
     let result: FormState = {
         ok: true,
-        message: repeat === 'NONE' ? 'Título criado.' : 'Parcelamento criado.',
+        ...(repeat === 'NONE' ? SUCCESS.titleCreated : SUCCESS.seriesCreated),
     };
     if (payNow && created) {
         try {
@@ -89,7 +90,8 @@ export async function createTitleAction(_prev: FormState, formData: FormData): P
             const failure = stateFromApiError(error);
             result = {
                 ok: false,
-                message: `Título criado, mas a transação não foi registrada: ${failure.message ?? 'erro desconhecido'}`,
+                title: 'Título criado, sem transação',
+                message: `O título foi criado, mas a transação não foi registrada: ${failure.message ?? 'erro desconhecido'}`,
             };
         }
     }
@@ -115,7 +117,7 @@ export async function updateTitleAction(
         return stateFromApiError(error);
     }
     revalidatePath(`/operacoes/titulos/${titleId}`);
-    return { ok: true, message: 'Título atualizado.' };
+    return { ok: true, ...SUCCESS.titleUpdated };
 }
 
 /** Exclui um título e volta à lista do tipo dele. */
@@ -130,7 +132,7 @@ export async function deleteTitleAction(
         return stateFromApiError(error);
     }
     revalidatePath(LIST_PATHS[type]);
-    await flash('Título excluído.');
+    await flash(SUCCESS.titleDeleted);
     redirect(LIST_PATHS[type]);
 }
 
@@ -156,7 +158,7 @@ export async function createEntryAction(
     revalidatePath(HOME_PATH);
     revalidatePath(ENTRIES_PATH);
     Object.values(LIST_PATHS).forEach(path => revalidatePath(path));
-    return { ok: true, message: 'Transação registrada.' };
+    return { ok: true, ...SUCCESS.transactionCreated };
 }
 
 /** Dá baixa no saldo em aberto sem pagamento (perda). */
@@ -178,7 +180,7 @@ export async function writeOffTitleAction(
         return stateFromApiError(error);
     }
     revalidatePath(`/operacoes/titulos/${titleId}`);
-    return { ok: true, message: 'Baixa por perda registrada.' };
+    return { ok: true, ...SUCCESS.writeOff };
 }
 
 /** Exclui uma baixa do título. */
@@ -224,7 +226,7 @@ export async function extendSeriesAction(
     }
     revalidatePath('/operacoes/series');
     Object.values(LIST_PATHS).forEach(path => revalidatePath(path));
-    return { ok: true, message: 'Parcelamento estendido.' };
+    return { ok: true, ...SUCCESS.seriesExtended };
 }
 
 /** Cancela um parcelamento, removendo as ocorrências ainda sem baixa. */
@@ -236,7 +238,7 @@ export async function cancelSeriesAction(seriesId: string): Promise<FormState> {
         return stateFromApiError(error);
     }
     revalidatePath('/operacoes/series');
-    await flash('Parcelamento cancelado.');
+    await flash(SUCCESS.seriesCancelled);
     redirect('/operacoes/series');
 }
 

@@ -21,6 +21,7 @@ import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import { formatAmount } from '@/lib/_utils/money';
 import { notify, notifyResult } from '@/lib/_utils/notify';
 import { PAYMENT_METHOD_LABELS, formatDate } from '@/lib/_utils/title-labels';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
 import { useActionState, useState } from 'react';
 
@@ -92,7 +93,7 @@ export function EntriesTable({ titleId, entries }: { titleId: string; entries: T
                         () => deleteEntryAction(titleId, toDelete.id),
                         'Excluindo transação…',
                     );
-                    notifyResult(result, 'Transação excluída.', 'Não foi possível excluir.');
+                    notifyResult(result, SUCCESS.transactionDeleted, 'Não foi possível excluir.');
                     setToDelete(null);
                 }}
             />
