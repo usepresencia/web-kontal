@@ -30,6 +30,7 @@ const INVALID_ID: FormState = { ok: false, message: 'Identificador inválido.' }
 const isUuid = (value: string) => z.uuid().safeParse(value).success;
 
 const HOME_PATH = '/home';
+const ENTRIES_PATH = '/operacoes/baixas';
 
 const LIST_PATHS = { EXPENSE: '/operacoes/pagar', INCOME: '/operacoes/receber' } as const;
 
@@ -91,6 +92,7 @@ export async function createTitleAction(_prev: FormState, formData: FormData): P
     }
     revalidatePath(LIST_PATHS[title.type]);
     revalidatePath(HOME_PATH);
+    if (payNow) revalidatePath(ENTRIES_PATH);
     return result;
 }
 
@@ -149,6 +151,7 @@ export async function createEntryAction(
     }
     revalidatePath(`/operacoes/titulos/${titleId}`);
     revalidatePath(HOME_PATH);
+    revalidatePath(ENTRIES_PATH);
     Object.values(LIST_PATHS).forEach(path => revalidatePath(path));
     return { ok: true, message: 'Baixa registrada.' };
 }
