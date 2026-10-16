@@ -49,12 +49,12 @@ export default async function EntriesPage({
         <div className="space-y-6">
             <header className="flex items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold">Baixas</h1>
+                    <h1 className="text-2xl font-bold">Transações</h1>
                     <p className="text-muted-foreground text-sm">
                         Acompanhe os pagamentos e recebimentos registrados
                     </p>
                 </div>
-                <NewTransactionDialog label="Nova baixa" appearance="default" />
+                <NewTransactionDialog label="Nova transação" appearance="default" />
             </header>
 
             <FilterForm className="flex flex-wrap items-end gap-3">
@@ -106,7 +106,7 @@ export default async function EntriesPage({
             </FilterForm>
 
             {entries.items.length === 0 ? (
-                <EmptyState title="Nenhuma baixa encontrada" />
+                <EmptyState title="Nenhuma transação encontrada" />
             ) : (
                 <BaixasTable page={entries} />
             )}

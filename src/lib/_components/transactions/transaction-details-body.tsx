@@ -107,11 +107,11 @@ export function TransactionDetailsBody({
             </dl>
 
             <section className="space-y-2">
-                <h3 className="text-foreground text-sm font-semibold">Baixas</h3>
+                <h3 className="text-foreground text-sm font-semibold">Transações</h3>
                 {entries === null ? (
                     <p className="text-muted-foreground text-sm">Carregando…</p>
                 ) : entries.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">Nenhuma baixa registrada.</p>
+                    <p className="text-muted-foreground text-sm">Nenhuma transação registrada.</p>
                 ) : (
                     <ul className="space-y-1 py-1">
                         {entries.map((entry, index) => (

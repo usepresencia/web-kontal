@@ -2,7 +2,7 @@
 
 import { getTitleEntriesAction } from '@/actions/titles';
 import { useBusyFlag } from '@/lib/_components/busy-provider';
-import { Dialog, DialogContent, DialogHeader } from '@/lib/_components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, MODAL_CLASS } from '@/lib/_components/ui/dialog';
 import { entryLabels } from '@/lib/_utils/title-labels';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
 import { useEffect, useState } from 'react';
@@ -56,7 +56,7 @@ export function TransactionDialog({ title, ago, onClose, onBack }: TransactionDi
 
     return (
         <Dialog open={title !== null} onOpenChange={open => !open && onClose()}>
-            <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+            <DialogContent className={MODAL_CLASS}>
                 <DialogHeader>
                     {step === 'details' ? (
                         <StepTitle onBack={onBack}>Detalhes da transação</StepTitle>

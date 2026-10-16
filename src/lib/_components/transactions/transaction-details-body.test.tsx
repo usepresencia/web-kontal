@@ -95,7 +95,7 @@ describe('TransactionDetailsBody', () => {
     });
 
     it('avisa quando não há baixas', () => {
-        expect(render([])).toContain('Nenhuma baixa registrada');
+        expect(render([])).toContain('Nenhuma transação registrada');
     });
 
     it('lista as baixas com data, forma e valor', () => {

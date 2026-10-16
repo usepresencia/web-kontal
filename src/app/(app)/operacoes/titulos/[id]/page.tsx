@@ -65,7 +65,7 @@ export default async function TitlePage({ params }: { params: Promise<{ id: stri
             <TitleEditForm title={title} />
 
             <section className="space-y-3">
-                <h2 className="font-display text-lg font-semibold">Baixas</h2>
+                <h2 className="font-display text-lg font-semibold">Transações</h2>
                 <EntriesTable titleId={id} entries={entries.items} />
             </section>
 

@@ -30,7 +30,7 @@ export function EntriesTable({ titleId, entries }: { titleId: string; entries: T
     const [toDelete, setToDelete] = useState<TitleEntry | null>(null);
 
     if (entries.length === 0) {
-        return <p className="text-muted-foreground text-sm">Nenhuma baixa registrada.</p>;
+        return <p className="text-muted-foreground text-sm">Nenhuma transação registrada.</p>;
     }
 
     return (
@@ -82,17 +82,17 @@ export function EntriesTable({ titleId, entries }: { titleId: string; entries: T
             <ConfirmationDialog
                 open={toDelete !== null}
                 onOpenChange={open => !open && setToDelete(null)}
-                title="Excluir baixa"
-                description="Excluir esta baixa? O saldo do título volta a ficar em aberto. Baixas em período fechado não podem ser excluídas."
+                title="Excluir transação"
+                description="Excluir esta transação? O saldo do título volta a ficar em aberto. Transações em período fechado não podem ser excluídas."
                 confirmLabel="Excluir"
                 variant="destructive"
                 onConfirm={async () => {
                     if (!toDelete) return;
                     const result = await run(
                         () => deleteEntryAction(titleId, toDelete.id),
-                        'Excluindo baixa…',
+                        'Excluindo transação…',
                     );
-                    notifyResult(result, 'Baixa excluída.', 'Não foi possível excluir.');
+                    notifyResult(result, 'Transação excluída.', 'Não foi possível excluir.');
                     setToDelete(null);
                 }}
             />
@@ -152,7 +152,7 @@ export function DeleteTitleButton({ title }: { title: Title }) {
                 open={open}
                 onOpenChange={setOpen}
                 title="Excluir título"
-                description={`Excluir "${title.description}"? Títulos com baixas ou em período fechado não podem ser excluídos.`}
+                description={`Excluir "${title.description}"? Títulos com transações ou em período fechado não podem ser excluídos.`}
                 confirmLabel="Excluir"
                 variant="destructive"
                 onConfirm={async () => {

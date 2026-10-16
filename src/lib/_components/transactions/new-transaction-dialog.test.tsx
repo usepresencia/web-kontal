@@ -25,14 +25,14 @@ describe('NewTransactionDialog', () => {
         expect(html.indexOf('lucide-plus')).toBeLessThan(html.indexOf('Nova transação'));
     });
 
-    it('aceita outro rótulo, como "Nova baixa" na lista de baixas', () => {
-        const html = render('Nova baixa');
-        expect(html).toContain('Nova baixa');
+    it('aceita outro rótulo', () => {
+        const html = render('Outro rótulo');
+        expect(html).toContain('Outro rótulo');
         expect(html).not.toContain('Nova transação');
     });
 
     it('usa a pílula verde na home e o botão escuro padrão nas listas', () => {
         expect(render()).toContain('bg-accent');
-        expect(render('Nova baixa', 'default')).not.toContain('bg-accent');
+        expect(render('Outro rótulo', 'default')).not.toContain('bg-accent');
     });
 });
