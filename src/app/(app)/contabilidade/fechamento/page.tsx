@@ -1,6 +1,5 @@
 import { EmptyState } from '@/lib/_components/empty-state';
 import { nextMonth } from '@/lib/_utils/dates';
-import { formatDate } from '@/lib/_utils/title-labels';
 import { apiFetch } from '@/lib/api/client';
 import { accountPageSchema } from '@/lib/api/schemas/billing';
 import { periodClosingsSchema } from '@/lib/api/schemas/reports';
@@ -31,9 +30,7 @@ export default async function PeriodClosingPage() {
                 <div>
                     <h1 className="text-2xl font-bold">Fechamento de período</h1>
                     <p className="text-muted-foreground text-sm">
-                        {closings.closedThrough
-                            ? `Lançamentos até ${formatDate(closings.closedThrough)} estão travados.`
-                            : 'Nenhum período fechado.'}
+                        Gerencie os fechamentos e trave os lançamentos dos meses já conferidos
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -43,7 +40,10 @@ export default async function PeriodClosingPage() {
             </header>
 
             {closings.items.length === 0 ? (
-                <EmptyState title="Nenhum fechamento" />
+                <EmptyState
+                    title="Nenhum fechamento"
+                    description="Feche um mês para travar os lançamentos até o fim dele."
+                />
             ) : (
                 <ClosingsList items={closings.items} />
             )}
