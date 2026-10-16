@@ -6,6 +6,7 @@ import {
     type TitleFormOptions,
 } from '@/actions/titles';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
+import { FieldError, PILL_CLASS, PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { Button } from '@/lib/_components/ui/button';
 import {
     Dialog,
@@ -22,7 +23,6 @@ import { ArrowDownCircle, ArrowUpCircle, ChevronDown, Plus } from 'lucide-react'
 import Link from 'next/link';
 import { useActionState, useEffect, useState } from 'react';
 import { AdvancedFields } from './new-transaction-advanced';
-import { FieldError, PILL_CLASS, PillInput, PillSelect } from './pill-fields';
 
 type TitleType = 'INCOME' | 'EXPENSE';
 

@@ -1,8 +1,8 @@
 'use client';
 
+import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { SERIES_FREQUENCY_LABELS, SERIES_KIND_LABELS } from '@/lib/_utils/title-labels';
 import { useState } from 'react';
-import { PillInput, PillSelect } from './pill-fields';
 
 type Option = { value: string; label: string };
 
