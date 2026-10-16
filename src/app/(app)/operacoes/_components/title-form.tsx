@@ -26,6 +26,8 @@ type TitleFormProps = {
     destinationAccounts?: Option[];
     /** Contas financeiras onde a baixa na hora é registrada. */
     financialAccounts?: Option[];
+    /** Cadastra o saldo ou a despesa inicial (título de implantação) no lugar de um título comum. */
+    opening?: boolean;
     /** Chamado depois que o título é criado. */
     onSuccess?: () => void;
 };
@@ -40,13 +42,14 @@ const REPEAT_OPTIONS: Option[] = [
     ...toOptions(SERIES_KIND_LABELS),
 ];
 
-/** Cadastro de título nos campos em pílula, com opção de parcelamento ou recorrência. */
+/** Cadastro de título nos campos em pílula: com parcelamento, recorrência e baixa na hora, ou como saldo/despesa inicial. */
 export function TitleForm({
     action,
     type,
     presets,
     destinationAccounts = [],
     financialAccounts = [],
+    opening = false,
     onSuccess,
 }: TitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
@@ -59,7 +62,8 @@ export function TitleForm({
     const [repeat, setRepeat] = useState('NONE');
     const [frequency, setFrequency] = useState('');
     const labels = entryLabels(type);
-    const canPayNow = repeat === 'NONE' && financialAccounts.length > 0;
+    const initialLabel = labels.opening.toLowerCase();
+    const canPayNow = !opening && repeat === 'NONE' && financialAccounts.length > 0;
     const errors = (field: string) => state.fieldErrors?.[field];
 
     useEffect(() => {
@@ -68,8 +72,11 @@ export function TitleForm({
 
     return (
         <form action={formAction} className="space-y-4">
-            <FormPendingOverlay message="Salvando título…" />
+            <FormPendingOverlay
+                message={opening ? `Salvando ${initialLabel}…` : 'Salvando título…'}
+            />
             <input type="hidden" name="type" value={type} />
+            {opening && <input type="hidden" name="isOpening" value="true" />}
 
             <AmountInput
                 name="amount"
@@ -102,13 +109,32 @@ export function TitleForm({
                     type="date"
                     errors={errors('expirationDate')}
                 />
-                <PillInput
-                    className={FILTER_PILL_CLASS}
-                    label="Emissão (opcional)"
-                    name="issueDate"
-                    type="date"
-                    errors={errors('issueDate')}
-                />
+                {opening ? (
+                    <>
+                        <PillInput
+                            className={FILTER_PILL_CLASS}
+                            label="Data de implantação"
+                            name="openingDate"
+                            type="date"
+                            errors={errors('openingDate')}
+                        />
+                        <PillInput
+                            className={FILTER_PILL_CLASS}
+                            label="Já baixado (R$, opcional)"
+                            name="settledAmount"
+                            inputMode="decimal"
+                            errors={errors('settledAmount')}
+                        />
+                    </>
+                ) : (
+                    <PillInput
+                        className={FILTER_PILL_CLASS}
+                        label="Emissão (opcional)"
+                        name="issueDate"
+                        type="date"
+                        errors={errors('issueDate')}
+                    />
+                )}
                 <PillInput
                     className={FILTER_PILL_CLASS}
                     label="Juros mensais"
@@ -121,7 +147,7 @@ export function TitleForm({
                     suffix="%"
                     errors={errors('feesPercentageMonthly')}
                 />
-                {type === 'EXPENSE' && destinationAccounts.length > 0 && (
+                {!opening && type === 'EXPENSE' && destinationAccounts.length > 0 && (
                     <PillSelect
                         className={FILTER_PILL_CLASS}
                         label="Conta de destino"
@@ -135,44 +161,50 @@ export function TitleForm({
                         errors={errors('destinationAccountId')}
                     />
                 )}
-                <PillSelect
-                    className={FILTER_PILL_CLASS}
-                    label="Repetição"
-                    name="repeat"
-                    value={repeat}
-                    onChange={next => setRepeat(next || 'NONE')}
-                    options={REPEAT_OPTIONS}
-                    errors={errors('repeat')}
-                />
-                {repeat !== 'NONE' && (
+                {!opening && (
                     <>
                         <PillSelect
                             className={FILTER_PILL_CLASS}
-                            label="Frequência"
-                            name="frequency"
-                            value={frequency}
-                            onChange={setFrequency}
-                            options={toOptions(SERIES_FREQUENCY_LABELS)}
-                            allowEmpty={repeat === 'INSTALLMENT'}
-                            emptyLabel="Mensal (padrão)"
-                            placeholder={repeat === 'INSTALLMENT' ? 'Mensal (padrão)' : 'Selecione'}
-                            errors={errors('frequency')}
+                            label="Repetição"
+                            name="repeat"
+                            value={repeat}
+                            onChange={next => setRepeat(next || 'NONE')}
+                            options={REPEAT_OPTIONS}
+                            errors={errors('repeat')}
                         />
-                        <PillInput
-                            className={FILTER_PILL_CLASS}
-                            label="Quantidade"
-                            name="count"
-                            type="number"
-                            min={1}
-                            errors={errors('count')}
-                        />
-                        <PillInput
-                            className={FILTER_PILL_CLASS}
-                            label="Ou data final"
-                            name="until"
-                            type="date"
-                            errors={errors('until')}
-                        />
+                        {repeat !== 'NONE' && (
+                            <>
+                                <PillSelect
+                                    className={FILTER_PILL_CLASS}
+                                    label="Frequência"
+                                    name="frequency"
+                                    value={frequency}
+                                    onChange={setFrequency}
+                                    options={toOptions(SERIES_FREQUENCY_LABELS)}
+                                    allowEmpty={repeat === 'INSTALLMENT'}
+                                    emptyLabel="Mensal (padrão)"
+                                    placeholder={
+                                        repeat === 'INSTALLMENT' ? 'Mensal (padrão)' : 'Selecione'
+                                    }
+                                    errors={errors('frequency')}
+                                />
+                                <PillInput
+                                    className={FILTER_PILL_CLASS}
+                                    label="Quantidade"
+                                    name="count"
+                                    type="number"
+                                    min={1}
+                                    errors={errors('count')}
+                                />
+                                <PillInput
+                                    className={FILTER_PILL_CLASS}
+                                    label="Ou data final"
+                                    name="until"
+                                    type="date"
+                                    errors={errors('until')}
+                                />
+                            </>
+                        )}
                     </>
                 )}
             </div>
@@ -227,15 +259,19 @@ export function TitleForm({
 
             <div className="flex justify-end">
                 <ConfirmSubmitButton
-                    confirmTitle="Criar título"
+                    confirmTitle={opening ? `Registrar ${initialLabel}` : 'Criar título'}
                     confirmDescription={
-                        payNow ? `${labels.now} e cadastrar este título?` : 'Cadastrar este título?'
+                        opening
+                            ? `Registrar ${initialLabel} deste título?`
+                            : payNow
+                              ? `${labels.now} e cadastrar este título?`
+                              : 'Cadastrar este título?'
                     }
-                    confirmLabel="Criar"
+                    confirmLabel={opening ? 'Registrar' : 'Criar'}
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending ? 'Salvando…' : 'Criar título'}
+                    {pending ? 'Salvando…' : opening ? `Registrar ${initialLabel}` : 'Criar título'}
                 </ConfirmSubmitButton>
             </div>
         </form>

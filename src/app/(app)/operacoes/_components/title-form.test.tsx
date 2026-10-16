@@ -57,3 +57,42 @@ describe('TitleForm', () => {
         expect(html).not.toContain('Implantação');
     });
 });
+
+const renderOpening = (type: 'INCOME' | 'EXPENSE') =>
+    renderToStaticMarkup(
+        <BusyProvider>
+            <TitleForm
+                action={vi.fn()}
+                type={type}
+                presets={[{ value: 'p1', label: 'Padrão' }]}
+                financialAccounts={[{ value: 'c1', label: '1.1 Caixa' }]}
+                opening
+            />
+        </BusyProvider>,
+    );
+
+describe('TitleForm como saldo ou despesa inicial', () => {
+    it('envia o título como implantação e pede a data e o valor já baixado', () => {
+        const html = renderOpening('INCOME');
+        expect(html).toMatch(/<input[^>]*name="isOpening"[^>]*value="true"/);
+        expect(html).toContain('name="openingDate"');
+        expect(html).toContain('name="settledAmount"');
+        expect(html).not.toContain('name="issueDate"');
+    });
+
+    it('não oferece repetição, conta de destino nem baixa na hora', () => {
+        const html = renderOpening('EXPENSE');
+        expect(html).not.toContain('name="repeat"');
+        expect(html).not.toContain('destinationAccountId');
+        expect(html).not.toContain('payNow');
+    });
+
+    it('chama de saldo inicial a receber e de despesa inicial a pagar', () => {
+        expect(renderOpening('INCOME')).toContain('Registrar saldo inicial');
+        expect(renderOpening('EXPENSE')).toContain('Registrar despesa inicial');
+    });
+
+    it('não mostra os campos de implantação no cadastro comum', () => {
+        expect(render('EXPENSE')).not.toContain('isOpening');
+    });
+});
