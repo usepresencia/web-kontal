@@ -3,6 +3,7 @@ import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
 import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
+import { FilterForm } from '@/lib/_components/filter-form';
 import { daysAgoLabel } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
 import { TITLE_STATUS_LABELS, formatDate } from '@/lib/_utils/title-labels';
@@ -55,7 +56,7 @@ export async function TitlesView({ type, heading, subtitle, searchParams }: Titl
                 </div>
             </header>
 
-            <form method="get" className="flex flex-wrap items-end gap-3">
+            <FilterForm className="flex flex-wrap items-end gap-3">
                 <FilterField label="Situação">
                     <DropdownSelect
                         name="status"
@@ -87,7 +88,7 @@ export async function TitlesView({ type, heading, subtitle, searchParams }: Titl
                     />
                 </FilterField>
                 <FilterButton />
-            </form>
+            </FilterForm>
 
             {titles.items.length === 0 ? (
                 <EmptyState title="Nenhum título encontrado" />

@@ -2,6 +2,7 @@ import { DatePickerField } from '@/lib/_components/date-picker-field';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
 import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
+import { FilterForm } from '@/lib/_components/filter-form';
 import { Button } from '@/lib/_components/ui/button';
 import { parseIsoDate } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
@@ -34,7 +35,7 @@ export default async function JournalEntriesPage({
                 </Button>
             </header>
 
-            <form method="get" className="flex flex-wrap items-end gap-3">
+            <FilterForm className="flex flex-wrap items-end gap-3">
                 <FilterField label="De">
                     <DatePickerField
                         name="from"
@@ -52,7 +53,7 @@ export default async function JournalEntriesPage({
                     />
                 </FilterField>
                 <FilterButton />
-            </form>
+            </FilterForm>
 
             {entries.items.length === 0 ? (
                 <EmptyState title="Nenhum lançamento encontrado" />
