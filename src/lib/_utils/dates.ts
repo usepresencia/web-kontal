@@ -10,3 +10,27 @@ export function currentMonthRange(now: Date): { start: string; end: string } {
         end: `${year}-${pad(month + 1)}-${pad(lastDay)}`,
     };
 }
+
+/** Valida uma data `YYYY-MM-DD` real (rejeita 30 de fevereiro); devolve null se inválida. */
+export function parseIsoDate(value: string | string[] | undefined): string | null {
+    const raw = Array.isArray(value) ? value[0] : value;
+    if (!raw || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null;
+    const [year, month, day] = raw.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    const valid =
+        date.getUTCFullYear() === year &&
+        date.getUTCMonth() === month - 1 &&
+        date.getUTCDate() === day;
+    return valid ? raw : null;
+}
+
+/** Período da query (`start` e `end`), com o mês corrente por padrão e as pontas em ordem. */
+export function parsePeriodParams(
+    query: Record<string, string | string[] | undefined>,
+    now: Date,
+): { start: string; end: string } {
+    const fallback = currentMonthRange(now);
+    const start = parseIsoDate(query.start) ?? fallback.start;
+    const end = parseIsoDate(query.end) ?? fallback.end;
+    return start <= end ? { start, end } : { start: end, end: start };
+}
