@@ -2,6 +2,7 @@
 
 import { getSeriesAction } from '@/actions/titles';
 import { useBusyFlag } from '@/lib/_components/busy-provider';
+import { Divider } from '@/lib/_components/divider';
 import { StepTitle } from '@/lib/_components/transactions/step-title';
 import { TransactionDialog } from '@/lib/_components/transactions/transaction-dialog';
 import { Button } from '@/lib/_components/ui/button';
@@ -77,9 +78,10 @@ export function SeriesDialog({ series, onClose }: SeriesDialogProps) {
                                 {` · ${detail.titles.length} ocorrências`}
                             </p>
                         </div>
-                        <ul className="divide-border/40 divide-y">
-                            {detail.titles.map(title => (
+                        <ul className="space-y-1 py-1">
+                            {detail.titles.map((title, index) => (
                                 <li key={title.id}>
+                                    {index > 0 && <Divider className="mx-2 my-1" />}
                                     <button
                                         type="button"
                                         onClick={() => setPicked(title)}

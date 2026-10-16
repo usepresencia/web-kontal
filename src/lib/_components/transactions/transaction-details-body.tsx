@@ -1,3 +1,4 @@
+import { Divider } from '@/lib/_components/divider';
 import { Badge } from '@/lib/_components/ui/badge';
 import { Button } from '@/lib/_components/ui/button';
 import { cn } from '@/lib/_utils/cn';
@@ -112,25 +113,25 @@ export function TransactionDetailsBody({
                 ) : entries.length === 0 ? (
                     <p className="text-muted-foreground text-sm">Nenhuma baixa registrada.</p>
                 ) : (
-                    <ul className="divide-border/40 divide-y">
-                        {entries.map(entry => (
-                            <li
-                                key={entry.id}
-                                className="flex items-center justify-between py-2 text-sm"
-                            >
-                                <span>
-                                    {formatDate(entry.paidAt)}
-                                    <span className="text-muted-foreground ml-2 text-xs">
-                                        {entry.kind === 'WRITE_OFF'
-                                            ? 'Perda'
-                                            : (PAYMENT_METHOD_LABELS[
-                                                  entry.paymentMethod as keyof typeof PAYMENT_METHOD_LABELS
-                                              ] ?? entry.paymentMethod)}
+                    <ul className="space-y-1 py-1">
+                        {entries.map((entry, index) => (
+                            <li key={entry.id}>
+                                {index > 0 && <Divider className="mx-2 my-1" />}
+                                <div className="flex items-center justify-between px-2 py-2 text-sm">
+                                    <span>
+                                        {formatDate(entry.paidAt)}
+                                        <span className="text-muted-foreground ml-2 text-xs">
+                                            {entry.kind === 'WRITE_OFF'
+                                                ? 'Perda'
+                                                : (PAYMENT_METHOD_LABELS[
+                                                      entry.paymentMethod as keyof typeof PAYMENT_METHOD_LABELS
+                                                  ] ?? entry.paymentMethod)}
+                                        </span>
                                     </span>
-                                </span>
-                                <span className="font-medium">
-                                    {formatAmount(entry.totalAmount)}
-                                </span>
+                                    <span className="font-medium">
+                                        {formatAmount(entry.totalAmount)}
+                                    </span>
+                                </div>
                             </li>
                         ))}
                     </ul>
