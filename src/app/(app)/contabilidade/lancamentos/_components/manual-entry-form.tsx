@@ -1,11 +1,13 @@
 'use client';
 
 import { createManualEntryAction } from '@/actions/journal';
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { FormField } from '@/lib/_components/form-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { Button } from '@/lib/_components/ui/button';
 import { Input } from '@/lib/_components/ui/input';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import { amountToCents, formatMoney, toApiAmount } from '@/lib/_utils/money';
 import { Plus, Trash2 } from 'lucide-react';
@@ -28,6 +30,7 @@ export function ManualEntryForm({ accounts, today }: ManualEntryFormProps) {
         createManualEntryAction,
         INITIAL_FORM_STATE,
     );
+    useActionToast(state);
     const [lines, setLines] = useState<Line[]>([emptyLine(1), emptyLine(2)]);
     const [nextKey, setNextKey] = useState(3);
 
@@ -152,15 +155,15 @@ export function ManualEntryForm({ accounts, today }: ManualEntryFormProps) {
                             ))}
                     </ul>
                 )}
-            {state.message && (
-                <p role="alert" className="text-negative text-sm">
-                    {state.message}
-                </p>
-            )}
 
-            <Button type="submit" disabled={pending || !balanced}>
+            <ConfirmSubmitButton
+                confirmTitle="Lançar"
+                confirmDescription="Registrar este lançamento manual na contabilidade?"
+                confirmLabel="Lançar"
+                disabled={pending || !balanced}
+            >
                 {pending ? 'Lançando…' : 'Lançar'}
-            </Button>
+            </ConfirmSubmitButton>
         </form>
     );
 }

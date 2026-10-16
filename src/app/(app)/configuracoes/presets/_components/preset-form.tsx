@@ -1,9 +1,10 @@
 'use client';
 
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FormField } from '@/lib/_components/form-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { SelectField } from '@/lib/_components/select-field';
-import { Button } from '@/lib/_components/ui/button';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import {
     PRESET_ROLES,
@@ -33,6 +34,7 @@ export function PresetForm({
     submitLabel,
 }: PresetFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
+    useActionToast(state);
     const errors = (field: string) => state.fieldErrors?.[field];
 
     return (
@@ -87,18 +89,14 @@ export function PresetForm({
                 ))}
             </fieldset>
 
-            {state.message && (
-                <p
-                    role={state.ok ? 'status' : 'alert'}
-                    className={state.ok ? 'text-positive' : 'text-negative'}
-                >
-                    {state.message}
-                </p>
-            )}
-
-            <Button type="submit" disabled={pending}>
+            <ConfirmSubmitButton
+                confirmTitle={submitLabel}
+                confirmDescription="Confirmar e salvar as informações do preset?"
+                confirmLabel="Confirmar"
+                disabled={pending}
+            >
                 {pending ? 'Salvando…' : submitLabel}
-            </Button>
+            </ConfirmSubmitButton>
         </form>
     );
 }

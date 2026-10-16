@@ -14,6 +14,7 @@ import {
     TableRow,
 } from '@/lib/_components/ui/table';
 import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
+import { notifyResult } from '@/lib/_utils/notify';
 import type { Page } from '@/lib/_utils/pagination';
 import type { BillingPlan } from '@/lib/api/schemas/billing';
 import Link from 'next/link';
@@ -24,7 +25,6 @@ export function PlansTable({ page }: { page: Page<BillingPlan> }) {
     const run = useBusyRun();
     const pagination = usePaginationQuery();
     const [toDelete, setToDelete] = useState<BillingPlan | null>(null);
-    const [error, setError] = useState<string | null>(null);
 
     return (
         <div className="space-y-4">
@@ -56,12 +56,6 @@ export function PlansTable({ page }: { page: Page<BillingPlan> }) {
                 </TableBody>
             </Table>
 
-            {error && (
-                <p role="alert" className="text-negative text-sm">
-                    {error}
-                </p>
-            )}
-
             <Pagination
                 page={page.page}
                 pageSize={page.pageSize}
@@ -84,7 +78,7 @@ export function PlansTable({ page }: { page: Page<BillingPlan> }) {
                         () => deletePlanAction(toDelete.id),
                         'Excluindo plano…',
                     );
-                    setError(result.ok ? null : (result.message ?? 'Não foi possível excluir.'));
+                    notifyResult(result, 'Plano excluído.', 'Não foi possível excluir.');
                     setToDelete(null);
                 }}
             />

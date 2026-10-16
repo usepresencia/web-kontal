@@ -1,4 +1,6 @@
 import { BusyProvider } from '@/lib/_components/busy-provider';
+import { FlashToast } from '@/lib/_components/flash-toast';
+import { ToastProvider } from '@/lib/_components/ui/toast-provider';
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { headers } from 'next/headers';
@@ -33,6 +35,8 @@ export default async function RootLayout({
         <html lang="pt-BR" className={`${spaceGrotesk.variable} ${inter.variable}`}>
             <body className="bg-background text-foreground antialiased">
                 <BusyProvider>{children}</BusyProvider>
+                <ToastProvider />
+                <FlashToast />
             </body>
         </html>
     );

@@ -1,9 +1,10 @@
 'use client';
 
 import { reverseEntryAction } from '@/actions/journal';
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FormField } from '@/lib/_components/form-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { Button } from '@/lib/_components/ui/button';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import { useActionState } from 'react';
 
@@ -13,6 +14,7 @@ export function ReverseForm({ entryId }: { entryId: string }) {
         reverseEntryAction.bind(null, entryId),
         INITIAL_FORM_STATE,
     );
+    useActionToast(state);
 
     return (
         <form action={formAction} className="max-w-xl space-y-4">
@@ -23,14 +25,15 @@ export function ReverseForm({ entryId }: { entryId: string }) {
                 name="description"
                 errors={state.fieldErrors?.description}
             />
-            {state.message && (
-                <p role="alert" className="text-negative text-sm">
-                    {state.message}
-                </p>
-            )}
-            <Button type="submit" variant="outline" disabled={pending}>
+            <ConfirmSubmitButton
+                confirmTitle="Estornar lançamento"
+                confirmDescription="O lançamento será estornado com um lançamento inverso. Continuar?"
+                confirmLabel="Estornar"
+                variant="outline"
+                disabled={pending}
+            >
                 {pending ? 'Estornando…' : 'Estornar'}
-            </Button>
+            </ConfirmSubmitButton>
         </form>
     );
 }

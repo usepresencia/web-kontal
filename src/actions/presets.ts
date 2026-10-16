@@ -1,5 +1,6 @@
 'use server';
 
+import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { apiFetch } from '@/lib/api/client';
 import { stateFromApiError } from '@/lib/api/form-state';
@@ -22,6 +23,7 @@ export async function createPresetAction(_prev: FormState, formData: FormData): 
         return stateFromApiError(error);
     }
     revalidatePath('/configuracoes/presets');
+    await flash('Preset criado.');
     redirect('/configuracoes/presets');
 }
 

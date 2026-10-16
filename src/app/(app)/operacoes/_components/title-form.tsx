@@ -1,10 +1,11 @@
 'use client';
 
 import { AmountInput } from '@/lib/_components/amount-input';
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { FieldError, PillInput, PillSelect } from '@/lib/_components/pill-fields';
-import { Button } from '@/lib/_components/ui/button';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import { toLocalIsoDate } from '@/lib/_utils/dates';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import {
@@ -49,6 +50,7 @@ export function TitleForm({
     onSuccess,
 }: TitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
+    useActionToast(state);
     const [preset, setPreset] = useState(presets[0]?.value ?? '');
     const [destination, setDestination] = useState('');
     const [payNow, setPayNow] = useState(false);
@@ -223,20 +225,18 @@ export function TitleForm({
                 </div>
             )}
 
-            {state.message && !state.ok && (
-                <p role="alert" className="text-negative text-sm">
-                    {state.message}
-                </p>
-            )}
-
             <div className="flex justify-end">
-                <Button
-                    type="submit"
+                <ConfirmSubmitButton
+                    confirmTitle="Criar título"
+                    confirmDescription={
+                        payNow ? `${labels.now} e cadastrar este título?` : 'Cadastrar este título?'
+                    }
+                    confirmLabel="Criar"
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
                     {pending ? 'Salvando…' : 'Criar título'}
-                </Button>
+                </ConfirmSubmitButton>
             </div>
         </form>
     );

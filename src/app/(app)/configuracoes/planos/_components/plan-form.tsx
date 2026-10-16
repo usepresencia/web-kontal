@@ -1,8 +1,9 @@
 'use client';
 
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FormField } from '@/lib/_components/form-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { Button } from '@/lib/_components/ui/button';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import type { BillingPlan } from '@/lib/api/schemas/billing';
 import { useActionState } from 'react';
@@ -16,6 +17,7 @@ type PlanFormProps = {
 /** Formulário de plano de contas (cadastro e edição). */
 export function PlanForm({ action, plan, submitLabel }: PlanFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
+    useActionToast(state);
 
     return (
         <form action={formAction} className="max-w-xl space-y-4">
@@ -33,17 +35,14 @@ export function PlanForm({ action, plan, submitLabel }: PlanFormProps) {
                 defaultValue={plan?.description ?? ''}
                 errors={state.fieldErrors?.description}
             />
-            {state.message && (
-                <p
-                    role={state.ok ? 'status' : 'alert'}
-                    className={state.ok ? 'text-positive' : 'text-negative'}
-                >
-                    {state.message}
-                </p>
-            )}
-            <Button type="submit" disabled={pending}>
+            <ConfirmSubmitButton
+                confirmTitle={submitLabel}
+                confirmDescription="Confirmar e salvar as informações do plano?"
+                confirmLabel="Confirmar"
+                disabled={pending}
+            >
                 {pending ? 'Salvando…' : submitLabel}
-            </Button>
+            </ConfirmSubmitButton>
         </form>
     );
 }

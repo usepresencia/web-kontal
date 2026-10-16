@@ -15,6 +15,7 @@ import {
     TableRow,
 } from '@/lib/_components/ui/table';
 import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
+import { notifyResult } from '@/lib/_utils/notify';
 import type { Page } from '@/lib/_utils/pagination';
 import type { Company } from '@/lib/api/schemas/company';
 import { useState, useTransition } from 'react';
@@ -26,7 +27,6 @@ export function CompaniesTable({ page }: { page: Page<Company> }) {
     const [selecting, startTransition] = useTransition();
     useBusyFlag(selecting, 'Abrindo empresa…');
     const [toDeactivate, setToDeactivate] = useState<Company | null>(null);
-    const [error, setError] = useState<string | null>(null);
 
     return (
         <div className="space-y-4">
@@ -72,12 +72,6 @@ export function CompaniesTable({ page }: { page: Page<Company> }) {
                 </TableBody>
             </Table>
 
-            {error && (
-                <p role="alert" className="text-negative text-sm">
-                    {error}
-                </p>
-            )}
-
             <Pagination
                 page={page.page}
                 pageSize={page.pageSize}
@@ -100,7 +94,7 @@ export function CompaniesTable({ page }: { page: Page<Company> }) {
                         () => deactivateCompanyAction(toDeactivate.id),
                         'Desativando empresa…',
                     );
-                    setError(result.ok ? null : (result.message ?? 'Não foi possível desativar.'));
+                    notifyResult(result, 'Empresa desativada.', 'Não foi possível desativar.');
                     setToDeactivate(null);
                 }}
             />

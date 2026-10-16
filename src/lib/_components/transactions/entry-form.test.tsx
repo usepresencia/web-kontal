@@ -33,7 +33,7 @@ describe('EntryForm', () => {
         const triggers =
             html.match(/<(input|button)[^>]*class="[^"]*rounded-full[^"]*"[^>]*>/g) ?? [];
         const fields = triggers.filter(
-            tag => !tag.includes('type="hidden"') && !tag.includes('type="submit"'),
+            tag => !tag.includes('type="hidden"') && !tag.includes('bg-accent'),
         );
         expect(fields.length).toBeGreaterThanOrEqual(7);
         for (const tag of fields) {
@@ -91,5 +91,13 @@ describe('EntryForm', () => {
         const html = render();
         expect(html).toContain('role="separator"');
         expect(html).not.toMatch(/[\s"]border-b[\s"]/);
+    });
+});
+
+describe('EntryForm confirmação', () => {
+    it('pede confirmação antes de enviar: o botão não envia o formulário direto', () => {
+        const html = render();
+        expect(html).not.toContain('type="submit"');
+        expect(html).toMatch(/<button[^>]*type="button"[^>]*>Pagar<\/button>/);
     });
 });

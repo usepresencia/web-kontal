@@ -2,6 +2,7 @@
 
 import { deleteEntryAction, deleteTitleAction, writeOffTitleAction } from '@/actions/titles';
 import { useBusyRun } from '@/lib/_components/busy-provider';
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FormField } from '@/lib/_components/form-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { Badge } from '@/lib/_components/ui/badge';
@@ -15,8 +16,10 @@ import {
     TableHeader,
     TableRow,
 } from '@/lib/_components/ui/table';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import { formatAmount } from '@/lib/_utils/money';
+import { notify, notifyResult } from '@/lib/_utils/notify';
 import { PAYMENT_METHOD_LABELS, formatDate } from '@/lib/_utils/title-labels';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
 import { useActionState, useState } from 'react';
@@ -25,7 +28,6 @@ import { useActionState, useState } from 'react';
 export function EntriesTable({ titleId, entries }: { titleId: string; entries: TitleEntry[] }) {
     const run = useBusyRun();
     const [toDelete, setToDelete] = useState<TitleEntry | null>(null);
-    const [error, setError] = useState<string | null>(null);
 
     if (entries.length === 0) {
         return <p className="text-muted-foreground text-sm">Nenhuma baixa registrada.</p>;
@@ -77,11 +79,6 @@ export function EntriesTable({ titleId, entries }: { titleId: string; entries: T
                     ))}
                 </TableBody>
             </Table>
-            {error && (
-                <p role="alert" className="text-negative text-sm">
-                    {error}
-                </p>
-            )}
             <ConfirmationDialog
                 open={toDelete !== null}
                 onOpenChange={open => !open && setToDelete(null)}
@@ -95,7 +92,7 @@ export function EntriesTable({ titleId, entries }: { titleId: string; entries: T
                         () => deleteEntryAction(titleId, toDelete.id),
                         'Excluindo baixa…',
                     );
-                    setError(result.ok ? null : (result.message ?? 'Não foi possível excluir.'));
+                    notifyResult(result, 'Baixa excluída.', 'Não foi possível excluir.');
                     setToDelete(null);
                 }}
             />
@@ -109,6 +106,7 @@ export function WriteOffForm({ titleId }: { titleId: string }) {
         writeOffTitleAction.bind(null, titleId),
         INITIAL_FORM_STATE,
     );
+    useActionToast(state);
 
     return (
         <form action={formAction} className="space-y-4">
@@ -127,17 +125,15 @@ export function WriteOffForm({ titleId }: { titleId: string }) {
                     errors={state.fieldErrors?.description}
                 />
             </div>
-            {state.message && (
-                <p
-                    role={state.ok ? 'status' : 'alert'}
-                    className={state.ok ? 'text-positive' : 'text-negative'}
-                >
-                    {state.message}
-                </p>
-            )}
-            <Button type="submit" variant="outline" disabled={pending}>
+            <ConfirmSubmitButton
+                confirmTitle="Baixar por perda"
+                confirmDescription="O saldo em aberto será baixado sem pagamento. Continuar?"
+                confirmLabel="Baixar"
+                variant="outline"
+                disabled={pending}
+            >
                 {pending ? 'Baixando…' : 'Baixar saldo por perda'}
-            </Button>
+            </ConfirmSubmitButton>
         </form>
     );
 }
@@ -146,18 +142,12 @@ export function WriteOffForm({ titleId }: { titleId: string }) {
 export function DeleteTitleButton({ title }: { title: Title }) {
     const run = useBusyRun();
     const [open, setOpen] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     return (
         <div className="space-y-2">
             <Button variant="destructive" onClick={() => setOpen(true)}>
                 Excluir título
             </Button>
-            {error && (
-                <p role="alert" className="text-negative text-sm">
-                    {error}
-                </p>
-            )}
             <ConfirmationDialog
                 open={open}
                 onOpenChange={setOpen}
@@ -171,7 +161,7 @@ export function DeleteTitleButton({ title }: { title: Title }) {
                         'Excluindo título…',
                     );
                     if (result && !result.ok)
-                        setError(result.message ?? 'Não foi possível excluir.');
+                        notify('error', result.message ?? 'Não foi possível excluir.');
                     setOpen(false);
                 }}
             />

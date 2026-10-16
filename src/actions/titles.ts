@@ -1,5 +1,6 @@
 'use server';
 
+import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
@@ -123,6 +124,7 @@ export async function deleteTitleAction(
         return stateFromApiError(error);
     }
     revalidatePath(LIST_PATHS[type]);
+    await flash('Título excluído.');
     redirect(LIST_PATHS[type]);
 }
 
@@ -215,6 +217,7 @@ export async function cancelSeriesAction(seriesId: string): Promise<FormState> {
         return stateFromApiError(error);
     }
     revalidatePath('/operacoes/series');
+    await flash('Série cancelada.');
     redirect('/operacoes/series');
 }
 

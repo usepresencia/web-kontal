@@ -2,12 +2,15 @@
 
 import { closePeriodAction, reopenPeriodAction } from '@/actions/periods';
 import { useBusyRun } from '@/lib/_components/busy-provider';
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FormField } from '@/lib/_components/form-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { SelectField } from '@/lib/_components/select-field';
 import { Button } from '@/lib/_components/ui/button';
 import { ConfirmationDialog } from '@/lib/_components/ui/confirmation-dialog';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
+import { notifyResult } from '@/lib/_utils/notify';
 import { useActionState, useState } from 'react';
 
 type ClosePeriodFormProps = {
@@ -18,6 +21,7 @@ type ClosePeriodFormProps = {
 /** Fecha o próximo mês; em dezembro, informe a conta de lucros acumulados para a apuração. */
 export function ClosePeriodForm({ suggestedMonth, equityAccounts }: ClosePeriodFormProps) {
     const [state, formAction, pending] = useActionState(closePeriodAction, INITIAL_FORM_STATE);
+    useActionToast(state);
 
     return (
         <form action={formAction} className="max-w-xl space-y-4">
@@ -39,17 +43,14 @@ export function ClosePeriodForm({ suggestedMonth, equityAccounts }: ClosePeriodF
                 placeholder="Padrão do plano"
                 errors={state.fieldErrors?.retainedEarningsAccountId}
             />
-            {state.message && (
-                <p
-                    role={state.ok ? 'status' : 'alert'}
-                    className={state.ok ? 'text-positive' : 'text-negative'}
-                >
-                    {state.message}
-                </p>
-            )}
-            <Button type="submit" disabled={pending}>
+            <ConfirmSubmitButton
+                confirmTitle="Fechar período"
+                confirmDescription="O mês deixa de aceitar lançamentos. Continuar?"
+                confirmLabel="Fechar"
+                disabled={pending}
+            >
                 {pending ? 'Fechando…' : 'Fechar período'}
-            </Button>
+            </ConfirmSubmitButton>
         </form>
     );
 }
@@ -58,18 +59,12 @@ export function ClosePeriodForm({ suggestedMonth, equityAccounts }: ClosePeriodF
 export function ReopenButton() {
     const run = useBusyRun();
     const [open, setOpen] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     return (
         <div className="space-y-2">
             <Button variant="outline" onClick={() => setOpen(true)}>
                 Reabrir último fechamento
             </Button>
-            {error && (
-                <p role="alert" className="text-negative text-sm">
-                    {error}
-                </p>
-            )}
             <ConfirmationDialog
                 open={open}
                 onOpenChange={setOpen}
@@ -79,7 +74,7 @@ export function ReopenButton() {
                 variant="destructive"
                 onConfirm={async () => {
                     const result = await run(() => reopenPeriodAction(), 'Reabrindo período…');
-                    setError(result.ok ? null : (result.message ?? 'Não foi possível reabrir.'));
+                    notifyResult(result, 'Período reaberto.', 'Não foi possível reabrir.');
                     setOpen(false);
                 }}
             />

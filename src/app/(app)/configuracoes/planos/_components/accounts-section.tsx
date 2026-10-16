@@ -15,6 +15,7 @@ import {
     TableRow,
 } from '@/lib/_components/ui/table';
 import { ACCOUNT_TYPE_LABELS, NATURE_LABELS } from '@/lib/_utils/billing-labels';
+import { notifyResult } from '@/lib/_utils/notify';
 import type { BillingAccount } from '@/lib/api/schemas/billing';
 import { useState } from 'react';
 import { AccountDialog } from './account-dialog';
@@ -28,7 +29,6 @@ export function AccountsSection({ planId, accounts }: AccountsSectionProps) {
         open: false,
     });
     const [toDelete, setToDelete] = useState<BillingAccount | null>(null);
-    const [error, setError] = useState<string | null>(null);
     const sorted = [...accounts].sort((a, b) =>
         a.code.localeCompare(b.code, 'pt-BR', { numeric: true }),
     );
@@ -99,12 +99,6 @@ export function AccountsSection({ planId, accounts }: AccountsSectionProps) {
                 </Table>
             )}
 
-            {error && (
-                <p role="alert" className="text-negative text-sm">
-                    {error}
-                </p>
-            )}
-
             {dialog.open && (
                 <AccountDialog
                     key={dialog.account?.id ?? 'new'}
@@ -129,7 +123,7 @@ export function AccountsSection({ planId, accounts }: AccountsSectionProps) {
                         () => deleteAccountAction(planId, toDelete.id),
                         'Excluindo conta…',
                     );
-                    setError(result.ok ? null : (result.message ?? 'Não foi possível excluir.'));
+                    notifyResult(result, 'Conta excluída.', 'Não foi possível excluir.');
                     setToDelete(null);
                 }}
             />

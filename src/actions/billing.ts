@@ -1,5 +1,6 @@
 'use server';
 
+import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { apiFetch } from '@/lib/api/client';
 import { stateFromApiError } from '@/lib/api/form-state';
@@ -31,6 +32,7 @@ export async function createPlanAction(_prev: FormState, formData: FormData): Pr
         return stateFromApiError(error);
     }
     revalidatePath('/configuracoes/planos');
+    await flash('Plano criado.');
     redirect(`/configuracoes/planos/${planId}`);
 }
 
