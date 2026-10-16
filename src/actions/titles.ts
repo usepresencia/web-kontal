@@ -5,7 +5,7 @@ import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
 import { stateFromApiError } from '@/lib/api/form-state';
 import { accountPageSchema } from '@/lib/api/schemas/billing';
-import { presetPageSchema } from '@/lib/api/schemas/preset';
+import { presetPageSchema, presetSchema } from '@/lib/api/schemas/preset';
 import {
     entryCreateSchema,
     entryPageSchema,
@@ -117,6 +117,8 @@ export async function createEntryAction(
         return stateFromApiError(error);
     }
     revalidatePath(`/operacoes/titulos/${titleId}`);
+    revalidatePath(HOME_PATH);
+    Object.values(LIST_PATHS).forEach(path => revalidatePath(path));
     return { ok: true, message: 'Baixa registrada.' };
 }
 
@@ -233,4 +235,30 @@ export async function getTitleFormOptionsAction(
             )
             .map(account => ({ value: account.id, label: `${account.code} ${account.name}` })),
     };
+}
+
+/** Contas financeiras (ativo analítico ativo) do plano do título, para escolher onde registrar a baixa. */
+export async function getTitlePaymentAccountsAction(
+    titleId: string,
+): Promise<{ value: string; label: string }[]> {
+    if (!isUuid(titleId)) return [];
+    try {
+        const title = await apiFetch(`/titles/${titleId}`, titleSchema);
+        const preset = await apiFetch(`/presets/${title.presetId}`, presetSchema);
+        const accounts = await apiFetch(
+            `/billing-accounts?planId=${preset.billingPlanId}&page=1&pageSize=100`,
+            accountPageSchema,
+        );
+        return accounts.items
+            .filter(
+                account =>
+                    account.accountType === 'ANALYTIC' &&
+                    account.isActive &&
+                    account.nature === 'ASSET',
+            )
+            .map(account => ({ value: account.id, label: `${account.code} ${account.name}` }));
+    } catch (error) {
+        if (error instanceof ApiError && error.status < 500) return [];
+        throw error;
+    }
 }

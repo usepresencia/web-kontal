@@ -7,22 +7,28 @@ import { SelectField } from '@/lib/_components/select-field';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import { PAYMENT_METHOD_LABELS } from '@/lib/_utils/title-labels';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 
 type EntryFormProps = {
     titleId: string;
     accounts: { value: string; label: string }[];
     today: string;
     paying: boolean;
+    /** Chamado depois que a baixa é registrada. */
+    onSuccess?: () => void;
 };
 
 /** Registro de baixa: pagamento (título a pagar) ou recebimento (título a receber). */
-export function EntryForm({ titleId, accounts, today, paying }: EntryFormProps) {
+export function EntryForm({ titleId, accounts, today, paying, onSuccess }: EntryFormProps) {
     const [state, formAction, pending] = useActionState(
         createEntryAction.bind(null, titleId),
         INITIAL_FORM_STATE,
     );
     const errors = (field: string) => state.fieldErrors?.[field];
+
+    useEffect(() => {
+        if (state.ok) onSuccess?.();
+    }, [state, onSuccess]);
 
     return (
         <form action={formAction} className="space-y-4">

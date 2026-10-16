@@ -133,3 +133,65 @@ describe('getTitleFormOptionsAction', () => {
         expect(apiFetch).not.toHaveBeenCalled();
     });
 });
+
+describe('getTitlePaymentAccountsAction', () => {
+    it('devolve as contas financeiras (ativo analítico ativo) do plano do preset do título', async () => {
+        const { getTitlePaymentAccountsAction } = await import('./titles');
+        apiFetch
+            .mockResolvedValueOnce({ presetId: 'p1' })
+            .mockResolvedValueOnce({ billingPlanId: 'plan1' })
+            .mockResolvedValueOnce({
+                items: [
+                    {
+                        id: 'a1',
+                        code: '1.1',
+                        name: 'Caixa',
+                        accountType: 'ANALYTIC',
+                        isActive: true,
+                        nature: 'ASSET',
+                    },
+                    {
+                        id: 'a2',
+                        code: '1.2',
+                        name: 'Inativa',
+                        accountType: 'ANALYTIC',
+                        isActive: false,
+                        nature: 'ASSET',
+                    },
+                    {
+                        id: 'a3',
+                        code: '2',
+                        name: 'Fornecedores',
+                        accountType: 'ANALYTIC',
+                        isActive: true,
+                        nature: 'LIABILITY',
+                    },
+                    {
+                        id: 'a4',
+                        code: '1',
+                        name: 'Ativo',
+                        accountType: 'SYNTHETIC',
+                        isActive: true,
+                        nature: 'ASSET',
+                    },
+                ],
+            });
+        expect(await getTitlePaymentAccountsAction(TITLE_ID)).toEqual([
+            { value: 'a1', label: '1.1 Caixa' },
+        ]);
+        expect(apiFetch.mock.calls[2][0]).toContain('planId=plan1');
+    });
+
+    it('recusa identificador que não é UUID sem consultar a API', async () => {
+        const { getTitlePaymentAccountsAction } = await import('./titles');
+        expect(await getTitlePaymentAccountsAction('../x')).toEqual([]);
+        expect(apiFetch).not.toHaveBeenCalled();
+    });
+
+    it('devolve lista vazia em erro 4xx da API', async () => {
+        const { getTitlePaymentAccountsAction } = await import('./titles');
+        const { ApiError } = await import('@/lib/api/errors');
+        apiFetch.mockRejectedValue(new ApiError(404, 'NOT_FOUND', 'x'));
+        expect(await getTitlePaymentAccountsAction(TITLE_ID)).toEqual([]);
+    });
+});

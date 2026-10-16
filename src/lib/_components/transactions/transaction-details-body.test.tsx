@@ -45,11 +45,12 @@ const render = (entries: TitleEntry[] | null, overrides: Partial<Title> = {}) =>
             entries={entries}
             copied={false}
             onCopy={() => undefined}
+            onPay={() => undefined}
         />,
     );
 
 describe('TransactionDetailsBody', () => {
-    it('mostra os dados do título e o link para a página completa', () => {
+    it('mostra os dados do título', () => {
         const html = render([]);
         expect(html).toContain('Aluguel da loja');
         expect(html).toContain('-R$ 3.200,00');
@@ -57,8 +58,19 @@ describe('TransactionDetailsBody', () => {
         expect(html).toContain('Em aberto');
         expect(html).toContain('10/11/2026');
         expect(html).toContain('2%');
-        expect(html).toContain(`/operacoes/titulos/${title.id}`);
+        expect(html).not.toContain('Abrir título completo');
     });
+
+    it('oferece "Baixar título" quando o título está em aberto', () => {
+        expect(render([])).toContain('Baixar título');
+    });
+
+    it.each(['SETTLED', 'WRITTEN_OFF'] as const)(
+        'não oferece baixa quando o título está %s',
+        status => {
+            expect(render([], { status })).not.toContain('Baixar título');
+        },
+    );
 
     it('mostra "Carregando" enquanto as baixas não chegam', () => {
         expect(render(null)).toContain('Carregando');
