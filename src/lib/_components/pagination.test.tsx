@@ -42,6 +42,23 @@ describe('Pagination', () => {
         expect(html.indexOf('>25<')).toBeLessThan(html.indexOf('Página anterior'));
     });
 
+    it('mostra o rótulo em duas linhas, em tamanho de legenda, acima do dropdown', () => {
+        const html = renderToStaticMarkup(
+            <Pagination
+                page={1}
+                pageSize={10}
+                total={100}
+                onPageChange={() => undefined}
+                onPageSizeChange={() => undefined}
+                pageSizeLabel="Títulos por página:"
+            />,
+        );
+        const label = html.match(/<span[^>]*>Títulos por página:<\/span>/)?.[0] ?? '';
+        expect(label).toContain('text-xs');
+        expect(label).not.toContain('text-sm');
+        expect(html).toContain('flex-col');
+    });
+
     it('usa "Itens por página:" quando nenhum rótulo é informado', () => {
         const html = renderToStaticMarkup(
             <Pagination
