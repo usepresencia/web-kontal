@@ -37,6 +37,7 @@ export const entrySchema = z.object({
     id: z.string(),
     titleId: z.string(),
     titleDescription: z.string().nullable().optional(),
+    titleType: z.enum(TITLE_TYPES).optional(),
     kind: z.enum(['PAYMENT', 'WRITE_OFF']),
     billingAccountId: z.string().nullable(),
     billingAccountName: z.string().nullable().optional(),
