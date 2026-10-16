@@ -20,18 +20,18 @@ export function RecentTransactions({ titles, openCount, query }: RecentTransacti
     const now = new Date();
 
     return (
-        <section className="bg-card rounded-3xl p-8 shadow-sm">
-            <div className="mb-6 flex items-center justify-between gap-4">
+        <section className="bg-card rounded-2xl p-5 shadow-sm">
+            <div className="mb-4 flex items-center justify-between gap-4">
                 <div>
-                    <h2 className="font-display text-foreground text-2xl font-semibold">
+                    <h2 className="font-display text-foreground text-lg font-semibold">
                         Transações recentes
                     </h2>
-                    <p className="text-muted-foreground text-sm">{openCount} em aberto</p>
+                    <p className="text-muted-foreground text-xs">{openCount} em aberto</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <Link
                         href="/operacoes/pagar"
-                        className="text-muted-foreground hover:text-foreground text-base"
+                        className="text-muted-foreground hover:text-foreground text-sm"
                     >
                         Ver todas
                     </Link>
@@ -53,11 +53,11 @@ export function RecentTransactions({ titles, openCount, query }: RecentTransacti
                             <li key={title.id}>
                                 <Link
                                     href={`/operacoes/titulos/${title.id}`}
-                                    className="hover:bg-muted/50 -mx-3 flex items-center gap-4 rounded-2xl px-3 py-3"
+                                    className="hover:bg-muted/50 -mx-3 flex items-center gap-3 rounded-xl px-3 py-2"
                                 >
                                     <div
                                         className={cn(
-                                            'flex size-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold',
+                                            'flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
                                             income
                                                 ? 'bg-positive/10 text-positive'
                                                 : 'bg-negative/10 text-negative',
@@ -66,12 +66,12 @@ export function RecentTransactions({ titles, openCount, query }: RecentTransacti
                                         {initials(title.description)}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <p className="text-foreground truncate text-lg font-medium">
+                                        <p className="text-foreground truncate text-sm font-medium">
                                             {title.description}
                                         </p>
-                                        <p className="text-muted-foreground flex items-center gap-2 text-sm">
+                                        <p className="text-muted-foreground flex items-center gap-2 text-xs">
                                             {TITLE_TYPE_LABELS[title.type]}
-                                            <span className="bg-muted rounded-full px-2.5 py-0.5 text-xs">
+                                            <span className="bg-muted rounded-full px-2 py-0.5 text-[11px]">
                                                 {TITLE_STATUS_LABELS[title.status]}
                                             </span>
                                         </p>
@@ -79,15 +79,15 @@ export function RecentTransactions({ titles, openCount, query }: RecentTransacti
                                     <div className="flex flex-col items-end gap-0.5">
                                         <span
                                             className={cn(
-                                                'text-lg font-semibold',
+                                                'text-sm font-semibold',
                                                 income ? 'text-positive' : 'text-negative',
                                             )}
                                         >
                                             {income ? '+' : '-'}
                                             {formatAmount(title.amount)}
                                         </span>
-                                        <span className="text-muted-foreground flex items-center gap-1 text-sm">
-                                            <Clock className="size-3.5" aria-hidden="true" />
+                                        <span className="text-muted-foreground flex items-center gap-1 text-xs">
+                                            <Clock className="size-3" aria-hidden="true" />
                                             {daysAgoLabel(title.createdAt, now)}
                                         </span>
                                     </div>
