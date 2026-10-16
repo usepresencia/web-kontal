@@ -24,10 +24,23 @@ export function FieldError({ errors }: { errors?: string[] }) {
     );
 }
 
-type PillFieldProps = ComponentProps<'input'> & { label: string; errors?: string[] };
+type PillFieldProps = ComponentProps<'input'> & {
+    label: string;
+    errors?: string[];
+    /** Unidade mostrada à direita dentro do campo (ex.: "%"). */
+    suffix?: string;
+};
 
 /** Campo de texto em pílula com rótulo pequeno e mensagem de erro. */
-export function PillInput({ label, errors, className, id, name, ...props }: PillFieldProps) {
+export function PillInput({
+    label,
+    errors,
+    suffix,
+    className,
+    id,
+    name,
+    ...props
+}: PillFieldProps) {
     const fieldId = id ?? name;
     return (
         <div className="min-w-0">
@@ -37,13 +50,23 @@ export function PillInput({ label, errors, className, id, name, ...props }: Pill
             >
                 {label}
             </label>
-            <input
-                id={fieldId}
-                name={name}
-                aria-invalid={errors ? true : undefined}
-                className={cn(PILL_CLASS, 'w-full', className)}
-                {...props}
-            />
+            <div className="relative">
+                <input
+                    id={fieldId}
+                    name={name}
+                    aria-invalid={errors ? true : undefined}
+                    className={cn(PILL_CLASS, 'w-full', suffix && 'pr-9', className)}
+                    {...props}
+                />
+                {suffix && (
+                    <span
+                        className="text-muted-foreground pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm"
+                        aria-hidden="true"
+                    >
+                        {suffix}
+                    </span>
+                )}
+            </div>
             <FieldError errors={errors} />
         </div>
     );
