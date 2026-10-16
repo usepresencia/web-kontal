@@ -3,9 +3,11 @@ import {
     currentMonthRange,
     daysAgoLabel,
     formatMonth,
+    monthAbbreviation,
     nextMonth,
     parseIsoDate,
     parsePeriodParams,
+    previousMonthRange,
 } from './dates';
 
 describe('currentMonthRange', () => {
@@ -101,5 +103,29 @@ describe('daysAgoLabel', () => {
 
     it('trata data futura como hoje', () => {
         expect(daysAgoLabel('2026-11-01T00:00:00.000Z', now)).toBe('hoje');
+    });
+});
+
+describe('previousMonthRange', () => {
+    it('devolve o mês anterior', () => {
+        expect(previousMonthRange(new Date(2026, 9, 16))).toEqual({
+            start: '2026-09-01',
+            end: '2026-09-30',
+        });
+    });
+
+    it('vira o ano em janeiro', () => {
+        expect(previousMonthRange(new Date(2027, 0, 5))).toEqual({
+            start: '2026-12-01',
+            end: '2026-12-31',
+        });
+    });
+});
+
+describe('monthAbbreviation', () => {
+    it('abrevia o mês em minúsculas, a partir de 0', () => {
+        expect(monthAbbreviation(0)).toBe('jan');
+        expect(monthAbbreviation(8)).toBe('set');
+        expect(monthAbbreviation(11)).toBe('dez');
     });
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getGreeting } from './page-greeting';
+import { getGreeting } from './greeting';
 
 describe('getGreeting', () => {
     it.each([
