@@ -1,78 +1,59 @@
 'use client';
 
-import { deactivateCompanyAction } from '@/actions/companies';
-import { selectCompanyAction } from '@/actions/session';
-import { useBusyFlag, useBusyRun } from '@/lib/_components/busy-provider';
+import { Divider } from '@/lib/_components/divider';
 import { Pagination } from '@/lib/_components/pagination';
-import { Button } from '@/lib/_components/ui/button';
-import { ConfirmationDialog } from '@/lib/_components/ui/confirmation-dialog';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/lib/_components/ui/table';
 import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
-import { notifyResult } from '@/lib/_utils/notify';
 import type { Page } from '@/lib/_utils/pagination';
-import { SUCCESS } from '@/lib/_utils/toast-messages';
 import type { Company } from '@/lib/api/schemas/company';
-import { useState, useTransition } from 'react';
+import { Building2, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { CompanyDialog } from './company-dialog';
 
-/** Lista paginada de empresas com as ações de abrir e desativar. */
+/** Lista paginada de empresas no padrão das demais telas; cada linha abre o modal de detalhes. */
 export function CompaniesTable({ page }: { page: Page<Company> }) {
-    const run = useBusyRun();
     const pagination = usePaginationQuery();
-    const [selecting, startTransition] = useTransition();
-    useBusyFlag(selecting, 'Abrindo empresa…');
-    const [toDeactivate, setToDeactivate] = useState<Company | null>(null);
+    const [selected, setSelected] = useState<Company | null>(null);
 
     return (
-        <div className="space-y-4">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Nome</TableHead>
-                        <TableHead>CNPJ</TableHead>
-                        <TableHead>Cidade</TableHead>
-                        <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {page.items.map(company => (
-                        <TableRow key={company.id}>
-                            <TableCell className="font-medium">{company.name}</TableCell>
-                            <TableCell>{company.cnpj}</TableCell>
-                            <TableCell>
-                                {company.address.city}/{company.address.state}
-                            </TableCell>
-                            <TableCell className="space-x-2 text-right">
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() =>
-                                        startTransition(async () => {
-                                            await selectCompanyAction(company.id);
-                                        })
-                                    }
-                                >
-                                    Abrir
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => setToDeactivate(company)}
-                                >
-                                    Desativar
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-
+        <section className="bg-card space-y-4 rounded-2xl p-5 shadow-sm">
+            <ul className="space-y-1">
+                {page.items.map((company, index) => (
+                    <li key={company.id}>
+                        {index > 0 && <Divider className="my-1 mr-3 ml-12" />}
+                        <button
+                            type="button"
+                            onClick={() => setSelected(company)}
+                            aria-haspopup="dialog"
+                            className="group hover:bg-muted/50 focus-visible:ring-ring -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-3 rounded-xl px-3 py-2 text-left focus-visible:ring-2 focus-visible:outline-none"
+                        >
+                            <div className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full">
+                                {company.logoUrl ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img
+                                        src={company.logoUrl}
+                                        alt=""
+                                        className="size-full object-cover"
+                                    />
+                                ) : (
+                                    <Building2 className="size-4" aria-hidden="true" />
+                                )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-foreground truncate text-sm font-medium">
+                                    {company.name}
+                                </p>
+                                <p className="text-muted-foreground truncate text-xs">
+                                    {company.cnpj} · {company.address.city}/{company.address.state}
+                                </p>
+                            </div>
+                            <ChevronRight
+                                className="text-muted-foreground size-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                                aria-hidden="true"
+                            />
+                        </button>
+                    </li>
+                ))}
+            </ul>
             <Pagination
                 page={page.page}
                 pageSize={page.pageSize}
@@ -81,24 +62,7 @@ export function CompaniesTable({ page }: { page: Page<Company> }) {
                 onPageSizeChange={pagination.onPageSizeChange}
                 pageSizeLabel="Empresas por página:"
             />
-
-            <ConfirmationDialog
-                open={toDeactivate !== null}
-                onOpenChange={open => !open && setToDeactivate(null)}
-                title="Desativar empresa"
-                description={`Desativar ${toDeactivate?.name ?? ''}? Ela deixa de aparecer para os usuários.`}
-                confirmLabel="Desativar"
-                variant="destructive"
-                onConfirm={async () => {
-                    if (!toDeactivate) return;
-                    const result = await run(
-                        () => deactivateCompanyAction(toDeactivate.id),
-                        'Desativando empresa…',
-                    );
-                    notifyResult(result, SUCCESS.companyDeactivated, 'Não foi possível desativar.');
-                    setToDeactivate(null);
-                }}
-            />
-        </div>
+            <CompanyDialog company={selected} onClose={() => setSelected(null)} />
+        </section>
     );
 }
