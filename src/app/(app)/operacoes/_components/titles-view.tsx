@@ -67,7 +67,7 @@ export async function TitlesView({
                     <DropdownSelect
                         name="status"
                         defaultValue={status ?? ''}
-                        className={`${FILTER_PILL_CLASS} w-44`}
+                        className={`${FILTER_PILL_CLASS} w-36`}
                         options={[
                             { value: '', label: 'Todas' },
                             ...TITLE_STATUSES.map(item => ({
@@ -82,7 +82,7 @@ export async function TitlesView({
                         name="dueFrom"
                         defaultValue={dueFrom}
                         clearable
-                        className={`${FILTER_PILL_CLASS} w-44`}
+                        className={`${FILTER_PILL_CLASS} w-36`}
                     />
                 </FilterField>
                 <FilterField label="até">
@@ -90,7 +90,7 @@ export async function TitlesView({
                         name="dueTo"
                         defaultValue={dueTo}
                         clearable
-                        className={`${FILTER_PILL_CLASS} w-44`}
+                        className={`${FILTER_PILL_CLASS} w-36`}
                     />
                 </FilterField>
                 <FilterButton />

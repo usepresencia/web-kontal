@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 /** Estilo dos campos de filtro: pílula clara com sombra leve, como a busca do cabeçalho da home. */
-export const FILTER_PILL_CLASS = 'bg-card h-10 rounded-full border-0 px-5 shadow-sm';
+export const FILTER_PILL_CLASS = 'bg-card h-10 rounded-full border-0 px-4 shadow-sm';
 
 /** Campo de filtro com o rótulo recuado para começar onde termina o arredondamento da pílula. */
 export function FilterField({ label, children }: { label: ReactNode; children: ReactNode }) {

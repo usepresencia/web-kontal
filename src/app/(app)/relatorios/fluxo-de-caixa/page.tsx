@@ -39,7 +39,7 @@ export default async function CashFlowPage({
                     <DropdownSelect
                         name="groupBy"
                         defaultValue={groupBy ?? ''}
-                        className={`${FILTER_PILL_CLASS} w-48`}
+                        className={`${FILTER_PILL_CLASS} w-40`}
                         options={[
                             { value: '', label: 'Sem agrupamento' },
                             ...Object.entries(GROUPS).map(([value, label]) => ({ value, label })),
