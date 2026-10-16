@@ -21,7 +21,7 @@ export async function createPresetAction(_prev: FormState, formData: FormData): 
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/cadastros/presets');
+    revalidatePath('/cadastros/plano-de-contas');
     return { ok: true, ...SUCCESS.presetCreated };
 }
 
@@ -40,7 +40,7 @@ export async function updatePresetAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/cadastros/presets');
+    revalidatePath('/cadastros/plano-de-contas');
     return { ok: true, ...SUCCESS.presetUpdated };
 }
 
@@ -52,6 +52,6 @@ export async function deletePresetAction(presetId: string): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/cadastros/presets');
+    revalidatePath('/cadastros/plano-de-contas');
     return { ok: true };
 }

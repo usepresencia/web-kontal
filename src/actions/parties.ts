@@ -13,7 +13,7 @@ import { z } from 'zod';
 const INVALID_ID: FormState = { ok: false, message: 'Identificador inválido.' };
 const isUuid = (value: string) => z.uuid().safeParse(value).success;
 
-export const PARTIES_PATH = '/cadastros/clientes-fornecedores';
+const PARTIES_PATH = '/cadastros/clientes-fornecedores';
 
 /** Cria um cliente ou fornecedor do tenant. */
 export async function createPartyAction(_prev: FormState, formData: FormData): Promise<FormState> {

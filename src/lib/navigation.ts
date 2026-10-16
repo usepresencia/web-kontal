@@ -13,7 +13,6 @@ import {
     Receipt,
     Repeat,
     Scale,
-    SlidersHorizontal,
     Users,
     type LucideIcon,
 } from 'lucide-react';
@@ -65,7 +64,6 @@ export const NAV_SECTIONS: NavSection[] = [
                 icon: Users,
             },
             { title: 'Plano de contas', href: '/cadastros/plano-de-contas', icon: ListTree },
-            { title: 'Presets', href: '/cadastros/presets', icon: SlidersHorizontal },
         ],
     },
 ];
