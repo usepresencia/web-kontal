@@ -62,6 +62,17 @@ Toda resposta da API passa por um schema zod antes de chegar à tela.
 `src/proxy.ts` aplica a CSP com nonce e os cabeçalhos de segurança (`src/lib/security/csp.ts`).
 `dangerouslySetInnerHTML` é erro de lint. Redirects só aceitam caminhos internos (`isSafeInternalPath`).
 
+## Entrada pelo Presencia (SSO)
+
+O acesso começa no Presencia: `INTERNAL_ADMIN` e `INTERNAL_BILLING` são enviados a
+`/sso-callback#token=<id-token>`. O fragmento não chega ao servidor, então a página lê o token, o remove
+da URL e o entrega à Server Action `createSessionAction`, que o valida em `POST /auth/session` da
+api-kontal e grava o cookie `httpOnly`. Em seguida o usuário escolhe a empresa ativa (`/empresa`). Com o
+token vencido (1 h), a API responde 401 e o usuário volta ao Presencia, que entrega um token novo.
+
+Variáveis: `KONTAL_API_URL` (servidor) e `NEXT_PUBLIC_PRESENCIA_URL`; veja o `.env.example`. A api-kontal
+precisa ter a origem deste app em `CORS_ALLOWED_ORIGINS`.
+
 ## Qualidade
 
 ```bash
