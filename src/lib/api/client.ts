@@ -15,16 +15,34 @@ type ApiFetchInit = {
     tenant?: boolean;
 };
 
-/** Lê o `code` e a `message` do corpo de erro da api-kontal, quando existirem. */
-async function readError(response: Response): Promise<{ code: string; message: string }> {
+type ErrorDetails = { code: string; message: string; fieldErrors: Record<string, string[]> };
+
+/** Mantém só os erros por campo que são listas de texto. */
+function readFieldErrors(errors: unknown): Record<string, string[]> {
+    if (typeof errors !== 'object' || errors === null) return {};
+    return Object.fromEntries(
+        Object.entries(errors).filter(
+            (entry): entry is [string, string[]] =>
+                Array.isArray(entry[1]) && entry[1].every(item => typeof item === 'string'),
+        ),
+    );
+}
+
+/** Lê `code`, `message` e os erros por campo do corpo de erro da api-kontal, quando existirem. */
+async function readError(response: Response): Promise<ErrorDetails> {
     try {
-        const body = (await response.json()) as { code?: unknown; message?: unknown };
+        const body = (await response.json()) as {
+            code?: unknown;
+            message?: unknown;
+            errors?: unknown;
+        };
         return {
             code: typeof body.code === 'string' ? body.code : `HTTP_${response.status}`,
             message: typeof body.message === 'string' ? body.message : response.statusText,
+            fieldErrors: readFieldErrors(body.errors),
         };
     } catch {
-        return { code: `HTTP_${response.status}`, message: response.statusText };
+        return { code: `HTTP_${response.status}`, message: response.statusText, fieldErrors: {} };
     }
 }
 
@@ -59,8 +77,8 @@ export async function apiFetch<S extends z.ZodType>(
 
     if (response.status === 401) redirect(SESSION_ENDED_PATH);
     if (!response.ok) {
-        const { code, message } = await readError(response);
-        throw new ApiError(response.status, code, message);
+        const { code, message, fieldErrors } = await readError(response);
+        throw new ApiError(response.status, code, message, fieldErrors);
     }
 
     const payload = response.status === 204 ? undefined : await response.json();

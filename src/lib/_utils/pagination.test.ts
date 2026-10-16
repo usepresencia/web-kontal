@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildPageWindow, pageCount, pageRange } from './pagination';
+import { buildPageWindow, pageCount, pageRange, parsePageParams } from './pagination';
 
 describe('buildPageWindow', () => {
     it.each([
@@ -29,5 +29,31 @@ describe('pageRange', () => {
         expect(pageRange(1, 10, 25)).toEqual({ from: 1, to: 10 });
         expect(pageRange(3, 10, 25)).toEqual({ from: 21, to: 25 });
         expect(pageRange(1, 10, 0)).toEqual({ from: 0, to: 0 });
+    });
+});
+
+describe('parsePageParams', () => {
+    it('usa página 1 e tamanho 10 por padrão', () => {
+        expect(parsePageParams({})).toEqual({ page: 1, pageSize: 10 });
+    });
+
+    it('lê os valores da query', () => {
+        expect(parsePageParams({ page: '3', pageSize: '25' })).toEqual({ page: 3, pageSize: 25 });
+    });
+
+    it('usa o primeiro valor quando a query repete o parâmetro', () => {
+        expect(parsePageParams({ page: ['2', '9'] })).toEqual({ page: 2, pageSize: 10 });
+    });
+
+    it.each([
+        [{ page: '0' }, { page: 1, pageSize: 10 }],
+        [{ page: '-4' }, { page: 1, pageSize: 10 }],
+        [{ page: 'abc' }, { page: 1, pageSize: 10 }],
+        [{ page: '1.5' }, { page: 1, pageSize: 10 }],
+        [{ pageSize: '0' }, { page: 1, pageSize: 10 }],
+        [{ pageSize: '101' }, { page: 1, pageSize: 10 }],
+        [{ pageSize: '100' }, { page: 1, pageSize: 100 }],
+    ])('descarta valores inválidos %j', (query, expected) => {
+        expect(parsePageParams(query)).toEqual(expected);
     });
 });

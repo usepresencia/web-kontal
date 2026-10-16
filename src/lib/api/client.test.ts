@@ -82,6 +82,18 @@ describe('apiFetch', () => {
         expect(error).toMatchObject({ status: 409, code: 'PERIOD_CLOSED' });
     });
 
+    it('expõe os erros por campo de uma validação 400', async () => {
+        mockFetch(400, {
+            message: 'Validation failed',
+            errors: { name: ['Obrigatório'], address: ['CEP inválido', 'x'], bad: 'não é lista' },
+        });
+        const error = await apiFetch('/x', schema).catch(e => e);
+        expect(error).toMatchObject({
+            status: 400,
+            fieldErrors: { name: ['Obrigatório'], address: ['CEP inválido', 'x'] },
+        });
+    });
+
     it('envia o corpo como JSON', async () => {
         const fetchMock = mockFetch(200, { id: '1', name: 'A' });
         await apiFetch('/x', schema, { method: 'POST', body: { name: 'A' } });
