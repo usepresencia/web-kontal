@@ -305,6 +305,17 @@ export async function getTitlePaymentAccountsAction(
     }
 }
 
+/** Busca um título pelo identificador, para abrir seus detalhes; `null` se não existir. */
+export async function getTitleAction(titleId: string): Promise<Title | null> {
+    if (!isUuid(titleId)) return null;
+    try {
+        return await apiFetch(`/titles/${titleId}`, titleSchema);
+    } catch (error) {
+        if (error instanceof ApiError && error.status < 500) return null;
+        throw error;
+    }
+}
+
 /** Títulos em aberto de um tipo (até 100), para escolher qual pagar ou receber. */
 export async function getOpenTitlesAction(type: 'INCOME' | 'EXPENSE'): Promise<Title[]> {
     if (type !== 'INCOME' && type !== 'EXPENSE') return [];

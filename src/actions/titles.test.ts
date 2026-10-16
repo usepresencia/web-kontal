@@ -296,3 +296,25 @@ describe('createTitleAction com baixa na hora', () => {
         expect(apiFetch).not.toHaveBeenCalled();
     });
 });
+
+describe('getTitleAction', () => {
+    it('devolve o título pedido', async () => {
+        const { getTitleAction } = await import('./titles');
+        apiFetch.mockResolvedValue({ id: TITLE_ID });
+        expect(await getTitleAction(TITLE_ID)).toEqual({ id: TITLE_ID });
+        expect(apiFetch.mock.calls[0][0]).toBe(`/titles/${TITLE_ID}`);
+    });
+
+    it('recusa identificador inválido sem consultar a API', async () => {
+        const { getTitleAction } = await import('./titles');
+        expect(await getTitleAction('../x')).toBeNull();
+        expect(apiFetch).not.toHaveBeenCalled();
+    });
+
+    it('devolve null em erro 4xx da API', async () => {
+        const { getTitleAction } = await import('./titles');
+        const { ApiError } = await import('@/lib/api/errors');
+        apiFetch.mockRejectedValue(new ApiError(404, 'NOT_FOUND', 'x'));
+        expect(await getTitleAction(TITLE_ID)).toBeNull();
+    });
+});
