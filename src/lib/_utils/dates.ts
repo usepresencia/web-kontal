@@ -46,3 +46,16 @@ export function formatMonth(month: string): string {
     const [year, number] = month.split('-');
     return `${number}/${year}`;
 }
+
+const MS_PER_DAY = 86_400_000;
+
+/** Há quantos dias a data ISO aconteceu: "hoje", "ontem" ou "Nd atrás" (pela data, sem a hora). */
+export function daysAgoLabel(iso: string, now: Date): string {
+    const [year, month, day] = iso.slice(0, 10).split('-').map(Number);
+    const then = Date.UTC(year, month - 1, day);
+    const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const days = Math.max(0, Math.floor((today - then) / MS_PER_DAY));
+    if (days === 0) return 'hoje';
+    if (days === 1) return 'ontem';
+    return `${days}d atrás`;
+}
