@@ -59,3 +59,28 @@ export function daysAgoLabel(iso: string, now: Date): string {
     if (days === 1) return 'ontem';
     return `${days}d atrás`;
 }
+
+/** Primeiro e último dia do mês anterior ao da data informada, como `YYYY-MM-DD`. */
+export function previousMonthRange(now: Date): { start: string; end: string } {
+    return currentMonthRange(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+}
+
+const MONTH_ABBREVIATIONS = [
+    'jan',
+    'fev',
+    'mar',
+    'abr',
+    'mai',
+    'jun',
+    'jul',
+    'ago',
+    'set',
+    'out',
+    'nov',
+    'dez',
+];
+
+/** Abreviação do mês em minúsculas ("set"); o índice começa em 0 como em `Date#getMonth`. */
+export function monthAbbreviation(monthIndex: number): string {
+    return MONTH_ABBREVIATIONS[monthIndex];
+}
