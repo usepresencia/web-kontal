@@ -1,71 +1,104 @@
 'use client';
 
-import { FormField } from '@/lib/_components/form-field';
+import { AmountInput } from '@/lib/_components/amount-input';
+import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { SelectField } from '@/lib/_components/select-field';
+import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import { SERIES_FREQUENCY_LABELS, SERIES_KIND_LABELS } from '@/lib/_utils/title-labels';
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
+
+type Option = { value: string; label: string };
 
 type TitleFormProps = {
     action: (state: FormState, formData: FormData) => Promise<FormState>;
     type: 'INCOME' | 'EXPENSE';
-    presets: { value: string; label: string }[];
+    presets: Option[];
     /** Contas de ativo ou despesa para a compra de ativo (só em título a pagar). */
-    destinationAccounts?: { value: string; label: string }[];
+    destinationAccounts?: Option[];
+    /** Chamado depois que o título é criado. */
+    onSuccess?: () => void;
 };
 
 const toOptions = (labels: Record<string, string>) =>
     Object.entries(labels).map(([value, label]) => ({ value, label }));
 
-/** Formulário de título, com opção de parcelamento ou recorrência. */
-export function TitleForm({ action, type, presets, destinationAccounts = [] }: TitleFormProps) {
+const YES_NO: Option[] = [
+    { value: 'false', label: 'Não' },
+    { value: 'true', label: 'Sim' },
+];
+
+const REPEAT_OPTIONS: Option[] = [
+    { value: 'NONE', label: 'Sem repetição' },
+    ...toOptions(SERIES_KIND_LABELS),
+];
+
+/** Cadastro de título nos campos em pílula, com opção de parcelamento ou recorrência. */
+export function TitleForm({
+    action,
+    type,
+    presets,
+    destinationAccounts = [],
+    onSuccess,
+}: TitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
+    const [preset, setPreset] = useState(presets[0]?.value ?? '');
+    const [destination, setDestination] = useState('');
+    const [isOpening, setIsOpening] = useState('false');
     const [repeat, setRepeat] = useState('NONE');
-    const [isOpening, setIsOpening] = useState(false);
+    const [frequency, setFrequency] = useState('');
     const errors = (field: string) => state.fieldErrors?.[field];
 
+    useEffect(() => {
+        if (state.ok) onSuccess?.();
+    }, [state, onSuccess]);
+
     return (
-        <form action={formAction} className="space-y-6">
+        <form action={formAction} className="space-y-4">
             <FormPendingOverlay message="Salvando título…" />
             <input type="hidden" name="type" value={type} />
 
-            <div className="grid gap-4 md:grid-cols-2">
-                <SelectField
+            <AmountInput
+                name="amount"
+                label="Valor"
+                tone={type === 'EXPENSE' ? 'negative' : 'positive'}
+                errors={errors('amount')}
+            />
+
+            <div className="grid grid-cols-2 gap-3">
+                <PillInput
+                    className={FILTER_PILL_CLASS}
+                    label="Descrição"
+                    name="description"
+                    required
+                    errors={errors('description')}
+                />
+                <PillSelect
+                    className={FILTER_PILL_CLASS}
                     label="Preset"
                     name="presetId"
+                    value={preset}
+                    onChange={setPreset}
                     options={presets}
                     errors={errors('presetId')}
                 />
-                <FormField
-                    label="Descrição"
-                    name="description"
-                    errors={errors('description')}
-                    required
-                />
-                <FormField
-                    label="Valor (R$)"
-                    name="amount"
-                    inputMode="decimal"
-                    placeholder="1.234,50"
-                    errors={errors('amount')}
-                    required
-                />
-                <FormField
+                <PillInput
+                    className={FILTER_PILL_CLASS}
                     label="Vencimento"
                     name="expirationDate"
                     type="date"
                     errors={errors('expirationDate')}
-                    required
                 />
-                <FormField
+                <PillInput
+                    className={FILTER_PILL_CLASS}
                     label="Emissão (opcional)"
                     name="issueDate"
                     type="date"
                     errors={errors('issueDate')}
                 />
-                <FormField
+                <PillInput
+                    className={FILTER_PILL_CLASS}
                     label="Juros mensais"
                     name="feesPercentageMonthly"
                     type="number"
@@ -76,98 +109,103 @@ export function TitleForm({ action, type, presets, destinationAccounts = [] }: T
                     suffix="%"
                     errors={errors('feesPercentageMonthly')}
                 />
-            </div>
-
-            {type === 'EXPENSE' && destinationAccounts.length > 0 && (
-                <SelectField
-                    label="Conta de destino (compra de ativo)"
-                    name="destinationAccountId"
-                    options={destinationAccounts}
-                    allowEmpty
-                    placeholder="Despesa do preset (padrão)"
-                    errors={errors('destinationAccountId')}
-                />
-            )}
-
-            <fieldset className="space-y-4">
-                <legend className="font-display text-lg font-semibold">Implantação</legend>
-                <SelectField
-                    label="Título de implantação (saldo inicial)"
+                {type === 'EXPENSE' && destinationAccounts.length > 0 && (
+                    <PillSelect
+                        className={FILTER_PILL_CLASS}
+                        label="Conta de destino"
+                        name="destinationAccountId"
+                        value={destination}
+                        onChange={setDestination}
+                        options={destinationAccounts}
+                        allowEmpty
+                        emptyLabel="Despesa do preset (padrão)"
+                        placeholder="Despesa do preset (padrão)"
+                        errors={errors('destinationAccountId')}
+                    />
+                )}
+                <PillSelect
+                    className={FILTER_PILL_CLASS}
+                    label="Saldo inicial (implantação)"
                     name="isOpening"
-                    options={[
-                        { value: 'false', label: 'Não' },
-                        { value: 'true', label: 'Sim' },
-                    ]}
-                    defaultValue="false"
-                    onValueChange={value => setIsOpening(value === 'true')}
+                    value={isOpening}
+                    onChange={setIsOpening}
+                    options={YES_NO}
                 />
-                {isOpening && (
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <FormField
+                {isOpening === 'true' && (
+                    <>
+                        <PillInput
+                            className={FILTER_PILL_CLASS}
                             label="Data de implantação"
                             name="openingDate"
                             type="date"
                             errors={errors('openingDate')}
                         />
-                        <FormField
+                        <PillInput
+                            className={FILTER_PILL_CLASS}
                             label="Já baixado (R$, opcional)"
                             name="settledAmount"
                             inputMode="decimal"
                             errors={errors('settledAmount')}
                         />
-                    </div>
+                    </>
                 )}
-            </fieldset>
-
-            <fieldset className="space-y-4">
-                <legend className="font-display text-lg font-semibold">Repetição</legend>
-                <SelectField
-                    label="Tipo de repetição"
+                <PillSelect
+                    className={FILTER_PILL_CLASS}
+                    label="Repetição"
                     name="repeat"
-                    options={[
-                        { value: 'NONE', label: 'Sem repetição' },
-                        ...toOptions(SERIES_KIND_LABELS),
-                    ]}
-                    defaultValue="NONE"
-                    onValueChange={value => setRepeat(value || 'NONE')}
+                    value={repeat}
+                    onChange={next => setRepeat(next || 'NONE')}
+                    options={REPEAT_OPTIONS}
                     errors={errors('repeat')}
                 />
                 {repeat !== 'NONE' && (
-                    <div className="grid gap-4 md:grid-cols-3">
-                        <SelectField
+                    <>
+                        <PillSelect
+                            className={FILTER_PILL_CLASS}
                             label="Frequência"
                             name="frequency"
+                            value={frequency}
+                            onChange={setFrequency}
                             options={toOptions(SERIES_FREQUENCY_LABELS)}
                             allowEmpty={repeat === 'INSTALLMENT'}
+                            emptyLabel="Mensal (padrão)"
                             placeholder={repeat === 'INSTALLMENT' ? 'Mensal (padrão)' : 'Selecione'}
                             errors={errors('frequency')}
                         />
-                        <FormField
+                        <PillInput
+                            className={FILTER_PILL_CLASS}
                             label="Quantidade"
                             name="count"
                             type="number"
                             min={1}
                             errors={errors('count')}
                         />
-                        <FormField
-                            label="ou data final"
+                        <PillInput
+                            className={FILTER_PILL_CLASS}
+                            label="Ou data final"
                             name="until"
                             type="date"
                             errors={errors('until')}
                         />
-                    </div>
+                    </>
                 )}
-            </fieldset>
+            </div>
 
-            {state.message && (
+            {state.message && !state.ok && (
                 <p role="alert" className="text-negative text-sm">
                     {state.message}
                 </p>
             )}
 
-            <Button type="submit" disabled={pending}>
-                {pending ? 'Salvando…' : 'Criar'}
-            </Button>
+            <div className="flex justify-end">
+                <Button
+                    type="submit"
+                    disabled={pending}
+                    className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
+                >
+                    {pending ? 'Salvando…' : 'Criar título'}
+                </Button>
+            </div>
         </form>
     );
 }

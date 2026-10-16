@@ -8,7 +8,6 @@ export default async function Page({
     return (
         <TitlesView
             type="EXPENSE"
-            basePath="/operacoes/pagar"
             heading="Contas a pagar"
             subtitle="Gerencie suas contas a pagar"
             searchParams={await searchParams}
