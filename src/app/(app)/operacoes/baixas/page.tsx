@@ -53,7 +53,7 @@ export default async function EntriesPage({
                         name="paidFrom"
                         defaultValue={paidFrom ?? ''}
                         clearable
-                        className={`${FILTER_PILL_CLASS} w-44`}
+                        className={`${FILTER_PILL_CLASS} w-36`}
                     />
                 </FilterField>
                 <FilterField label="até">
@@ -61,14 +61,14 @@ export default async function EntriesPage({
                         name="paidTo"
                         defaultValue={paidTo ?? ''}
                         clearable
-                        className={`${FILTER_PILL_CLASS} w-44`}
+                        className={`${FILTER_PILL_CLASS} w-36`}
                     />
                 </FilterField>
                 <FilterField label="Tipo">
                     <DropdownSelect
                         name="titleType"
                         defaultValue={titleType ?? ''}
-                        className={`${FILTER_PILL_CLASS} w-40`}
+                        className={`${FILTER_PILL_CLASS} w-32`}
                         options={[
                             { value: '', label: 'Todos' },
                             ...Object.entries(TITLE_TYPE_LABELS).map(([value, label]) => ({
@@ -82,7 +82,7 @@ export default async function EntriesPage({
                     <DropdownSelect
                         name="billingAccountId"
                         defaultValue={accountId.success ? accountId.data : ''}
-                        className={`${FILTER_PILL_CLASS} w-64`}
+                        className={`${FILTER_PILL_CLASS} w-52`}
                         options={[
                             { value: '', label: 'Todas' },
                             ...financial.map(account => ({

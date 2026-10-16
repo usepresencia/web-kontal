@@ -40,7 +40,7 @@ export default async function JournalEntriesPage({
                         name="from"
                         defaultValue={from ?? ''}
                         clearable
-                        className={`${FILTER_PILL_CLASS} w-44`}
+                        className={`${FILTER_PILL_CLASS} w-36`}
                     />
                 </FilterField>
                 <FilterField label="Até">
@@ -48,7 +48,7 @@ export default async function JournalEntriesPage({
                         name="to"
                         defaultValue={to ?? ''}
                         clearable
-                        className={`${FILTER_PILL_CLASS} w-44`}
+                        className={`${FILTER_PILL_CLASS} w-36`}
                     />
                 </FilterField>
                 <FilterButton />

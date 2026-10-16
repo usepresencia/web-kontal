@@ -53,7 +53,7 @@ export default async function AccountLedgerPage({
                         name="accountId"
                         defaultValue={accountId.success ? accountId.data : ''}
                         placeholder="Selecione"
-                        className={`${FILTER_PILL_CLASS} w-72`}
+                        className={`${FILTER_PILL_CLASS} w-56`}
                         options={options.map(account => ({
                             value: account.id,
                             label: `${account.code} ${account.name}`,
