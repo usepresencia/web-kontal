@@ -27,11 +27,12 @@ export function formatDate(isoDate: string): string {
     return `${day}/${month}/${year}`;
 }
 
-/** Textos da baixa conforme o tipo: pagamento no título a pagar e recebimento no título a receber. */
-export function entryLabels(type: 'INCOME' | 'EXPENSE') {
+/** Textos da baixa conforme o tipo: pagamento no título a pagar e recebimento no título a receber; "parcela" no lugar de "título" quando é de um parcelamento. */
+export function entryLabels(type: 'INCOME' | 'EXPENSE', installment = false) {
+    const noun = installment ? 'parcela' : 'título';
     return type === 'EXPENSE'
         ? {
-              action: 'Pagar título',
+              action: `Pagar ${noun}`,
               create: 'Novo pagamento',
               now: 'Pagar agora',
               opening: 'Despesa inicial',
@@ -40,7 +41,7 @@ export function entryLabels(type: 'INCOME' | 'EXPENSE') {
               overlay: 'Registrando pagamento…',
           }
         : {
-              action: 'Receber título',
+              action: `Receber ${noun}`,
               create: 'Novo recebimento',
               now: 'Receber agora',
               opening: 'Saldo inicial',

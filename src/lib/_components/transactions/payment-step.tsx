@@ -42,6 +42,7 @@ export function PaymentStep({ title, onSuccess }: PaymentStepProps) {
             accounts={accounts}
             today={toLocalIsoDate(new Date())}
             paying={title.type === 'EXPENSE'}
+            installment={title.seriesIndex !== null}
             defaultAmount={toInputAmount(title.remainingAmount)}
             onSuccess={onSuccess}
         />

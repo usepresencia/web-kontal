@@ -111,6 +111,11 @@ describe('TransactionDetailsBody', () => {
         expect(html).toContain('A receber');
     });
 
+    it('chama o botão de "Pagar parcela" quando o título é de um parcelamento', () => {
+        expect(render([], { seriesId: 's', seriesIndex: 2 })).toContain('Pagar parcela');
+        expect(render([])).toContain('Pagar título');
+    });
+
     it('mostra a parcela quando o título é de uma série', () => {
         expect(render([], { seriesId: 's', seriesIndex: 3 })).toContain('Parcela 3');
     });

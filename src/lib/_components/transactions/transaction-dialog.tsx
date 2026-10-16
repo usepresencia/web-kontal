@@ -16,10 +16,12 @@ type TransactionDialogProps = {
     title: Title | null;
     ago: string;
     onClose: () => void;
+    /** Quando informado, mostra o chevron de voltar antes do título dos detalhes (ex.: de volta ao parcelamento). */
+    onBack?: () => void;
 };
 
 /** Modal de detalhes da transação: dados do título e as baixas, carregadas ao abrir. */
-export function TransactionDialog({ title, ago, onClose }: TransactionDialogProps) {
+export function TransactionDialog({ title, ago, onClose, onBack }: TransactionDialogProps) {
     const [entries, setEntries] = useState<TitleEntry[] | null>(null);
     const [copied, setCopied] = useState(false);
     const [step, setStep] = useState<'details' | 'pay'>('details');
@@ -57,10 +59,12 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
             <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
                 <DialogHeader>
                     {step === 'details' ? (
-                        <StepTitle>Detalhes da transação</StepTitle>
+                        <StepTitle onBack={onBack}>Detalhes da transação</StepTitle>
                     ) : (
                         <StepTitle onBack={() => setStep('details')}>
-                            {title ? entryLabels(title.type).action : 'Baixar título'}
+                            {title
+                                ? entryLabels(title.type, title.seriesIndex !== null).action
+                                : 'Baixar título'}
                         </StepTitle>
                     )}
                 </DialogHeader>

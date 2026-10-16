@@ -21,6 +21,8 @@ type EntryFormProps = {
     accounts: { value: string; label: string }[];
     today: string;
     paying: boolean;
+    /** O título é uma parcela de parcelamento: os textos dizem "parcela" em vez de "título". */
+    installment?: boolean;
     /** Valor inicial do campo (ex.: o saldo em aberto, como "1234,50"). */
     defaultAmount?: string;
     /** Chamado depois que a baixa é registrada. */
@@ -33,6 +35,7 @@ export function EntryForm({
     accounts,
     today,
     paying,
+    installment = false,
     defaultAmount,
     onSuccess,
 }: EntryFormProps) {
@@ -44,7 +47,7 @@ export function EntryForm({
     const [account, setAccount] = useState('');
     const [method, setMethod] = useState('PIX');
     const errors = (field: string) => state.fieldErrors?.[field];
-    const labels = entryLabels(paying ? 'EXPENSE' : 'INCOME');
+    const labels = entryLabels(paying ? 'EXPENSE' : 'INCOME', installment);
 
     useEffect(() => {
         if (state.ok) onSuccess?.();
@@ -119,7 +122,7 @@ export function EntryForm({
             <div className="flex justify-end">
                 <ConfirmSubmitButton
                     confirmTitle={labels.action}
-                    confirmDescription={`Registrar ${paying ? 'o pagamento' : 'o recebimento'} deste título?`}
+                    confirmDescription={`Registrar ${paying ? 'o pagamento' : 'o recebimento'} d${installment ? 'esta parcela' : 'este título'}?`}
                     confirmLabel={labels.submit}
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
