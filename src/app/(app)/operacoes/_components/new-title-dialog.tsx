@@ -32,7 +32,7 @@ type NewTitleDialogProps = {
 export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
     const [open, setOpen] = useState(false);
     const [options, setOptions] = useState<TitleFormOptions | null>(null);
-    const label = opening ? 'Saldo inicial' : entryLabels(type).create;
+    const label = opening ? entryLabels(type).opening : entryLabels(type).create;
 
     useEffect(() => {
         if (!open) return;
@@ -65,7 +65,9 @@ export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
                     </DialogTitle>
                     <DialogDescription className="text-sm">
                         {opening
-                            ? 'Registre o saldo que já existia antes de usar o sistema.'
+                            ? type === 'EXPENSE'
+                                ? 'Registre a despesa que já existia antes de usar o sistema.'
+                                : 'Registre o saldo que já existia antes de usar o sistema.'
                             : 'Cadastre o título e, se quiser, já registre a baixa.'}
                     </DialogDescription>
                 </DialogHeader>

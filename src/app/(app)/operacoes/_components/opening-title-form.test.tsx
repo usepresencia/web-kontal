@@ -13,7 +13,22 @@ const html = renderToStaticMarkup(
     </BusyProvider>,
 );
 
+const expenseHtml = renderToStaticMarkup(
+    <BusyProvider>
+        <OpeningTitleForm
+            action={vi.fn()}
+            type="EXPENSE"
+            presets={[{ value: 'p1', label: 'Padrão' }]}
+        />
+    </BusyProvider>,
+);
+
 describe('OpeningTitleForm', () => {
+    it('chama de saldo inicial a receber e de despesa inicial a pagar', () => {
+        expect(html).toContain('Registrar saldo inicial');
+        expect(expenseHtml).toContain('Registrar despesa inicial');
+    });
+
     it('envia o título como implantação e pede a data e o valor já baixado', () => {
         expect(html).toMatch(/<input[^>]*name="isOpening"[^>]*value="true"/);
         expect(html).toContain('name="openingDate"');
