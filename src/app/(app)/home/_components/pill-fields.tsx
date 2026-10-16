@@ -18,7 +18,7 @@ const NONE = '__none__';
 export function FieldError({ errors }: { errors?: string[] }) {
     if (!errors) return null;
     return (
-        <p role="alert" className="text-negative mt-1 text-xs">
+        <p role="alert" className="text-negative mt-1 pl-4 text-xs">
             {errors.join(' ')}
         </p>
     );
@@ -46,7 +46,7 @@ export function PillInput({
         <div className="min-w-0">
             <label
                 htmlFor={fieldId}
-                className="text-muted-foreground mb-1 block text-xs font-medium"
+                className="text-muted-foreground mb-1 block pl-4 text-xs font-medium"
             >
                 {label}
             </label>
@@ -100,7 +100,9 @@ export function PillSelect({
 }: PillSelectProps) {
     return (
         <div className="min-w-0">
-            <span className="text-muted-foreground mb-1 block text-xs font-medium">{label}</span>
+            <span className="text-muted-foreground mb-1 block pl-4 text-xs font-medium">
+                {label}
+            </span>
             <input type="hidden" name={name} value={value} />
             <Select
                 value={value === '' && allowEmpty ? NONE : value}
