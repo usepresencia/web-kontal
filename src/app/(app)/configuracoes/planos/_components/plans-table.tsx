@@ -1,62 +1,50 @@
 'use client';
 
-import { deletePlanAction } from '@/actions/billing';
-import { useBusyRun } from '@/lib/_components/busy-provider';
+import { Divider } from '@/lib/_components/divider';
 import { Pagination } from '@/lib/_components/pagination';
-import { Button } from '@/lib/_components/ui/button';
-import { ConfirmationDialog } from '@/lib/_components/ui/confirmation-dialog';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/lib/_components/ui/table';
 import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
-import { notifyResult } from '@/lib/_utils/notify';
 import type { Page } from '@/lib/_utils/pagination';
-import { SUCCESS } from '@/lib/_utils/toast-messages';
 import type { BillingPlan } from '@/lib/api/schemas/billing';
-import Link from 'next/link';
+import { ChevronRight, ListTree } from 'lucide-react';
 import { useState } from 'react';
+import { PlanDialog } from './plan-dialog';
 
-/** Lista paginada de planos de contas. */
+/** Lista paginada de planos de contas no padrão das demais telas; cada linha abre o modal do plano. */
 export function PlansTable({ page }: { page: Page<BillingPlan> }) {
-    const run = useBusyRun();
     const pagination = usePaginationQuery();
-    const [toDelete, setToDelete] = useState<BillingPlan | null>(null);
+    const [selected, setSelected] = useState<BillingPlan | null>(null);
 
     return (
-        <div className="space-y-4">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Nome</TableHead>
-                        <TableHead>Descrição</TableHead>
-                        <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {page.items.map(plan => (
-                        <TableRow key={plan.id}>
-                            <TableCell className="font-medium">{plan.name}</TableCell>
-                            <TableCell className="text-muted-foreground">
-                                {plan.description}
-                            </TableCell>
-                            <TableCell className="space-x-2 text-right">
-                                <Button asChild size="sm" variant="outline">
-                                    <Link href={`/configuracoes/planos/${plan.id}`}>Abrir</Link>
-                                </Button>
-                                <Button size="sm" variant="ghost" onClick={() => setToDelete(plan)}>
-                                    Excluir
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-
+        <section className="bg-card space-y-4 rounded-2xl p-5 shadow-sm">
+            <ul className="space-y-1">
+                {page.items.map((plan, index) => (
+                    <li key={plan.id}>
+                        {index > 0 && <Divider className="my-1 mr-3 ml-12" />}
+                        <button
+                            type="button"
+                            onClick={() => setSelected(plan)}
+                            aria-haspopup="dialog"
+                            className="group hover:bg-muted/50 focus-visible:ring-ring -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-3 rounded-xl px-3 py-2 text-left focus-visible:ring-2 focus-visible:outline-none"
+                        >
+                            <div className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-full">
+                                <ListTree className="size-4" aria-hidden="true" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-foreground truncate text-sm font-medium">
+                                    {plan.name}
+                                </p>
+                                <p className="text-muted-foreground truncate text-xs">
+                                    {plan.description || 'Sem descrição'}
+                                </p>
+                            </div>
+                            <ChevronRight
+                                className="text-muted-foreground size-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                                aria-hidden="true"
+                            />
+                        </button>
+                    </li>
+                ))}
+            </ul>
             <Pagination
                 page={page.page}
                 pageSize={page.pageSize}
@@ -65,24 +53,7 @@ export function PlansTable({ page }: { page: Page<BillingPlan> }) {
                 onPageSizeChange={pagination.onPageSizeChange}
                 pageSizeLabel="Planos por página:"
             />
-
-            <ConfirmationDialog
-                open={toDelete !== null}
-                onOpenChange={open => !open && setToDelete(null)}
-                title="Excluir plano"
-                description={`Excluir o plano ${toDelete?.name ?? ''}? Planos com contas em uso não podem ser excluídos.`}
-                confirmLabel="Excluir"
-                variant="destructive"
-                onConfirm={async () => {
-                    if (!toDelete) return;
-                    const result = await run(
-                        () => deletePlanAction(toDelete.id),
-                        'Excluindo plano…',
-                    );
-                    notifyResult(result, SUCCESS.planDeleted, 'Não foi possível excluir.');
-                    setToDelete(null);
-                }}
-            />
-        </div>
+            <PlanDialog plan={selected} onClose={() => setSelected(null)} />
+        </section>
     );
 }
