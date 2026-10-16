@@ -50,6 +50,14 @@ const render = (entries: TitleEntry[] | null, overrides: Partial<Title> = {}) =>
     );
 
 describe('TransactionDetailsBody', () => {
+    it('separa as baixas com o divisor do padrão e afasta as linhas das bordas', () => {
+        const html = render([entry, { ...entry, id: 'e2' }]);
+        expect(html).toContain('role="separator"');
+        expect(html).toContain('from-primary/10');
+        expect(html).not.toContain('divide-y');
+        expect(html).toContain('space-y-1 py-1');
+    });
+
     it('mostra os dados do título', () => {
         const html = render([]);
         expect(html).toContain('Aluguel da loja');
