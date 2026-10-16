@@ -2,9 +2,11 @@
 
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { apiFetch } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/errors';
 import { stateFromApiError } from '@/lib/api/form-state';
 import {
     entryCreateSchema,
+    entryPageSchema,
     entrySchema,
     seriesDetailSchema,
     seriesExtendSchema,
@@ -12,6 +14,7 @@ import {
     titleSchema,
     titleUpdateSchema,
     writeOffSchema,
+    type TitleEntry,
 } from '@/lib/api/schemas/title';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -172,4 +175,19 @@ export async function cancelSeriesAction(seriesId: string): Promise<FormState> {
     }
     revalidatePath('/operacoes/series');
     redirect('/operacoes/series');
+}
+
+/** Baixas de um título (até 100), para o modal de detalhes; vazio se o título não existe. */
+export async function getTitleEntriesAction(titleId: string): Promise<TitleEntry[]> {
+    if (!isUuid(titleId)) return [];
+    try {
+        const page = await apiFetch(
+            `/titles/${titleId}/entries?page=1&pageSize=100`,
+            entryPageSchema,
+        );
+        return page.items;
+    } catch (error) {
+        if (error instanceof ApiError && error.status < 500) return [];
+        throw error;
+    }
 }
