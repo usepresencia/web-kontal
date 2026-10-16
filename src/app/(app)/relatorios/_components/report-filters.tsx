@@ -1,4 +1,4 @@
-import { Button } from '@/lib/_components/ui/button';
+import { FilterButton } from '@/lib/_components/filter-button';
 import type { ReactNode } from 'react';
 
 type ReportFiltersProps = {
@@ -38,9 +38,7 @@ export function ReportFilters({ mode, start, end, children }: ReportFiltersProps
                 />
             </label>
             {children}
-            <Button type="submit" variant="outline">
-                Gerar
-            </Button>
+            <FilterButton label="Gerar" />
         </form>
     );
 }
