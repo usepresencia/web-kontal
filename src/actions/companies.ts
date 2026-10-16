@@ -3,6 +3,7 @@
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
+import { stateFromApiError } from '@/lib/api/form-state';
 import {
     companyInputSchema,
     companySchema,
@@ -14,14 +15,6 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const FALLBACK_MESSAGE = 'Não foi possível concluir a operação. Tente novamente.';
-
-/** Converte um erro da API em estado de formulário; erros inesperados sobem. */
-function stateFromApiError(error: unknown): FormState {
-    if (error instanceof ApiError && error.status < 500) {
-        return { ok: false, message: error.message, fieldErrors: error.fieldErrors };
-    }
-    throw error;
-}
 
 /** Cria uma empresa (apenas administrador da plataforma; a API confirma). */
 export async function createCompanyAction(
