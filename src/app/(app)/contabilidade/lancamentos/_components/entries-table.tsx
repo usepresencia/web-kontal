@@ -76,7 +76,6 @@ export function EntriesTable({ page }: { page: Page<JournalDetail> }) {
                 pageSize={page.pageSize}
                 total={page.total}
                 onPageChange={pagination.onPageChange}
-                onPageSizeChange={pagination.onPageSizeChange}
             />
         </div>
     );
