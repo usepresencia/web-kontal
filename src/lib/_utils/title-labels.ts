@@ -32,12 +32,14 @@ export function entryLabels(type: 'INCOME' | 'EXPENSE') {
     return type === 'EXPENSE'
         ? {
               action: 'Pagar título',
+              create: 'Novo pagamento',
               submit: 'Pagar',
               pending: 'Pagando…',
               overlay: 'Registrando pagamento…',
           }
         : {
               action: 'Receber título',
+              create: 'Novo recebimento',
               submit: 'Receber',
               pending: 'Recebendo…',
               overlay: 'Registrando recebimento…',

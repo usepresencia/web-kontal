@@ -22,6 +22,7 @@ describe('entryLabels', () => {
     it('usa pagamento no título a pagar', () => {
         expect(entryLabels('EXPENSE')).toEqual({
             action: 'Pagar título',
+            create: 'Novo pagamento',
             submit: 'Pagar',
             pending: 'Pagando…',
             overlay: 'Registrando pagamento…',
@@ -31,6 +32,7 @@ describe('entryLabels', () => {
     it('usa recebimento no título a receber', () => {
         expect(entryLabels('INCOME')).toEqual({
             action: 'Receber título',
+            create: 'Novo recebimento',
             submit: 'Receber',
             pending: 'Recebendo…',
             overlay: 'Registrando recebimento…',

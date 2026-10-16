@@ -1,7 +1,7 @@
 import { createTitleAction, getTitleFormOptionsAction } from '@/actions/titles';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { Button } from '@/lib/_components/ui/button';
-import { TITLE_TYPE_LABELS } from '@/lib/_utils/title-labels';
+import { entryLabels } from '@/lib/_utils/title-labels';
 import Link from 'next/link';
 import { TitleForm } from './title-form';
 
@@ -11,9 +11,7 @@ export async function NewTitleView({ type }: { type: 'INCOME' | 'EXPENSE' }) {
 
     return (
         <div className="max-w-2xl space-y-6">
-            <h1 className="text-2xl font-bold">
-                Novo título ({TITLE_TYPE_LABELS[type].toLowerCase()})
-            </h1>
+            <h1 className="text-2xl font-bold">{entryLabels(type).create}</h1>
             {presets.length === 0 ? (
                 <EmptyState
                     title="Nenhum preset ativo"

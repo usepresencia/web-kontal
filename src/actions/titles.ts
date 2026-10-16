@@ -13,9 +13,11 @@ import {
     seriesDetailSchema,
     seriesExtendSchema,
     titleCreateSchema,
+    titlePageSchema,
     titleSchema,
     titleUpdateSchema,
     writeOffSchema,
+    type Title,
     type TitleEntry,
 } from '@/lib/api/schemas/title';
 import { revalidatePath } from 'next/cache';
@@ -33,9 +35,6 @@ const LIST_PATHS = { EXPENSE: '/operacoes/pagar', INCOME: '/operacoes/receber' }
 export async function createTitleAction(_prev: FormState, formData: FormData): Promise<FormState> {
     const parsed = titleCreateSchema.safeParse(formDataToObject(formData));
     if (!parsed.success) return stateFromZodError(parsed.error);
-
-    // Só a home pode ser destino de retorno: qualquer outro valor é ignorado (open redirect).
-    const returnTo = formData.get('returnTo') === HOME_PATH ? HOME_PATH : null;
 
     const { repeat, frequency, count, until, isOpening, openingDate, settledAmount, ...title } =
         parsed.data;
@@ -57,10 +56,6 @@ export async function createTitleAction(_prev: FormState, formData: FormData): P
         return stateFromApiError(error);
     }
     revalidatePath(LIST_PATHS[title.type]);
-    if (returnTo) {
-        revalidatePath(returnTo);
-        return { ok: true, message: 'Transação criada.' };
-    }
     redirect(destination);
 }
 
@@ -257,6 +252,21 @@ export async function getTitlePaymentAccountsAction(
                     account.nature === 'ASSET',
             )
             .map(account => ({ value: account.id, label: `${account.code} ${account.name}` }));
+    } catch (error) {
+        if (error instanceof ApiError && error.status < 500) return [];
+        throw error;
+    }
+}
+
+/** Títulos em aberto de um tipo (até 100), para escolher qual pagar ou receber. */
+export async function getOpenTitlesAction(type: 'INCOME' | 'EXPENSE'): Promise<Title[]> {
+    if (type !== 'INCOME' && type !== 'EXPENSE') return [];
+    try {
+        const page = await apiFetch(
+            `/titles?type=${type}&status=OPEN&page=1&pageSize=100`,
+            titlePageSchema,
+        );
+        return page.items;
     } catch (error) {
         if (error instanceof ApiError && error.status < 500) return [];
         throw error;

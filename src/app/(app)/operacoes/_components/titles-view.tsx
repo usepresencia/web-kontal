@@ -5,7 +5,7 @@ import { FilterButton } from '@/lib/_components/filter-button';
 import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
 import { daysAgoLabel } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
-import { TITLE_STATUS_LABELS, formatDate } from '@/lib/_utils/title-labels';
+import { TITLE_STATUS_LABELS, entryLabels, formatDate } from '@/lib/_utils/title-labels';
 import { apiFetch } from '@/lib/api/client';
 import { TITLE_STATUSES, titlePageSchema } from '@/lib/api/schemas/title';
 import { NewTitleButton } from './new-title-button';
@@ -56,7 +56,7 @@ export async function TitlesView({
                     <h1 className="text-2xl font-bold">{heading}</h1>
                     <p className="text-muted-foreground text-sm">{subtitle}</p>
                 </div>
-                <NewTitleButton href={`${basePath}/novo`} />
+                <NewTitleButton href={`${basePath}/novo`} label={entryLabels(type).create} />
             </header>
 
             <form method="get" className="flex flex-wrap items-end gap-3">

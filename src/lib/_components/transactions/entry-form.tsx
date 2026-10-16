@@ -20,12 +20,21 @@ type EntryFormProps = {
     accounts: { value: string; label: string }[];
     today: string;
     paying: boolean;
+    /** Valor inicial do campo (ex.: o saldo em aberto, como "1234,50"). */
+    defaultAmount?: string;
     /** Chamado depois que a baixa é registrada. */
     onSuccess?: () => void;
 };
 
 /** Baixa do título nos campos em pílula: pagamento (a pagar) ou recebimento (a receber). */
-export function EntryForm({ titleId, accounts, today, paying, onSuccess }: EntryFormProps) {
+export function EntryForm({
+    titleId,
+    accounts,
+    today,
+    paying,
+    defaultAmount,
+    onSuccess,
+}: EntryFormProps) {
     const [state, formAction, pending] = useActionState(
         createEntryAction.bind(null, titleId),
         INITIAL_FORM_STATE,
@@ -45,6 +54,7 @@ export function EntryForm({ titleId, accounts, today, paying, onSuccess }: Entry
             <AmountInput
                 name="principalAmount"
                 label="Valor"
+                defaultValue={defaultAmount}
                 tone={paying ? 'negative' : 'positive'}
                 errors={errors('principalAmount')}
             />

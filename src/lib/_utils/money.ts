@@ -67,3 +67,8 @@ export function amountToCents(amount: string): bigint {
     const [, sign, integer, fraction] = match;
     return BigInt(`${sign}${integer}${fraction}`);
 }
+
+/** Converte o valor da API ("890.00") no formato digitado ("890,00"), para preencher um campo. */
+export function toInputAmount(amount: string): string {
+    return amount.replace('.', ',');
+}
