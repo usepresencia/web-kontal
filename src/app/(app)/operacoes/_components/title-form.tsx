@@ -28,6 +28,8 @@ type TitleFormProps = {
     financialAccounts?: Option[];
     /** Cadastra o saldo ou a despesa inicial (título de implantação) no lugar de um título comum. */
     opening?: boolean;
+    /** Cadastra um parcelamento ou recorrência: a repetição é obrigatória e não há baixa na hora. */
+    series?: boolean;
     /** Chamado depois que o título é criado. */
     onSuccess?: () => void;
 };
@@ -37,10 +39,9 @@ const toOptions = (labels: Record<string, string>) =>
 
 const PAYMENT_METHODS = toOptions(PAYMENT_METHOD_LABELS);
 
-const REPEAT_OPTIONS: Option[] = [
-    { value: 'NONE', label: 'Sem repetição' },
-    ...toOptions(SERIES_KIND_LABELS),
-];
+const SERIES_OPTIONS: Option[] = toOptions(SERIES_KIND_LABELS);
+
+const REPEAT_OPTIONS: Option[] = [{ value: 'NONE', label: 'Sem repetição' }, ...SERIES_OPTIONS];
 
 /** Cadastro de título nos campos em pílula: com parcelamento, recorrência e baixa na hora, ou como saldo/despesa inicial. */
 export function TitleForm({
@@ -50,6 +51,7 @@ export function TitleForm({
     destinationAccounts = [],
     financialAccounts = [],
     opening = false,
+    series = false,
     onSuccess,
 }: TitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
@@ -59,7 +61,7 @@ export function TitleForm({
     const [payNow, setPayNow] = useState(false);
     const [account, setAccount] = useState('');
     const [method, setMethod] = useState('PIX');
-    const [repeat, setRepeat] = useState('NONE');
+    const [repeat, setRepeat] = useState(series ? 'INSTALLMENT' : 'NONE');
     const [frequency, setFrequency] = useState('');
     const labels = entryLabels(type);
     const initialLabel = labels.opening.toLowerCase();
@@ -73,7 +75,13 @@ export function TitleForm({
     return (
         <form action={formAction} className="space-y-4">
             <FormPendingOverlay
-                message={opening ? `Salvando ${initialLabel}…` : 'Salvando título…'}
+                message={
+                    opening
+                        ? `Salvando ${initialLabel}…`
+                        : series
+                          ? 'Salvando parcelamento…'
+                          : 'Salvando título…'
+                }
             />
             <input type="hidden" name="type" value={type} />
             {opening && <input type="hidden" name="isOpening" value="true" />}
@@ -165,11 +173,11 @@ export function TitleForm({
                     <>
                         <PillSelect
                             className={FILTER_PILL_CLASS}
-                            label="Repetição"
+                            label={series ? 'Tipo' : 'Repetição'}
                             name="repeat"
                             value={repeat}
-                            onChange={next => setRepeat(next || 'NONE')}
-                            options={REPEAT_OPTIONS}
+                            onChange={next => setRepeat(next || (series ? 'INSTALLMENT' : 'NONE'))}
+                            options={series ? SERIES_OPTIONS : REPEAT_OPTIONS}
                             errors={errors('repeat')}
                         />
                         {repeat !== 'NONE' && (
@@ -259,19 +267,33 @@ export function TitleForm({
 
             <div className="flex justify-end">
                 <ConfirmSubmitButton
-                    confirmTitle={opening ? `Registrar ${initialLabel}` : 'Criar título'}
+                    confirmTitle={
+                        opening
+                            ? `Registrar ${initialLabel}`
+                            : series
+                              ? 'Criar parcelamento'
+                              : 'Criar título'
+                    }
                     confirmDescription={
                         opening
                             ? `Registrar ${initialLabel} deste título?`
-                            : payNow
-                              ? `${labels.now} e cadastrar este título?`
-                              : 'Cadastrar este título?'
+                            : series
+                              ? 'Cadastrar este parcelamento e gerar as ocorrências?'
+                              : payNow
+                                ? `${labels.now} e cadastrar este título?`
+                                : 'Cadastrar este título?'
                     }
                     confirmLabel={opening ? 'Registrar' : 'Criar'}
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending ? 'Salvando…' : opening ? `Registrar ${initialLabel}` : 'Criar título'}
+                    {pending
+                        ? 'Salvando…'
+                        : opening
+                          ? `Registrar ${initialLabel}`
+                          : series
+                            ? 'Criar parcelamento'
+                            : 'Criar título'}
                 </ConfirmSubmitButton>
             </div>
         </form>
