@@ -12,9 +12,11 @@ import {
     type Company,
     type SignedLogoUpload,
 } from '@/lib/api/schemas/company';
+import { isPlatformAdmin, requireSession } from '@/lib/auth/session';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
+const FORBIDDEN_MESSAGE = 'Apenas o administrador da plataforma pode fazer isso.';
 const FALLBACK_MESSAGE = 'Não foi possível concluir a operação. Tente novamente.';
 
 /** Cria uma empresa (apenas administrador da plataforma; a API confirma). */
@@ -22,6 +24,7 @@ export async function createCompanyAction(
     _prev: FormState,
     formData: FormData,
 ): Promise<FormState> {
+    if (!isPlatformAdmin(await requireSession())) return { ok: false, message: FORBIDDEN_MESSAGE };
     const parsed = companyInputSchema.safeParse(formDataToObject(formData));
     if (!parsed.success) return stateFromZodError(parsed.error);
 
@@ -57,6 +60,7 @@ export async function updateCompanyAction(
 
 /** Desativa uma empresa (apenas administrador da plataforma; a API confirma). */
 export async function deactivateCompanyAction(companyId: string): Promise<FormState> {
+    if (!isPlatformAdmin(await requireSession())) return { ok: false, message: FORBIDDEN_MESSAGE };
     if (!z.uuid().safeParse(companyId).success) return { ok: false, message: FALLBACK_MESSAGE };
 
     try {

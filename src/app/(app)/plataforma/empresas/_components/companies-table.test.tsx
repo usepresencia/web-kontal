@@ -8,7 +8,7 @@ vi.mock('@/actions/companies', () => ({
     deactivateCompanyAction: vi.fn(),
     createCompanyAction: vi.fn(),
     updateCompanyAction: vi.fn(),
-    getCurrentCompanyAction: vi.fn(),
+
     signLogoUploadAction: vi.fn(),
     saveLogoAction: vi.fn(),
     removeLogoAction: vi.fn(),
@@ -20,8 +20,7 @@ vi.mock('@/lib/_hooks/use-pagination-query', () => ({
 
 const { CompaniesTable } = await import('./companies-table');
 const { NewCompanyDialog } = await import('./new-company-dialog');
-const { CurrentCompanyDialog } = await import('./current-company-dialog');
-const { CompanyForm } = await import('./company-form');
+const { CompanyForm } = await import('@/lib/_components/company-form');
 
 const company = (id: string, logoUrl: string | null = null): Company => ({
     id,
@@ -76,7 +75,7 @@ describe('CompaniesTable', () => {
     });
 });
 
-describe('botões do cabeçalho', () => {
+describe('botão do cabeçalho', () => {
     it('"Nova empresa" leva o + antes do texto', () => {
         const html = renderToStaticMarkup(
             <BusyProvider>
@@ -84,16 +83,6 @@ describe('botões do cabeçalho', () => {
             </BusyProvider>,
         );
         expect(html.indexOf('lucide-plus')).toBeLessThan(html.indexOf('Nova empresa'));
-    });
-
-    it('"Editar empresa atual" é um botão que abre modal', () => {
-        const html = renderToStaticMarkup(
-            <BusyProvider>
-                <CurrentCompanyDialog />
-            </BusyProvider>,
-        );
-        expect(html).toContain('Editar empresa atual');
-        expect(html).toContain('aria-haspopup="dialog"');
     });
 });
 

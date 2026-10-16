@@ -1,6 +1,7 @@
 'use client';
 
 import { createCompanyAction } from '@/actions/companies';
+import { CompanyForm } from '@/lib/_components/company-form';
 import { Button } from '@/lib/_components/ui/button';
 import {
     Dialog,
@@ -13,7 +14,6 @@ import {
 } from '@/lib/_components/ui/dialog';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { CompanyForm } from './company-form';
 
 /** Botão "Nova empresa": abre o cadastro da empresa em modal. */
 export function NewCompanyDialog() {
