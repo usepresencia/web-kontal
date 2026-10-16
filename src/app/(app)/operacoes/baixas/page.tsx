@@ -3,6 +3,7 @@ import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
 import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
+import { FilterForm } from '@/lib/_components/filter-form';
 import { parseIsoDate } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
 import { TITLE_TYPE_LABELS } from '@/lib/_utils/title-labels';
@@ -52,7 +53,7 @@ export default async function EntriesPage({
                 </p>
             </header>
 
-            <form method="get" className="flex flex-wrap items-end gap-3">
+            <FilterForm className="flex flex-wrap items-end gap-3">
                 <FilterField label="Pago de">
                     <DatePickerField
                         name="paidFrom"
@@ -98,7 +99,7 @@ export default async function EntriesPage({
                     />
                 </FilterField>
                 <FilterButton />
-            </form>
+            </FilterForm>
 
             {entries.items.length === 0 ? (
                 <EmptyState title="Nenhuma baixa encontrada" />
