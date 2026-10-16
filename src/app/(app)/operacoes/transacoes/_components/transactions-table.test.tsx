@@ -9,7 +9,7 @@ vi.mock('@/lib/_hooks/use-pagination-query', () => ({
     usePaginationQuery: () => ({ onPageChange: vi.fn(), onPageSizeChange: vi.fn() }),
 }));
 
-const { BaixasTable } = await import('./baixas-table');
+const { TransactionsTable } = await import('./transactions-table');
 
 const entry = (id: string, overrides: Partial<TitleEntry> = {}): TitleEntry => ({
     id,
@@ -34,11 +34,11 @@ const entry = (id: string, overrides: Partial<TitleEntry> = {}): TitleEntry => (
 const render = (items: TitleEntry[]) =>
     renderToStaticMarkup(
         <BusyProvider>
-            <BaixasTable page={{ items, page: 1, pageSize: 10, total: items.length }} />
+            <TransactionsTable page={{ items, page: 1, pageSize: 10, total: items.length }} />
         </BusyProvider>,
     );
 
-describe('BaixasTable', () => {
+describe('TransactionsTable', () => {
     it('usa a lista do padrão das contas, sem tabela, com divisor entre os itens', () => {
         const html = render([entry('a'), entry('b')]);
         expect(html).not.toContain('<table');

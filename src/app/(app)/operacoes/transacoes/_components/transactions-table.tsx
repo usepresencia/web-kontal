@@ -26,8 +26,8 @@ function entryMethodLabel(entry: TitleEntry): string {
     );
 }
 
-/** Lista paginada de baixas no mesmo estilo das contas a pagar e a receber; cada linha abre o modal de detalhes do título. */
-export function BaixasTable({ page }: { page: Page<TitleEntry> }) {
+/** Lista paginada de transações no mesmo estilo das contas a pagar e a receber; cada linha abre o modal de detalhes do título. */
+export function TransactionsTable({ page }: { page: Page<TitleEntry> }) {
     const pagination = usePaginationQuery();
     const run = useBusyRun();
     const [selected, setSelected] = useState<Title | null>(null);

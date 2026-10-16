@@ -42,7 +42,7 @@ describe('PlansTable', () => {
     it('abre o modal do plano, sem link para outra página', () => {
         const html = render([plan('a')]);
         expect(html).toContain('aria-haspopup="dialog"');
-        expect(html).not.toContain('href="/configuracoes/planos/');
+        expect(html).not.toContain('href="/cadastros/plano-de-contas/');
     });
 
     it('mostra a descrição ou "Sem descrição"', () => {

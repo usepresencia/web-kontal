@@ -46,7 +46,7 @@ describe('SeriesTable', () => {
     it('abre os detalhes em modal, sem link para outra página', () => {
         const html = render([series('a')]);
         expect(html).toContain('aria-haspopup="dialog"');
-        expect(html).not.toContain('href="/operacoes/series/');
+        expect(html).not.toContain('href="/operacoes/parcelamentos/');
     });
 
     it('mostra o tipo, a frequência, as ocorrências e o primeiro vencimento', () => {

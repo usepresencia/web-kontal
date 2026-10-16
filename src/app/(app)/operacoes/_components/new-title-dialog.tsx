@@ -81,7 +81,7 @@ export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
                         description="Cadastre um preset antes de criar títulos."
                         action={
                             <Button asChild variant="outline">
-                                <Link href="/configuracoes/presets">Novo preset</Link>
+                                <Link href="/cadastros/presets">Novo preset</Link>
                             </Button>
                         }
                     />
