@@ -39,13 +39,13 @@ export function Pagination({
             )}
         >
             {onPageSizeChange && (
-                <div className="flex flex-col gap-1">
-                    <span className="text-muted-foreground text-xs">{pageSizeLabel}</span>
+                <div className="flex w-fit flex-col gap-1">
+                    <span className="text-muted-foreground pl-4 text-xs">{pageSizeLabel}</span>
                     <DropdownSelect
                         aria-label={pageSizeLabel.replace(/:$/, '')}
                         value={String(pageSize)}
                         onChange={value => onPageSizeChange(Number(value))}
-                        className="w-20"
+                        className="bg-primary text-primary-foreground border-primary hover:bg-primary/90 h-10 w-full"
                         options={PAGE_SIZE_OPTIONS.map(size => ({
                             value: String(size),
                             label: String(size),
