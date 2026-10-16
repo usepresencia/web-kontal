@@ -67,11 +67,11 @@ export default async function HomePage({
     };
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             <HomeHeader name={me.name} query={query} />
 
             {summary ? (
-                <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                     <KpiCard
                         title="Receitas"
                         value={formatAmount(summary.totals.revenues)}

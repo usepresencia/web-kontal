@@ -17,29 +17,26 @@ export function KpiCard({ title, value, tone, icon: Icon, description, change }:
     const toneSoft = tone === 'positive' ? 'bg-positive/10' : 'bg-negative/10';
 
     return (
-        <div className="bg-card animate-fade-in flex flex-col justify-between rounded-3xl p-6 shadow-sm">
+        <div className="bg-card animate-fade-in flex flex-col justify-between rounded-2xl p-5 shadow-sm">
             <div className="flex items-start justify-between">
-                <p className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
+                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                     {title}
                 </p>
                 <div
-                    className={cn(
-                        'flex size-10 items-center justify-center rounded-full',
-                        toneSoft,
-                    )}
+                    className={cn('flex size-9 items-center justify-center rounded-full', toneSoft)}
                 >
                     <Icon className={cn('size-4', toneText)} aria-hidden="true" />
                 </div>
             </div>
-            <p className={cn('font-display my-6 text-4xl font-bold tracking-tight', toneText)}>
+            <p className={cn('font-display my-4 text-2xl font-bold tracking-tight', toneText)}>
                 {value}
             </p>
             <div className="flex items-center justify-between gap-2">
-                <span className="text-muted-foreground text-sm">{description}</span>
+                <span className="text-muted-foreground text-xs">{description}</span>
                 {change && (
                     <span
                         className={cn(
-                            'rounded-full px-3 py-1 text-xs font-semibold',
+                            'rounded-full px-2.5 py-0.5 text-xs font-semibold',
                             change.favorable
                                 ? 'bg-positive/10 text-positive'
                                 : 'bg-negative/10 text-negative',
