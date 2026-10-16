@@ -14,3 +14,13 @@ export function formatMoney(cents: string): string {
     const fraction = (absolute % HUNDRED).toString().padStart(2, '0');
     return `${negative ? '-' : ''}R$ ${integer},${fraction}`;
 }
+
+const AMOUNT_PATTERN = /^(-?)(\d+)\.(\d{2})$/;
+
+/** Formata o valor decimal em texto ("1234.50") enviado pela api-kontal, sem passar por Number. */
+export function formatAmount(amount: string): string {
+    const match = AMOUNT_PATTERN.exec(amount);
+    if (!match) throw new Error(`Valor monetário inválido: "${amount}"`);
+    const [, sign, integer, fraction] = match;
+    return formatMoney(`${sign}${integer}${fraction}`);
+}
