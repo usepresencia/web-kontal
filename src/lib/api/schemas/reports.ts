@@ -121,6 +121,8 @@ export const dailyJournalSchema = z.object({
     total: z.number(),
 });
 
+export type DailyJournal = z.infer<typeof dailyJournalSchema>;
+
 export const accountLedgerSchema = z.object({
     account: z.object({ id: z.string(), code: z.string(), name: z.string() }),
     start: z.string(),
@@ -193,6 +195,8 @@ export const managementDreSchema = z.object({
         )
         .optional(),
 });
+
+export type AccountLedger = z.infer<typeof accountLedgerSchema>;
 
 export const periodClosingsSchema = z.object({
     closedThrough: z.string().nullable(),

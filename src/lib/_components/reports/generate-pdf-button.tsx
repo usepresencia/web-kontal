@@ -6,15 +6,23 @@ import { Button } from '@/lib/_components/ui/button';
 import { notify } from '@/lib/_utils/notify';
 import { FileDown } from 'lucide-react';
 
+type GeneratePdfButtonProps = {
+    report: ReportDocument;
+    /** Busca o relatório completo (todas as páginas); sem ela, o PDF traz o que está na tela. */
+    loadFullReport?: () => Promise<ReportDocument | null>;
+};
+
 /** Botão "Gerar PDF": monta o PDF do relatório no navegador e o baixa. */
-export function GeneratePdfButton({ report }: { report: ReportDocument }) {
+export function GeneratePdfButton({ report, loadFullReport }: GeneratePdfButtonProps) {
     const run = useBusyRun();
 
     const generate = async () => {
         try {
             await run(async () => {
+                const full = loadFullReport ? await loadFullReport() : report;
+                if (!full) throw new Error('Relatório indisponível');
                 const { buildReportPdf } = await import('@/lib/_utils/report-pdf');
-                buildReportPdf(report).save(`${report.filename}.pdf`);
+                buildReportPdf(full).save(`${full.filename}.pdf`);
             }, 'Gerando PDF…');
             notify('success', 'O PDF do relatório foi gerado com sucesso.', 'PDF gerado');
         } catch {

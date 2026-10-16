@@ -2,12 +2,12 @@ import { ReportPage } from '@/lib/_components/reports/report-page';
 import type { ReportSection } from '@/lib/_components/reports/report-types';
 import { parsePeriodParams } from '@/lib/_utils/dates';
 import { formatAmount } from '@/lib/_utils/money';
+import { formatSided } from '@/lib/_utils/sided';
 import { formatDate } from '@/lib/_utils/title-labels';
 import { apiFetch } from '@/lib/api/client';
 import { trialBalanceSchema } from '@/lib/api/schemas/reports';
 import { ReportFilters } from '../_components/report-filters';
 import { periodLabel } from '../_components/report-rows';
-import { formatSided } from '../_components/sided';
 
 export default async function TrialBalancePage({
     searchParams,

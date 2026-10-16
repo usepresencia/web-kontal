@@ -1,11 +1,11 @@
+import { getFullLedgerReportAction } from '@/actions/reports';
 import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
 import { ReportPage } from '@/lib/_components/reports/report-page';
-import type { ReportSection } from '@/lib/_components/reports/report-types';
 import { parsePeriodParams } from '@/lib/_utils/dates';
-import { formatAmount } from '@/lib/_utils/money';
 import { parsePageParams } from '@/lib/_utils/pagination';
+import { ledgerSections } from '@/lib/_utils/report-builders';
 import { formatDate } from '@/lib/_utils/title-labels';
 import { apiFetch } from '@/lib/api/client';
 import { accountPageSchema } from '@/lib/api/schemas/billing';
@@ -13,7 +13,6 @@ import { accountLedgerSchema } from '@/lib/api/schemas/reports';
 import { z } from 'zod';
 import { ReportFilters } from '../_components/report-filters';
 import { periodLabel } from '../_components/report-rows';
-import { formatSided } from '../_components/sided';
 import { SimplePagination } from '../_components/simple-pagination';
 
 export default async function AccountLedgerPage({
@@ -39,32 +38,7 @@ export default async function AccountLedgerPage({
           )
         : null;
 
-    const sections: ReportSection[] = ledger
-        ? [
-              {
-                  title: `${ledger.account.code} ${ledger.account.name}`,
-                  note: `Saldo inicial ${formatSided(ledger.openingBalance)} · Saldo final ${formatSided(ledger.closingBalance)}`,
-                  columns: [
-                      { label: 'Data' },
-                      { label: 'Nº' },
-                      { label: 'Histórico' },
-                      { label: 'Débito', align: 'right' },
-                      { label: 'Crédito', align: 'right' },
-                      { label: 'Saldo', align: 'right' },
-                  ],
-                  rows: ledger.items.map(item => ({
-                      cells: [
-                          formatDate(item.date),
-                          String(item.number),
-                          item.description,
-                          formatAmount(item.debit),
-                          formatAmount(item.credit),
-                          formatSided(item.balance),
-                      ],
-                  })),
-              },
-          ]
-        : [];
+    const sections = ledger ? ledgerSections(ledger) : [];
 
     return (
         <ReportPage
@@ -90,6 +64,11 @@ export default async function AccountLedgerPage({
                         />
                     </FilterField>
                 </ReportFilters>
+            }
+            loadFullReport={
+                accountId.success
+                    ? getFullLedgerReportAction.bind(null, accountId.data, start, end)
+                    : undefined
             }
             empty={
                 <EmptyState
