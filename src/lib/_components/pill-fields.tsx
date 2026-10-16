@@ -95,6 +95,8 @@ type PillSelectProps = {
     /** Texto da opção vazia (padrão "Nenhum"). */
     emptyLabel?: string;
     errors?: string[];
+    /** Classes extras do botão do dropdown (ex.: a pílula clara dos filtros). */
+    className?: string;
 };
 
 /** Seleção em pílula que envia o valor no formulário por um campo oculto. */
@@ -108,6 +110,7 @@ export function PillSelect({
     allowEmpty = false,
     emptyLabel = 'Nenhum',
     errors,
+    className,
 }: PillSelectProps) {
     return (
         <div className="min-w-0">
@@ -121,7 +124,7 @@ export function PillSelect({
             >
                 <SelectTrigger
                     aria-label={label}
-                    className={cn(PILL_CLASS, 'w-full justify-between')}
+                    className={cn(PILL_CLASS, 'w-full justify-between', className)}
                 >
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>

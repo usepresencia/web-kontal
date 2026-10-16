@@ -27,6 +27,21 @@ describe('EntryForm', () => {
         expect(html).not.toMatch(/<input[^>]*type="date"/);
     });
 
+    it('usa a pílula clara com sombra dos filtros em todos os campos', () => {
+        const html = render();
+        const triggers =
+            html.match(/<(input|button)[^>]*class="[^"]*rounded-full[^"]*"[^>]*>/g) ?? [];
+        const fields = triggers.filter(
+            tag => !tag.includes('type="hidden"') && !tag.includes('type="submit"'),
+        );
+        expect(fields.length).toBeGreaterThanOrEqual(7);
+        for (const tag of fields) {
+            expect(tag).toContain('shadow-sm');
+            expect(tag).toContain('bg-card');
+            expect(tag).toContain('border-0');
+        }
+    });
+
     it('mostra todos os campos da baixa', () => {
         const html = render();
         for (const name of [

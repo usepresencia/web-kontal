@@ -2,6 +2,7 @@
 
 import { createEntryAction } from '@/actions/titles';
 import { AmountInput } from '@/lib/_components/amount-input';
+import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { Button } from '@/lib/_components/ui/button';
@@ -49,6 +50,7 @@ export function EntryForm({ titleId, accounts, today, paying, onSuccess }: Entry
             />
             <div className="grid grid-cols-2 gap-3">
                 <PillSelect
+                    className={FILTER_PILL_CLASS}
                     label="Conta"
                     name="billingAccountId"
                     value={account}
@@ -58,6 +60,7 @@ export function EntryForm({ titleId, accounts, today, paying, onSuccess }: Entry
                     errors={errors('billingAccountId')}
                 />
                 <PillInput
+                    className={FILTER_PILL_CLASS}
                     label="Data"
                     name="paidAt"
                     type="date"
@@ -65,6 +68,7 @@ export function EntryForm({ titleId, accounts, today, paying, onSuccess }: Entry
                     errors={errors('paidAt')}
                 />
                 <PillSelect
+                    className={FILTER_PILL_CLASS}
                     label="Forma de pagamento"
                     name="paymentMethod"
                     value={method}
@@ -73,24 +77,32 @@ export function EntryForm({ titleId, accounts, today, paying, onSuccess }: Entry
                     errors={errors('paymentMethod')}
                 />
                 <PillInput
+                    className={FILTER_PILL_CLASS}
                     label="Juros (R$)"
                     name="interestAmount"
                     inputMode="decimal"
                     errors={errors('interestAmount')}
                 />
                 <PillInput
+                    className={FILTER_PILL_CLASS}
                     label="Multa (R$)"
                     name="fineAmount"
                     inputMode="decimal"
                     errors={errors('fineAmount')}
                 />
                 <PillInput
+                    className={FILTER_PILL_CLASS}
                     label="Desconto (R$)"
                     name="discountAmount"
                     inputMode="decimal"
                     errors={errors('discountAmount')}
                 />
-                <PillInput label="Observação" name="description" errors={errors('description')} />
+                <PillInput
+                    className={FILTER_PILL_CLASS}
+                    label="Observação"
+                    name="description"
+                    errors={errors('description')}
+                />
             </div>
             {state.message && (
                 <p
