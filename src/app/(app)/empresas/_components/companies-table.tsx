@@ -2,6 +2,7 @@
 
 import { deactivateCompanyAction } from '@/actions/companies';
 import { selectCompanyAction } from '@/actions/session';
+import { useBusyFlag, useBusyRun } from '@/lib/_components/busy-provider';
 import { Pagination } from '@/lib/_components/pagination';
 import { Button } from '@/lib/_components/ui/button';
 import { ConfirmationDialog } from '@/lib/_components/ui/confirmation-dialog';
@@ -20,8 +21,10 @@ import { useState, useTransition } from 'react';
 
 /** Lista paginada de empresas com as ações de abrir e desativar. */
 export function CompaniesTable({ page }: { page: Page<Company> }) {
+    const run = useBusyRun();
     const pagination = usePaginationQuery();
-    const [, startTransition] = useTransition();
+    const [selecting, startTransition] = useTransition();
+    useBusyFlag(selecting, 'Abrindo empresa…');
     const [toDeactivate, setToDeactivate] = useState<Company | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -92,7 +95,10 @@ export function CompaniesTable({ page }: { page: Page<Company> }) {
                 variant="destructive"
                 onConfirm={async () => {
                     if (!toDeactivate) return;
-                    const result = await deactivateCompanyAction(toDeactivate.id);
+                    const result = await run(
+                        () => deactivateCompanyAction(toDeactivate.id),
+                        'Desativando empresa…',
+                    );
                     setError(result.ok ? null : (result.message ?? 'Não foi possível desativar.'));
                     setToDeactivate(null);
                 }}

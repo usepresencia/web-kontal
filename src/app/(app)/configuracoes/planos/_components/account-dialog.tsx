@@ -2,6 +2,7 @@
 
 import { createAccountAction, updateAccountAction } from '@/actions/billing';
 import { FormField } from '@/lib/_components/form-field';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { SelectField } from '@/lib/_components/select-field';
 import { Button } from '@/lib/_components/ui/button';
 import {
@@ -83,6 +84,7 @@ export function AccountDialog({
                 </DialogHeader>
 
                 <form action={formAction} className="space-y-4">
+                    <FormPendingOverlay message="Salvando conta…" />
                     <FormField
                         label="Nome"
                         name="name"

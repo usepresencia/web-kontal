@@ -1,6 +1,7 @@
 'use client';
 
 import { FormField } from '@/lib/_components/form-field';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { SelectField } from '@/lib/_components/select-field';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
@@ -41,6 +42,7 @@ export function TitleForm({
 
     return (
         <form action={formAction} className="space-y-6">
+            <FormPendingOverlay message="Salvando título…" />
             <input type="hidden" name="type" value={type} />
             {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
 

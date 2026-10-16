@@ -1,7 +1,9 @@
 'use client';
 
 import { deleteEntryAction, deleteTitleAction, writeOffTitleAction } from '@/actions/titles';
+import { useBusyRun } from '@/lib/_components/busy-provider';
 import { FormField } from '@/lib/_components/form-field';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { Badge } from '@/lib/_components/ui/badge';
 import { Button } from '@/lib/_components/ui/button';
 import { ConfirmationDialog } from '@/lib/_components/ui/confirmation-dialog';
@@ -21,6 +23,7 @@ import { useActionState, useState } from 'react';
 
 /** Baixas já registradas, com a exclusão de cada uma. */
 export function EntriesTable({ titleId, entries }: { titleId: string; entries: TitleEntry[] }) {
+    const run = useBusyRun();
     const [toDelete, setToDelete] = useState<TitleEntry | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -88,7 +91,10 @@ export function EntriesTable({ titleId, entries }: { titleId: string; entries: T
                 variant="destructive"
                 onConfirm={async () => {
                     if (!toDelete) return;
-                    const result = await deleteEntryAction(titleId, toDelete.id);
+                    const result = await run(
+                        () => deleteEntryAction(titleId, toDelete.id),
+                        'Excluindo baixa…',
+                    );
                     setError(result.ok ? null : (result.message ?? 'Não foi possível excluir.'));
                     setToDelete(null);
                 }}
@@ -106,6 +112,7 @@ export function WriteOffForm({ titleId }: { titleId: string }) {
 
     return (
         <form action={formAction} className="space-y-4">
+            <FormPendingOverlay message="Baixando…" />
             <h2 className="font-display text-lg font-semibold">Baixar por perda</h2>
             <div className="grid gap-4 md:grid-cols-2">
                 <FormField
@@ -137,6 +144,7 @@ export function WriteOffForm({ titleId }: { titleId: string }) {
 
 /** Exclusão do título, com confirmação. */
 export function DeleteTitleButton({ title }: { title: Title }) {
+    const run = useBusyRun();
     const [open, setOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -158,7 +166,10 @@ export function DeleteTitleButton({ title }: { title: Title }) {
                 confirmLabel="Excluir"
                 variant="destructive"
                 onConfirm={async () => {
-                    const result = await deleteTitleAction(title.id, title.type);
+                    const result = await run(
+                        () => deleteTitleAction(title.id, title.type),
+                        'Excluindo título…',
+                    );
                     if (result && !result.ok)
                         setError(result.message ?? 'Não foi possível excluir.');
                     setOpen(false);

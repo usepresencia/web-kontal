@@ -1,6 +1,7 @@
 'use client';
 
 import { removeLogoAction, saveLogoAction, signLogoUploadAction } from '@/actions/companies';
+import { useBusyFlag } from '@/lib/_components/busy-provider';
 import { Button } from '@/lib/_components/ui/button';
 import { Input } from '@/lib/_components/ui/input';
 import { useRef, useState, useTransition } from 'react';
@@ -12,6 +13,7 @@ const MAX_BYTES = 2 * 1024 * 1024;
 export function LogoUpload({ logoUrl }: { logoUrl: string | null }) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [pending, startTransition] = useTransition();
+    useBusyFlag(pending, 'Enviando logo…');
     const [message, setMessage] = useState<string | null>(null);
 
     const upload = (file: File) => {
