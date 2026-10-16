@@ -23,6 +23,7 @@
     --ink-raised: color-mix(in oklab, var(--ink) 88%, white);
     --ink-muted: color-mix(in oklab, var(--ink) 62%, var(--surface));
     --line: color-mix(in oklab, var(--surface) 78%, var(--ink));
+    --shadow-card: 0 1px 3px color-mix(in oklab, var(--ink) 8%, transparent);
 
     /* Raios */
     --radius-sm: 6px;
@@ -79,6 +80,9 @@
     --radius-md: 10px;
     --radius-lg: 16px;
 
+    /* Sombras e animações */
+    --animate-fade-in: fade-in 0.4s ease-out;
+
     /* Fontes (variáveis definidas pelo next/font no layout) */
     --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
     --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -130,4 +134,23 @@
     &::-webkit-scrollbar {
         display: none;
     }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Cartão padrão das telas: fundo do card, borda suave e sombra leve. */
+@utility glass-card {
+    background-color: var(--color-card);
+    border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
 }

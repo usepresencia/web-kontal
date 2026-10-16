@@ -1,8 +1,11 @@
 import { EmptyState } from '@/lib/_components/empty-state';
+import { PageGreeting } from '@/lib/_components/page-greeting';
 import { currentMonthRange } from '@/lib/_utils/dates';
 import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
 import { dreSummarySchema } from '@/lib/api/schemas/dre';
+import { requireSession } from '@/lib/auth/session';
+import { TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { SummaryCard } from './_components/summary-card';
 
 async function loadSummary() {
@@ -16,28 +19,32 @@ async function loadSummary() {
 }
 
 export default async function HomePage() {
-    const summary = await loadSummary();
+    const [me, summary] = await Promise.all([requireSession(), loadSummary()]);
 
     return (
         <div className="space-y-6">
-            <header>
-                <h1 className="text-2xl font-bold">Início</h1>
-                <p className="text-muted-foreground text-sm">Resultado do mês corrente.</p>
-            </header>
+            <PageGreeting name={me.name} />
 
             {summary ? (
-                <section className="grid gap-4 md:grid-cols-3">
+                <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <SummaryCard
                         title="Receitas"
                         amount={summary.totals.revenues}
+                        icon={TrendingUp}
                         tone="positive"
                     />
                     <SummaryCard
                         title="Despesas"
                         amount={summary.totals.expenses}
+                        icon={TrendingDown}
                         tone="negative"
                     />
-                    <SummaryCard title="Resultado" amount={summary.totals.result} tone="auto" />
+                    <SummaryCard
+                        title="Resultado"
+                        amount={summary.totals.result}
+                        icon={Wallet}
+                        tone="auto"
+                    />
                 </section>
             ) : (
                 <EmptyState
