@@ -42,10 +42,14 @@ export function AdvancedFields({ isExpense, destinationAccounts, errors }: Advan
                     errors={errors('issueDate')}
                 />
                 <PillInput
-                    label="Juros mensais (0 a 1)"
+                    label="Juros mensais"
                     name="feesPercentageMonthly"
-                    inputMode="decimal"
-                    placeholder="ex.: 0,02 = 2%"
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={1}
+                    placeholder="0"
+                    suffix="%"
                     errors={errors('feesPercentageMonthly')}
                 />
             </div>

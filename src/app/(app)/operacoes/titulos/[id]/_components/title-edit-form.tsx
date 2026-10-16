@@ -4,6 +4,7 @@ import { updateTitleAction } from '@/actions/titles';
 import { FormField } from '@/lib/_components/form-field';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
+import { fractionToPercent } from '@/lib/_utils/percent';
 import type { Title } from '@/lib/api/schemas/title';
 import { useActionState } from 'react';
 
@@ -35,10 +36,14 @@ export function TitleEditForm({ title }: { title: Title }) {
                     required
                 />
                 <FormField
-                    label="Juros mensais (0 a 1)"
+                    label="Juros mensais"
                     name="feesPercentageMonthly"
-                    inputMode="decimal"
-                    defaultValue={String(title.feesPercentageMonthly).replace('.', ',')}
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={1}
+                    suffix="%"
+                    defaultValue={fractionToPercent(title.feesPercentageMonthly)}
                     errors={errors('feesPercentageMonthly')}
                 />
             </div>

@@ -2,6 +2,7 @@ import { Badge } from '@/lib/_components/ui/badge';
 import { Button } from '@/lib/_components/ui/button';
 import { cn } from '@/lib/_utils/cn';
 import { formatAmount } from '@/lib/_utils/money';
+import { fractionToPercent } from '@/lib/_utils/percent';
 import {
     PAYMENT_METHOD_LABELS,
     TITLE_STATUS_LABELS,
@@ -79,7 +80,7 @@ export function TransactionDetailsBody({
             <dl className="grid grid-cols-2 gap-3">
                 <Field label="Preset">{title.presetName ?? '-'}</Field>
                 <Field label="Juros mensais">
-                    {Math.round(title.feesPercentageMonthly * 100)}%
+                    {fractionToPercent(title.feesPercentageMonthly)}%
                 </Field>
                 <Field label="Emissão">{formatDate(title.issueDate)}</Field>
                 <Field label="Vencimento">{formatDate(title.expirationDate)}</Field>

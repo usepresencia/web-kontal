@@ -79,9 +79,14 @@ export function TitleForm({
                     errors={errors('issueDate')}
                 />
                 <FormField
-                    label="Juros mensais (0 a 1, ex.: 0,02 = 2%)"
+                    label="Juros mensais"
                     name="feesPercentageMonthly"
-                    inputMode="decimal"
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={1}
+                    placeholder="0"
+                    suffix="%"
                     errors={errors('feesPercentageMonthly')}
                 />
             </div>
