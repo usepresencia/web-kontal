@@ -52,6 +52,16 @@ O tema fica em `src/app/globals.css`, em duas camadas: a da marca (valores do br
 fora do `globals.css` (regra em `src/lib/_utils/token-rules.ts`). Accent só aparece sobre Ink; Positive e
 Negative só em valores e estados financeiros.
 
+## Segurança
+
+O web-kontal é um BFF: o navegador nunca fala com a api-kontal nem guarda o token. O ID token fica em
+cookie `httpOnly` e só o servidor do Next o usa (`src/lib/api/client.ts`). Toda página chama
+`requireSession()`, que confirma a sessão na api-kontal a cada requisição; a autorização é da API.
+Toda resposta da API passa por um schema zod antes de chegar à tela.
+
+`src/proxy.ts` aplica a CSP com nonce e os cabeçalhos de segurança (`src/lib/security/csp.ts`).
+`dangerouslySetInnerHTML` é erro de lint. Redirects só aceitam caminhos internos (`isSafeInternalPath`).
+
 ## Qualidade
 
 ```bash
