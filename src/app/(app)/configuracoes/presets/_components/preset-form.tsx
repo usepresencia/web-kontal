@@ -1,9 +1,9 @@
 'use client';
 
 import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
-import { FormField } from '@/lib/_components/form-field';
+import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { SelectField } from '@/lib/_components/select-field';
+import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import {
@@ -11,10 +11,11 @@ import {
     PRESET_ROLE_LABELS,
     REQUIRED_ROLES,
     accountsForRole,
+    type PresetRole,
 } from '@/lib/_utils/preset-roles';
 import type { BillingAccount } from '@/lib/api/schemas/billing';
 import type { Preset } from '@/lib/api/schemas/preset';
-import { useActionState } from 'react';
+import { useActionState, useEffect, useState, type ReactNode } from 'react';
 
 type PresetFormProps = {
     action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -22,81 +23,103 @@ type PresetFormProps = {
     /** Plano do preset: enviado no cadastro e fixo na edição. */
     billingPlanId: string;
     preset?: Preset;
-    submitLabel: string;
+    /** Ação extra à esquerda do botão de salvar (ex.: excluir). */
+    footerStart?: ReactNode;
+    /** Chamado depois que o preset é salvo. */
+    onSuccess?: () => void;
 };
 
-/** Formulário de preset: nome e uma conta do plano para cada papel. */
+/** Preset nos campos em pílula: nome, descrição, status (na edição) e uma conta do plano para cada papel. */
 export function PresetForm({
     action,
     accounts,
     billingPlanId,
     preset,
-    submitLabel,
+    footerStart,
+    onSuccess,
 }: PresetFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
     useActionToast(state);
+    const [status, setStatus] = useState(preset?.isActive === false ? 'false' : 'true');
+    const [roles, setRoles] = useState<Record<string, string>>(() =>
+        Object.fromEntries(PRESET_ROLES.map(role => [role, preset?.accounts[role]?.id ?? ''])),
+    );
     const errors = (field: string) => state.fieldErrors?.[field];
 
+    useEffect(() => {
+        if (state.ok) onSuccess?.();
+    }, [state, onSuccess]);
+
     return (
-        <form action={formAction} className="max-w-2xl space-y-6">
+        <form action={formAction} className="space-y-4">
             <FormPendingOverlay message="Salvando preset…" />
             {!preset && <input type="hidden" name="billingPlanId" value={billingPlanId} />}
 
-            <div className="grid gap-4 md:grid-cols-2">
-                <FormField
+            <div className="grid grid-cols-2 gap-3">
+                <PillInput
+                    className={FILTER_PILL_CLASS}
                     label="Nome"
                     name="name"
                     defaultValue={preset?.name}
-                    errors={errors('name')}
                     required
+                    errors={errors('name')}
                 />
-                <FormField
+                <PillInput
+                    className={FILTER_PILL_CLASS}
                     label="Descrição"
                     name="description"
                     defaultValue={preset?.description ?? ''}
                     errors={errors('description')}
                 />
                 {preset && (
-                    <SelectField
+                    <PillSelect
+                        className={FILTER_PILL_CLASS}
                         label="Status"
                         name="isActive"
+                        value={status}
+                        onChange={setStatus}
                         options={[
                             { value: 'true', label: 'Ativo' },
                             { value: 'false', label: 'Inativo' },
                         ]}
-                        defaultValue={preset.isActive ? 'true' : 'false'}
                     />
                 )}
             </div>
 
-            <fieldset className="grid gap-4 md:grid-cols-2">
-                <legend className="font-display mb-2 text-lg font-semibold">
-                    Contas por papel
-                </legend>
-                {PRESET_ROLES.map(role => (
-                    <SelectField
+            <p className="text-muted-foreground pl-4 text-xs font-semibold tracking-wide uppercase">
+                Contas por papel
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+                {PRESET_ROLES.map((role: PresetRole) => (
+                    <PillSelect
                         key={role}
+                        className={FILTER_PILL_CLASS}
                         label={`${PRESET_ROLE_LABELS[role]}${REQUIRED_ROLES.includes(role) ? ' *' : ''}`}
                         name={`accounts.${role}`}
+                        value={roles[role]}
+                        onChange={value => setRoles(current => ({ ...current, [role]: value }))}
                         options={accountsForRole(accounts, role).map(account => ({
                             value: account.id,
                             label: `${account.code} ${account.name}`,
                         }))}
-                        defaultValue={preset?.accounts[role]?.id}
                         allowEmpty={!REQUIRED_ROLES.includes(role)}
                         errors={errors(`accounts.${role}`) ?? errors('accounts')}
                     />
                 ))}
-            </fieldset>
+            </div>
 
-            <ConfirmSubmitButton
-                confirmTitle={submitLabel}
-                confirmDescription="Confirmar e salvar as informações do preset?"
-                confirmLabel="Confirmar"
-                disabled={pending}
-            >
-                {pending ? 'Salvando…' : submitLabel}
-            </ConfirmSubmitButton>
+            <div className="flex items-center justify-between gap-3">
+                <div>{footerStart}</div>
+                <ConfirmSubmitButton
+                    confirmTitle={preset ? 'Salvar preset' : 'Criar preset'}
+                    confirmDescription="Confirmar e salvar as informações do preset?"
+                    confirmLabel="Confirmar"
+                    disabled={pending}
+                    className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
+                >
+                    {pending ? 'Salvando…' : preset ? 'Salvar preset' : 'Criar preset'}
+                </ConfirmSubmitButton>
+            </div>
         </form>
     );
 }

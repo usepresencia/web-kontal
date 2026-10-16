@@ -73,7 +73,7 @@ export function NewSeriesDialog() {
                         description="Cadastre um preset antes de criar parcelamentos."
                         action={
                             <Button asChild variant="outline">
-                                <Link href="/configuracoes/presets/nova">Novo preset</Link>
+                                <Link href="/configuracoes/presets">Novo preset</Link>
                             </Button>
                         }
                     />

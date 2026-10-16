@@ -1,71 +1,56 @@
 'use client';
 
-import { deletePresetAction } from '@/actions/presets';
-import { useBusyRun } from '@/lib/_components/busy-provider';
+import { Divider } from '@/lib/_components/divider';
 import { Pagination } from '@/lib/_components/pagination';
-import { Badge } from '@/lib/_components/ui/badge';
-import { Button } from '@/lib/_components/ui/button';
-import { ConfirmationDialog } from '@/lib/_components/ui/confirmation-dialog';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/lib/_components/ui/table';
 import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
-import { notifyResult } from '@/lib/_utils/notify';
 import type { Page } from '@/lib/_utils/pagination';
-import { SUCCESS } from '@/lib/_utils/toast-messages';
 import type { Preset } from '@/lib/api/schemas/preset';
-import Link from 'next/link';
+import { ChevronRight, SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
+import { PresetDialog } from './preset-dialog';
 
-/** Lista paginada de presets. */
+/** Lista paginada de presets no padrão das demais telas; cada linha abre o modal de edição. */
 export function PresetsTable({ page }: { page: Page<Preset> }) {
-    const run = useBusyRun();
     const pagination = usePaginationQuery();
-    const [toDelete, setToDelete] = useState<Preset | null>(null);
+    const [selected, setSelected] = useState<Preset | null>(null);
 
     return (
-        <div className="space-y-4">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Nome</TableHead>
-                        <TableHead>Plano</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {page.items.map(preset => (
-                        <TableRow key={preset.id}>
-                            <TableCell className="font-medium">{preset.name}</TableCell>
-                            <TableCell>{preset.billingPlanName}</TableCell>
-                            <TableCell>
-                                <Badge variant={preset.isActive ? 'default' : 'secondary'}>
-                                    {preset.isActive ? 'Ativo' : 'Inativo'}
-                                </Badge>
-                            </TableCell>
-                            <TableCell className="space-x-2 text-right">
-                                <Button asChild size="sm" variant="outline">
-                                    <Link href={`/configuracoes/presets/${preset.id}`}>Editar</Link>
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => setToDelete(preset)}
-                                >
-                                    Excluir
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-
+        <section className="bg-card space-y-4 rounded-2xl p-5 shadow-sm">
+            <ul className="space-y-1">
+                {page.items.map((preset, index) => (
+                    <li key={preset.id}>
+                        {index > 0 && <Divider className="my-1 mr-3 ml-12" />}
+                        <button
+                            type="button"
+                            onClick={() => setSelected(preset)}
+                            aria-haspopup="dialog"
+                            className="group hover:bg-muted/50 focus-visible:ring-ring -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-3 rounded-xl px-3 py-2 text-left focus-visible:ring-2 focus-visible:outline-none"
+                        >
+                            <div className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-full">
+                                <SlidersHorizontal className="size-4" aria-hidden="true" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-foreground truncate text-sm font-medium">
+                                    {preset.name}
+                                </p>
+                                <p className="text-muted-foreground flex items-center gap-2 text-xs">
+                                    {preset.billingPlanName ?? 'Sem plano'}
+                                    {preset.description && (
+                                        <span className="truncate">· {preset.description}</span>
+                                    )}
+                                </p>
+                            </div>
+                            <span className="bg-muted rounded-full px-2 py-0.5 text-[11px]">
+                                {preset.isActive ? 'Ativo' : 'Inativo'}
+                            </span>
+                            <ChevronRight
+                                className="text-muted-foreground size-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                                aria-hidden="true"
+                            />
+                        </button>
+                    </li>
+                ))}
+            </ul>
             <Pagination
                 page={page.page}
                 pageSize={page.pageSize}
@@ -74,24 +59,7 @@ export function PresetsTable({ page }: { page: Page<Preset> }) {
                 onPageSizeChange={pagination.onPageSizeChange}
                 pageSizeLabel="Presets por página:"
             />
-
-            <ConfirmationDialog
-                open={toDelete !== null}
-                onOpenChange={open => !open && setToDelete(null)}
-                title="Excluir preset"
-                description={`Excluir o preset ${toDelete?.name ?? ''}? Presets usados em títulos não podem ser excluídos.`}
-                confirmLabel="Excluir"
-                variant="destructive"
-                onConfirm={async () => {
-                    if (!toDelete) return;
-                    const result = await run(
-                        () => deletePresetAction(toDelete.id),
-                        'Excluindo preset…',
-                    );
-                    notifyResult(result, SUCCESS.presetDeleted, 'Não foi possível excluir.');
-                    setToDelete(null);
-                }}
-            />
-        </div>
+            <PresetDialog preset={selected} onClose={() => setSelected(null)} />
+        </section>
     );
 }

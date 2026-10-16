@@ -1,6 +1,5 @@
 'use server';
 
-import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { apiFetch } from '@/lib/api/client';
@@ -10,10 +9,10 @@ import {
     companyInputSchema,
     companySchema,
     signedLogoUploadSchema,
+    type Company,
     type SignedLogoUpload,
 } from '@/lib/api/schemas/company';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const FALLBACK_MESSAGE = 'Não foi possível concluir a operação. Tente novamente.';
@@ -36,8 +35,7 @@ export async function createCompanyAction(
         return stateFromApiError(error);
     }
     revalidatePath('/empresas');
-    await flash(SUCCESS.companyCreated);
-    redirect('/empresas');
+    return { ok: true, ...SUCCESS.companyCreated };
 }
 
 /** Atualiza os dados da empresa ativa. */
@@ -111,4 +109,14 @@ export async function removeLogoAction(): Promise<FormState> {
     }
     revalidatePath('/empresas/atual');
     return { ok: true };
+}
+
+/** Empresa ativa, para o modal de edição; `null` se não puder ser lida. */
+export async function getCurrentCompanyAction(): Promise<Company | null> {
+    try {
+        return await apiFetch('/company', companySchema);
+    } catch (error) {
+        if (error instanceof ApiError && error.status < 500) return null;
+        throw error;
+    }
 }
