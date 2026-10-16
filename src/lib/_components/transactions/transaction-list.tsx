@@ -19,11 +19,17 @@ export function TransactionList({ rows }: { rows: TransactionRow[] }) {
     return (
         <>
             <ul className="space-y-1">
-                {rows.map(row => {
+                {rows.map((row, index) => {
                     const { title } = row;
                     const income = title.type === 'INCOME';
                     return (
                         <li key={title.id}>
+                            {index > 0 && (
+                                <div
+                                    role="separator"
+                                    className="from-primary/30 mx-3 my-0.5 h-px bg-gradient-to-r from-50% to-transparent"
+                                />
+                            )}
                             <button
                                 type="button"
                                 onClick={() => setSelected(row)}
