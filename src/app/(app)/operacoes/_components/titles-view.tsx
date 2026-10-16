@@ -49,7 +49,10 @@ export async function TitlesView({ type, heading, subtitle, searchParams }: Titl
                     <h1 className="text-2xl font-bold">{heading}</h1>
                     <p className="text-muted-foreground text-sm">{subtitle}</p>
                 </div>
-                <NewTitleDialog type={type} />
+                <div className="flex items-center gap-2">
+                    <NewTitleDialog type={type} opening />
+                    <NewTitleDialog type={type} />
+                </div>
             </header>
 
             <form method="get" className="flex flex-wrap items-end gap-3">

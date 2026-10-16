@@ -19,15 +19,20 @@ import { entryLabels } from '@/lib/_utils/title-labels';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { OpeningTitleForm } from './opening-title-form';
 import { TitleForm } from './title-form';
 
-type NewTitleDialogProps = { type: 'INCOME' | 'EXPENSE' };
+type NewTitleDialogProps = {
+    type: 'INCOME' | 'EXPENSE';
+    /** Abre o cadastro de saldo inicial (implantação) no lugar do título comum. */
+    opening?: boolean;
+};
 
-/** Botão "Novo pagamento" ou "Novo recebimento": abre o cadastro de título em modal, com as opções carregadas ao abrir. */
-export function NewTitleDialog({ type }: NewTitleDialogProps) {
+/** Botão que abre em modal o cadastro de título ("Novo pagamento", "Novo recebimento") ou de saldo inicial, com as opções carregadas ao abrir. */
+export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
     const [open, setOpen] = useState(false);
     const [options, setOptions] = useState<TitleFormOptions | null>(null);
-    const label = entryLabels(type).create;
+    const label = opening ? 'Saldo inicial' : entryLabels(type).create;
 
     useEffect(() => {
         if (!open) return;
@@ -35,7 +40,11 @@ export function NewTitleDialog({ type }: NewTitleDialogProps) {
         setOptions(null);
         getTitleFormOptionsAction(type)
             .then(result => active && setOptions(result))
-            .catch(() => active && setOptions({ presets: [], destinationAccounts: [] }));
+            .catch(
+                () =>
+                    active &&
+                    setOptions({ presets: [], destinationAccounts: [], financialAccounts: [] }),
+            );
         return () => {
             active = false;
         };
@@ -44,7 +53,7 @@ export function NewTitleDialog({ type }: NewTitleDialogProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>
+                <Button variant={opening ? 'outline' : 'default'}>
                     <Plus aria-hidden="true" />
                     {label}
                 </Button>
@@ -55,7 +64,9 @@ export function NewTitleDialog({ type }: NewTitleDialogProps) {
                         {label}
                     </DialogTitle>
                     <DialogDescription className="text-sm">
-                        Cadastre o título; a baixa é registrada depois.
+                        {opening
+                            ? 'Registre o saldo que já existia antes de usar o sistema.'
+                            : 'Cadastre o título e, se quiser, já registre a baixa.'}
                     </DialogDescription>
                 </DialogHeader>
                 {options === null ? (
@@ -70,12 +81,20 @@ export function NewTitleDialog({ type }: NewTitleDialogProps) {
                             </Button>
                         }
                     />
+                ) : opening ? (
+                    <OpeningTitleForm
+                        action={createTitleAction}
+                        type={type}
+                        presets={options.presets}
+                        onSuccess={() => setOpen(false)}
+                    />
                 ) : (
                     <TitleForm
                         action={createTitleAction}
                         type={type}
                         presets={options.presets}
                         destinationAccounts={options.destinationAccounts}
+                        financialAccounts={options.financialAccounts}
                         onSuccess={() => setOpen(false)}
                     />
                 )}

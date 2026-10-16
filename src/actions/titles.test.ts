@@ -75,15 +75,29 @@ describe('getTitleFormOptionsAction', () => {
         expect(await getTitleFormOptionsAction('EXPENSE')).toEqual({
             presets: [{ value: 'p1', label: 'Padrão' }],
             destinationAccounts: [{ value: 'a1', label: '1.1 Caixa' }],
+            financialAccounts: [{ value: 'a1', label: '1.1 Caixa' }],
         });
     });
 
-    it('não busca contas de destino em título a receber', async () => {
+    it('não oferece contas de destino em título a receber, só as financeiras', async () => {
         const { getTitleFormOptionsAction } = await import('./titles');
-        apiFetch.mockResolvedValueOnce({ items: [{ id: 'p1', name: 'Padrão' }] });
+        apiFetch
+            .mockResolvedValueOnce({ items: [{ id: 'p1', name: 'Padrão' }] })
+            .mockResolvedValueOnce({
+                items: [
+                    {
+                        id: 'a1',
+                        code: '1.1',
+                        name: 'Caixa',
+                        accountType: 'ANALYTIC',
+                        isActive: true,
+                        nature: 'ASSET',
+                    },
+                ],
+            });
         const result = await getTitleFormOptionsAction('INCOME');
         expect(result.destinationAccounts).toEqual([]);
-        expect(apiFetch).toHaveBeenCalledTimes(1);
+        expect(result.financialAccounts).toEqual([{ value: 'a1', label: '1.1 Caixa' }]);
     });
 
     it('devolve vazio para um tipo inválido sem consultar a API', async () => {
@@ -92,6 +106,7 @@ describe('getTitleFormOptionsAction', () => {
         expect(await getTitleFormOptionsAction('X')).toEqual({
             presets: [],
             destinationAccounts: [],
+            financialAccounts: [],
         });
         expect(apiFetch).not.toHaveBeenCalled();
     });
@@ -213,6 +228,71 @@ describe('createTitleAction', () => {
         const { createTitleAction } = await import('./titles');
         const result = await createTitleAction({ ok: false }, form({ description: '' }));
         expect(result.ok).toBe(false);
+        expect(apiFetch).not.toHaveBeenCalled();
+    });
+});
+
+describe('createTitleAction com baixa na hora', () => {
+    const ACCOUNT_ID = '4a1c2b4e-5a6d-4e7f-8a9b-0c1d2e3f4a5b';
+    const form = (extra: Record<string, string> = {}) => {
+        const data = new FormData();
+        const fields = {
+            type: 'INCOME',
+            presetId: '3f1c2b4e-5a6d-4e7f-8a9b-0c1d2e3f4a5b',
+            description: 'Venda',
+            amount: '500,00',
+            expirationDate: '2026-11-10',
+            payNow: 'true',
+            paymentAccountId: ACCOUNT_ID,
+            paymentMethod: 'PIX',
+            paidAt: '2026-10-16',
+            ...extra,
+        };
+        Object.entries(fields).forEach(([key, value]) => data.set(key, value));
+        return data;
+    };
+
+    it('cria o título e registra a baixa do valor total na conta escolhida', async () => {
+        const { createTitleAction } = await import('./titles');
+        apiFetch
+            .mockResolvedValueOnce({ id: TITLE_ID, amount: '500.00' })
+            .mockResolvedValueOnce({});
+        const result = await createTitleAction({ ok: false }, form());
+        expect(result.ok).toBe(true);
+        expect(apiFetch.mock.calls[1][0]).toBe(`/titles/${TITLE_ID}/entries`);
+        expect(apiFetch.mock.calls[1][2].body).toEqual({
+            billingAccountId: ACCOUNT_ID,
+            principalAmount: '500.00',
+            paidAt: '2026-10-16',
+            paymentMethod: 'PIX',
+        });
+    });
+
+    it('avisa que o título foi criado quando só a baixa falha', async () => {
+        const { createTitleAction } = await import('./titles');
+        const { ApiError } = await import('@/lib/api/errors');
+        apiFetch
+            .mockResolvedValueOnce({ id: TITLE_ID, amount: '500.00' })
+            .mockRejectedValueOnce(new ApiError(422, 'INVALID', 'Conta inválida'));
+        const result = await createTitleAction({ ok: false }, form());
+        expect(result.ok).toBe(false);
+        expect(result.message).toContain('Título criado, mas a baixa não foi registrada');
+    });
+
+    it('exige conta, forma e data quando marcado', async () => {
+        const { createTitleAction } = await import('./titles');
+        const result = await createTitleAction({ ok: false }, form({ paymentAccountId: '' }));
+        expect(result.fieldErrors?.paymentAccountId).toBeDefined();
+        expect(apiFetch).not.toHaveBeenCalled();
+    });
+
+    it('recusa a baixa na hora em título parcelado', async () => {
+        const { createTitleAction } = await import('./titles');
+        const result = await createTitleAction(
+            { ok: false },
+            form({ repeat: 'INSTALLMENT', count: '3' }),
+        );
+        expect(result.fieldErrors?.payNow).toBeDefined();
         expect(apiFetch).not.toHaveBeenCalled();
     });
 });

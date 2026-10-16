@@ -143,8 +143,47 @@ export const titleCreateSchema = z
             .transform(value => value === 'true'),
         openingDate: optionalDate,
         settledAmount: optionalAmount,
+        payNow: z
+            .enum(['true'])
+            .optional()
+            .transform(value => value === 'true'),
+        paymentAccountId: z
+            .string()
+            .optional()
+            .transform(value => (value ? value : undefined)),
+        paymentMethod: z
+            .enum(PAYMENT_METHODS)
+            .optional()
+            .or(z.literal('').transform(() => undefined)),
+        paidAt: optionalDate,
     })
     .superRefine((value, ctx) => {
+        if (value.payNow) {
+            if (value.repeat !== 'NONE' || value.isOpening) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['payNow'],
+                    message: 'A baixa na hora vale só para título simples',
+                });
+            }
+            if (!value.paymentAccountId || !z.uuid().safeParse(value.paymentAccountId).success) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['paymentAccountId'],
+                    message: 'Selecione a conta',
+                });
+            }
+            if (!value.paymentMethod) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['paymentMethod'],
+                    message: 'Selecione a forma de pagamento',
+                });
+            }
+            if (!value.paidAt) {
+                ctx.addIssue({ code: 'custom', path: ['paidAt'], message: 'Informe a data' });
+            }
+        }
         if (value.isOpening) {
             if (value.repeat !== 'NONE') {
                 ctx.addIssue({
