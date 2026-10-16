@@ -1,9 +1,8 @@
 import { EmptyState } from '@/lib/_components/empty-state';
-import { Button } from '@/lib/_components/ui/button';
 import { parsePageParams } from '@/lib/_utils/pagination';
 import { apiFetch } from '@/lib/api/client';
 import { planPageSchema } from '@/lib/api/schemas/billing';
-import Link from 'next/link';
+import { NewPlanDialog } from './_components/new-plan-dialog';
 import { PlansTable } from './_components/plans-table';
 
 export default async function PlansPage({
@@ -21,12 +20,12 @@ export default async function PlansPage({
         <div className="space-y-6">
             <header className="flex items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold">Planos de contas</h1>
-                    <p className="text-muted-foreground text-sm">Estrutura contábil da empresa.</p>
+                    <h1 className="text-2xl font-bold">Plano de contas</h1>
+                    <p className="text-muted-foreground text-sm">
+                        Gerencie os planos e as contas que estruturam a contabilidade
+                    </p>
                 </div>
-                <Button asChild>
-                    <Link href="/configuracoes/planos/nova">Novo plano</Link>
-                </Button>
+                <NewPlanDialog />
             </header>
 
             {plans.items.length === 0 ? (
