@@ -11,15 +11,18 @@ type TitleFormProps = {
     action: (state: FormState, formData: FormData) => Promise<FormState>;
     type: 'INCOME' | 'EXPENSE';
     presets: { value: string; label: string }[];
+    /** Contas de ativo ou despesa para a compra de ativo (só em título a pagar). */
+    destinationAccounts?: { value: string; label: string }[];
 };
 
 const toOptions = (labels: Record<string, string>) =>
     Object.entries(labels).map(([value, label]) => ({ value, label }));
 
 /** Formulário de título, com opção de parcelamento ou recorrência. */
-export function TitleForm({ action, type, presets }: TitleFormProps) {
+export function TitleForm({ action, type, presets, destinationAccounts = [] }: TitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
     const [repeat, setRepeat] = useState('NONE');
+    const [isOpening, setIsOpening] = useState(false);
     const errors = (field: string) => state.fieldErrors?.[field];
 
     return (
@@ -68,6 +71,47 @@ export function TitleForm({ action, type, presets }: TitleFormProps) {
                 />
             </div>
 
+            {type === 'EXPENSE' && destinationAccounts.length > 0 && (
+                <SelectField
+                    label="Conta de destino (compra de ativo)"
+                    name="destinationAccountId"
+                    options={destinationAccounts}
+                    allowEmpty
+                    placeholder="Despesa do preset (padrão)"
+                    errors={errors('destinationAccountId')}
+                />
+            )}
+
+            <fieldset className="space-y-4">
+                <legend className="font-display text-lg font-semibold">Implantação</legend>
+                <SelectField
+                    label="Título de implantação (saldo inicial)"
+                    name="isOpening"
+                    options={[
+                        { value: 'false', label: 'Não' },
+                        { value: 'true', label: 'Sim' },
+                    ]}
+                    defaultValue="false"
+                    onValueChange={value => setIsOpening(value === 'true')}
+                />
+                {isOpening && (
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <FormField
+                            label="Data de implantação"
+                            name="openingDate"
+                            type="date"
+                            errors={errors('openingDate')}
+                        />
+                        <FormField
+                            label="Já baixado (R$, opcional)"
+                            name="settledAmount"
+                            inputMode="decimal"
+                            errors={errors('settledAmount')}
+                        />
+                    </div>
+                )}
+            </fieldset>
+
             <fieldset className="space-y-4">
                 <legend className="font-display text-lg font-semibold">Repetição</legend>
                 <SelectField
@@ -79,6 +123,7 @@ export function TitleForm({ action, type, presets }: TitleFormProps) {
                     ]}
                     defaultValue="NONE"
                     onValueChange={value => setRepeat(value || 'NONE')}
+                    errors={errors('repeat')}
                 />
                 {repeat !== 'NONE' && (
                     <div className="grid gap-4 md:grid-cols-3">

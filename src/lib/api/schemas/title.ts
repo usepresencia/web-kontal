@@ -23,6 +23,8 @@ export const titleSchema = z.object({
     issueDate: z.string(),
     expirationDate: z.string(),
     feesPercentageMonthly: z.number(),
+    isOpening: z.boolean().optional(),
+    openingDate: z.string().nullable().optional(),
     createdAt: z.string(),
 });
 
@@ -128,8 +130,35 @@ export const titleCreateSchema = z
             .or(z.literal('').transform(() => undefined)),
         count: optionalCount,
         until: optionalDate,
+        destinationAccountId: z
+            .string()
+            .optional()
+            .transform(value => (value ? value : undefined))
+            .pipe(z.uuid('Conta inválida').optional()),
+        isOpening: z
+            .enum(['true', 'false'])
+            .optional()
+            .transform(value => value === 'true'),
+        openingDate: optionalDate,
+        settledAmount: optionalAmount,
     })
     .superRefine((value, ctx) => {
+        if (value.isOpening) {
+            if (value.repeat !== 'NONE') {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['repeat'],
+                    message: 'Título de implantação não pode ser parcelado ou recorrente',
+                });
+            }
+            if (!value.openingDate) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['openingDate'],
+                    message: 'Informe a data de implantação',
+                });
+            }
+        }
         if (value.repeat === 'NONE') return;
         if (!value.frequency && value.repeat === 'RECURRING') {
             ctx.addIssue({ code: 'custom', path: ['frequency'], message: 'Informe a frequência' });

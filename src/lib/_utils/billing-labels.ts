@@ -53,3 +53,9 @@ export const BALANCE_CATEGORIES_BY_NATURE: Record<
     LIABILITY: ['CURRENT_LIABILITY', 'NON_CURRENT_LIABILITY'],
     EQUITY: ['EQUITY'],
 };
+
+export const COST_BEHAVIOR_LABELS = {
+    VARIABLE: 'Variável',
+    FIXED: 'Fixo',
+    DEPRECIATION: 'Depreciação',
+} as const;
