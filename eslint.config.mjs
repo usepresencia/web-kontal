@@ -23,6 +23,14 @@ const eslintConfig = defineConfig([
     ]),
     {
         rules: {
+            // Anti-XSS: HTML cru nunca é injetado; o React já escapa o conteúdo.
+            'no-restricted-syntax': [
+                'error',
+                {
+                    selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
+                    message: 'dangerouslySetInnerHTML é proibido (risco de XSS).',
+                },
+            ],
             // Permitimos setState em effects nos casos controlados deste projeto
             'react-hooks/set-state-in-effect': 'off',
         },
