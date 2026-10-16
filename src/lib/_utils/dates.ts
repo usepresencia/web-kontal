@@ -89,3 +89,9 @@ export function monthAbbreviation(monthIndex: number): string {
 export function toLocalIsoDate(date: Date): string {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
+
+/** Converte `YYYY-MM-DD` em Date no fuso local (diferente de `new Date(iso)`, que usa UTC). */
+export function isoToLocalDate(iso: string): Date {
+    const [year, month, day] = iso.split('-').map(Number);
+    return new Date(year, month - 1, day);
+}

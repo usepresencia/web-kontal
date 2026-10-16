@@ -1,0 +1,29 @@
+'use client';
+
+import { cn } from '@/lib/_utils/cn';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
+import * as React from 'react';
+
+const Popover = PopoverPrimitive.Root;
+const PopoverTrigger = PopoverPrimitive.Trigger;
+
+const PopoverContent = React.forwardRef<
+    React.ElementRef<typeof PopoverPrimitive.Content>,
+    React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
+>(({ className, align = 'start', sideOffset = 6, ...props }, ref) => (
+    <PopoverPrimitive.Portal>
+        <PopoverPrimitive.Content
+            ref={ref}
+            align={align}
+            sideOffset={sideOffset}
+            className={cn(
+                'border-border bg-card text-foreground z-[110] rounded-lg border shadow-lg outline-none',
+                className,
+            )}
+            {...props}
+        />
+    </PopoverPrimitive.Portal>
+));
+PopoverContent.displayName = PopoverPrimitive.Content.displayName;
+
+export { Popover, PopoverContent, PopoverTrigger };

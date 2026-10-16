@@ -1,3 +1,4 @@
+import { DatePickerField } from '@/lib/_components/date-picker-field';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
 import { Button } from '@/lib/_components/ui/button';
@@ -33,24 +34,19 @@ export default async function JournalEntriesPage({
             </header>
 
             <form method="get" className="flex flex-wrap items-end gap-3">
-                <label className="space-y-1 text-sm">
+                <div className="space-y-1 text-sm">
                     <span className="text-muted-foreground">De</span>
-                    <input
-                        type="date"
+                    <DatePickerField
                         name="from"
                         defaultValue={from ?? ''}
-                        className="border-input bg-background block h-10 rounded-md border px-3"
+                        clearable
+                        className="w-44"
                     />
-                </label>
-                <label className="space-y-1 text-sm">
+                </div>
+                <div className="space-y-1 text-sm">
                     <span className="text-muted-foreground">Até</span>
-                    <input
-                        type="date"
-                        name="to"
-                        defaultValue={to ?? ''}
-                        className="border-input bg-background block h-10 rounded-md border px-3"
-                    />
-                </label>
+                    <DatePickerField name="to" defaultValue={to ?? ''} clearable className="w-44" />
+                </div>
                 <FilterButton />
             </form>
 

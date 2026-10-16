@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'react-day-picker/style.css';
 
 /*
  * Tema Kontal em duas camadas.
@@ -174,4 +175,25 @@
 
 @utility squircle-spin {
     animation: squircle-morph 1.6s linear infinite;
+}
+
+/* Calendário (react-day-picker) com as cores da marca. */
+.rdp-root {
+    --rdp-accent-color: var(--ink);
+    --rdp-accent-background-color: var(--surface-sunken);
+    --rdp-day_button-border-radius: var(--radius-md);
+    --rdp-day_button-border: 1px solid transparent;
+    --rdp-selected-border: 1px solid var(--ink);
+    --rdp-today-color: var(--accent-soft);
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+.rdp-root .rdp-selected .rdp-day_button {
+    background-color: var(--ink);
+    color: var(--accent);
+    border-color: var(--ink);
+}
+
+.rdp-root .rdp-day:not(.rdp-selected) .rdp-day_button:hover:not(:disabled) {
+    background-color: color-mix(in oklab, var(--ink) 12%, transparent);
 }

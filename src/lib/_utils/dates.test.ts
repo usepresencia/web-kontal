@@ -3,6 +3,7 @@ import {
     currentMonthRange,
     daysAgoLabel,
     formatMonth,
+    isoToLocalDate,
     monthAbbreviation,
     nextMonth,
     parseIsoDate,
@@ -136,5 +137,13 @@ describe('toLocalIsoDate', () => {
         // 23:30 locais: em UTC já seria o dia seguinte em fusos a oeste de Greenwich.
         expect(toLocalIsoDate(new Date(2026, 9, 16, 23, 30))).toBe('2026-10-16');
         expect(toLocalIsoDate(new Date(2026, 0, 5, 0, 10))).toBe('2026-01-05');
+    });
+});
+
+describe('isoToLocalDate', () => {
+    it('cria a data no fuso local, sem recuar um dia', () => {
+        const date = isoToLocalDate('2026-10-16');
+        expect([date.getFullYear(), date.getMonth(), date.getDate()]).toEqual([2026, 9, 16]);
+        expect(toLocalIsoDate(date)).toBe('2026-10-16');
     });
 });

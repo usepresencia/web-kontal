@@ -1,3 +1,5 @@
+import { DatePickerField } from '@/lib/_components/date-picker-field';
+import { MonthPickerField } from '@/lib/_components/month-picker-field';
 import { Input } from '@/lib/_components/ui/input';
 import { Label } from '@/lib/_components/ui/label';
 import type { ComponentProps } from 'react';
@@ -16,24 +18,38 @@ export function FormField({ label, name, errors, suffix, ...props }: FormFieldPr
     return (
         <div className="space-y-1.5">
             <Label htmlFor={name}>{label}</Label>
-            <div className="relative">
-                <Input
-                    id={name}
+            {props.type === 'date' ? (
+                <DatePickerField
                     name={name}
+                    defaultValue={typeof props.defaultValue === 'string' ? props.defaultValue : ''}
                     aria-invalid={errors ? true : undefined}
-                    aria-describedby={errors ? errorId : undefined}
-                    className={suffix ? 'pr-9' : undefined}
-                    {...props}
                 />
-                {suffix && (
-                    <span
-                        className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm"
-                        aria-hidden="true"
-                    >
-                        {suffix}
-                    </span>
-                )}
-            </div>
+            ) : props.type === 'month' ? (
+                <MonthPickerField
+                    name={name}
+                    defaultValue={typeof props.defaultValue === 'string' ? props.defaultValue : ''}
+                    aria-invalid={errors ? true : undefined}
+                />
+            ) : (
+                <div className="relative">
+                    <Input
+                        id={name}
+                        name={name}
+                        aria-invalid={errors ? true : undefined}
+                        aria-describedby={errors ? errorId : undefined}
+                        className={suffix ? 'pr-9' : undefined}
+                        {...props}
+                    />
+                    {suffix && (
+                        <span
+                            className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm"
+                            aria-hidden="true"
+                        >
+                            {suffix}
+                        </span>
+                    )}
+                </div>
+            )}
             {errors && (
                 <p id={errorId} role="alert" className="text-negative text-sm">
                     {errors.join(' ')}

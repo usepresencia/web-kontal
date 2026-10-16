@@ -1,3 +1,5 @@
+import { DatePickerField } from '@/lib/_components/date-picker-field';
+import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
 import { Button } from '@/lib/_components/ui/button';
@@ -60,39 +62,34 @@ export async function TitlesView({
             </header>
 
             <form method="get" className="flex flex-wrap items-end gap-3">
-                <label className="space-y-1 text-sm">
+                <div className="space-y-1 text-sm">
                     <span className="text-muted-foreground">Situação</span>
-                    <select
+                    <DropdownSelect
                         name="status"
                         defaultValue={status ?? ''}
-                        className="border-input bg-background block h-10 rounded-md border px-3"
-                    >
-                        <option value="">Todas</option>
-                        {TITLE_STATUSES.map(item => (
-                            <option key={item} value={item}>
-                                {TITLE_STATUS_LABELS[item]}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <label className="space-y-1 text-sm">
+                        className="w-44"
+                        options={[
+                            { value: '', label: 'Todas' },
+                            ...TITLE_STATUSES.map(item => ({
+                                value: item,
+                                label: TITLE_STATUS_LABELS[item],
+                            })),
+                        ]}
+                    />
+                </div>
+                <div className="space-y-1 text-sm">
                     <span className="text-muted-foreground">Vencimento de</span>
-                    <input
-                        type="date"
+                    <DatePickerField
                         name="dueFrom"
                         defaultValue={dueFrom}
-                        className="border-input bg-background block h-10 rounded-md border px-3"
+                        clearable
+                        className="w-44"
                     />
-                </label>
-                <label className="space-y-1 text-sm">
+                </div>
+                <div className="space-y-1 text-sm">
                     <span className="text-muted-foreground">até</span>
-                    <input
-                        type="date"
-                        name="dueTo"
-                        defaultValue={dueTo}
-                        className="border-input bg-background block h-10 rounded-md border px-3"
-                    />
-                </label>
+                    <DatePickerField name="dueTo" defaultValue={dueTo} clearable className="w-44" />
+                </div>
                 <FilterButton />
             </form>
 
