@@ -1,6 +1,7 @@
 'use client';
 
 import { createSessionAction } from '@/actions/session';
+import { useBusyFlag } from '@/lib/_components/busy-provider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -16,6 +17,7 @@ export default function SsoCallbackPage() {
     const router = useRouter();
     const started = useRef(false);
     const [error, setError] = useState<keyof typeof MESSAGES | null>(null);
+    useBusyFlag(error === null, 'Entrando no Kontal…');
 
     useEffect(() => {
         // O Strict Mode roda o efeito duas vezes; o token só pode ser consumido uma vez.
@@ -50,9 +52,7 @@ export default function SsoCallbackPage() {
                         Voltar ao Presencia
                     </a>
                 </div>
-            ) : (
-                <p className="text-muted-foreground">Entrando no Kontal…</p>
-            )}
+            ) : null}
         </main>
     );
 }

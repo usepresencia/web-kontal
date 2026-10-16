@@ -1,6 +1,7 @@
 'use client';
 
 import { selectCompanyAction } from '@/actions/session';
+import { useBusyFlag } from '@/lib/_components/busy-provider';
 import { Button } from '@/lib/_components/ui/button';
 import type { Tenant } from '@/lib/api/schemas/tenant';
 import { useEffect, useRef, useState, useTransition } from 'react';
@@ -8,6 +9,7 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 /** Lista as empresas do usuário; com uma só, a seleciona sozinha. */
 export function CompanyList({ tenants }: { tenants: Tenant[] }) {
     const [pending, startTransition] = useTransition();
+    useBusyFlag(pending, 'Abrindo empresa…');
     const [error, setError] = useState(false);
     const autoSelected = useRef(false);
 

@@ -2,6 +2,7 @@
 
 import { createEntryAction } from '@/actions/titles';
 import { FormField } from '@/lib/_components/form-field';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { SelectField } from '@/lib/_components/select-field';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
@@ -25,6 +26,7 @@ export function EntryForm({ titleId, accounts, today, paying }: EntryFormProps) 
 
     return (
         <form action={formAction} className="space-y-4">
+            <FormPendingOverlay message="Registrando baixa…" />
             <h2 className="font-display text-lg font-semibold">
                 {paying ? 'Registrar pagamento' : 'Registrar recebimento'}
             </h2>

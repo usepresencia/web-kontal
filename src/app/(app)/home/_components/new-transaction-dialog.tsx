@@ -5,6 +5,7 @@ import {
     getTitleFormOptionsAction,
     type TitleFormOptions,
 } from '@/actions/titles';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { Button } from '@/lib/_components/ui/button';
 import {
     Dialog,
@@ -65,6 +66,7 @@ function NewTransactionForm({ options, onDone }: FormProps) {
 
     return (
         <form action={formAction} className="space-y-4">
+            <FormPendingOverlay message="Salvando transação…" />
             <input type="hidden" name="type" value={type} />
             <input type="hidden" name="returnTo" value="/home" />
 

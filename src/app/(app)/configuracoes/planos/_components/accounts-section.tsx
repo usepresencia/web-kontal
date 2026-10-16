@@ -1,6 +1,7 @@
 'use client';
 
 import { deleteAccountAction } from '@/actions/billing';
+import { useBusyRun } from '@/lib/_components/busy-provider';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { Badge } from '@/lib/_components/ui/badge';
 import { Button } from '@/lib/_components/ui/button';
@@ -22,6 +23,7 @@ type AccountsSectionProps = { planId: string; accounts: BillingAccount[] };
 
 /** Contas do plano, com criação, edição e exclusão. */
 export function AccountsSection({ planId, accounts }: AccountsSectionProps) {
+    const run = useBusyRun();
     const [dialog, setDialog] = useState<{ open: boolean; account?: BillingAccount }>({
         open: false,
     });
@@ -123,7 +125,10 @@ export function AccountsSection({ planId, accounts }: AccountsSectionProps) {
                 variant="destructive"
                 onConfirm={async () => {
                     if (!toDelete) return;
-                    const result = await deleteAccountAction(planId, toDelete.id);
+                    const result = await run(
+                        () => deleteAccountAction(planId, toDelete.id),
+                        'Excluindo conta…',
+                    );
                     setError(result.ok ? null : (result.message ?? 'Não foi possível excluir.'));
                     setToDelete(null);
                 }}

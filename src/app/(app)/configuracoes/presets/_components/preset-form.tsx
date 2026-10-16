@@ -1,6 +1,7 @@
 'use client';
 
 import { FormField } from '@/lib/_components/form-field';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { SelectField } from '@/lib/_components/select-field';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
@@ -36,6 +37,7 @@ export function PresetForm({
 
     return (
         <form action={formAction} className="max-w-2xl space-y-6">
+            <FormPendingOverlay message="Salvando preset…" />
             {!preset && <input type="hidden" name="billingPlanId" value={billingPlanId} />}
 
             <div className="grid gap-4 md:grid-cols-2">

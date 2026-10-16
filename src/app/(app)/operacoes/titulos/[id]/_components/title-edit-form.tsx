@@ -2,6 +2,7 @@
 
 import { updateTitleAction } from '@/actions/titles';
 import { FormField } from '@/lib/_components/form-field';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import { fractionToPercent } from '@/lib/_utils/percent';
@@ -18,6 +19,7 @@ export function TitleEditForm({ title }: { title: Title }) {
 
     return (
         <form action={formAction} className="space-y-4">
+            <FormPendingOverlay message="Salvando título…" />
             <h2 className="font-display text-lg font-semibold">Dados do título</h2>
             <div className="grid gap-4 md:grid-cols-3">
                 <FormField

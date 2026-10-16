@@ -1,7 +1,9 @@
 'use client';
 
 import { closePeriodAction, reopenPeriodAction } from '@/actions/periods';
+import { useBusyRun } from '@/lib/_components/busy-provider';
 import { FormField } from '@/lib/_components/form-field';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { SelectField } from '@/lib/_components/select-field';
 import { Button } from '@/lib/_components/ui/button';
 import { ConfirmationDialog } from '@/lib/_components/ui/confirmation-dialog';
@@ -19,6 +21,7 @@ export function ClosePeriodForm({ suggestedMonth, equityAccounts }: ClosePeriodF
 
     return (
         <form action={formAction} className="max-w-xl space-y-4">
+            <FormPendingOverlay message="Fechando período…" />
             <h2 className="font-display text-lg font-semibold">Fechar período</h2>
             <FormField
                 label="Mês"
@@ -53,6 +56,7 @@ export function ClosePeriodForm({ suggestedMonth, equityAccounts }: ClosePeriodF
 
 /** Reabre o último período fechado, com confirmação. */
 export function ReopenButton() {
+    const run = useBusyRun();
     const [open, setOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -74,7 +78,7 @@ export function ReopenButton() {
                 confirmLabel="Reabrir"
                 variant="destructive"
                 onConfirm={async () => {
-                    const result = await reopenPeriodAction();
+                    const result = await run(() => reopenPeriodAction(), 'Reabrindo período…');
                     setError(result.ok ? null : (result.message ?? 'Não foi possível reabrir.'));
                     setOpen(false);
                 }}

@@ -1,6 +1,7 @@
 'use client';
 
 import { FormField } from '@/lib/_components/form-field';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import type { Company } from '@/lib/api/schemas/company';
@@ -19,6 +20,7 @@ export function CompanyForm({ action, company, submitLabel }: CompanyFormProps) 
 
     return (
         <form action={formAction} className="space-y-6">
+            <FormPendingOverlay message="Salvando empresa…" />
             <fieldset className="grid gap-4 md:grid-cols-2">
                 <legend className="font-display mb-2 text-lg font-semibold">
                     Dados da empresa

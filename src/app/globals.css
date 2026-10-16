@@ -154,3 +154,24 @@
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
 }
+
+/* Squircle do LoadingOverlay: gira 360° enquanto o raio oscila entre círculo (50%) e
+   quadrado arredondado (19%) e volta, num ciclo só. */
+@keyframes squircle-morph {
+    0% {
+        border-radius: 50%;
+        transform: rotate(0deg);
+    }
+    50% {
+        border-radius: 19%;
+        transform: rotate(180deg);
+    }
+    100% {
+        border-radius: 50%;
+        transform: rotate(360deg);
+    }
+}
+
+@utility squircle-spin {
+    animation: squircle-morph 1.6s linear infinite;
+}
