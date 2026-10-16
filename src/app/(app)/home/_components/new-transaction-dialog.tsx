@@ -1,6 +1,7 @@
 'use client';
 
 import { getOpenTitlesAction } from '@/actions/titles';
+import { useBusyFlag } from '@/lib/_components/busy-provider';
 import { PaymentStep } from '@/lib/_components/transactions/payment-step';
 import { StepTitle } from '@/lib/_components/transactions/step-title';
 import { TitlePicker } from '@/lib/_components/transactions/title-picker';
@@ -47,6 +48,8 @@ export function NewTransactionDialog() {
             active = false;
         };
     }, [open, type, titles]);
+
+    useBusyFlag(open && titles[type] === null, 'Carregando títulos…');
 
     const close = () => {
         setOpen(false);

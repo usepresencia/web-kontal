@@ -1,6 +1,7 @@
 'use client';
 
 import { getTitleEntriesAction } from '@/actions/titles';
+import { useBusyFlag } from '@/lib/_components/busy-provider';
 import { Dialog, DialogContent, DialogHeader } from '@/lib/_components/ui/dialog';
 import { entryLabels } from '@/lib/_utils/title-labels';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
@@ -37,6 +38,8 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
             active = false;
         };
     }, [titleId]);
+
+    useBusyFlag(title !== null && entries === null, 'Carregando detalhes…');
 
     const copy = () => {
         if (!titleId) return;

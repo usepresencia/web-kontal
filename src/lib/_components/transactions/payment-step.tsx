@@ -1,6 +1,7 @@
 'use client';
 
 import { getTitlePaymentAccountsAction } from '@/actions/titles';
+import { useBusyFlag } from '@/lib/_components/busy-provider';
 import { EntryForm } from '@/lib/_components/transactions/entry-form';
 import { toLocalIsoDate } from '@/lib/_utils/dates';
 import { toInputAmount } from '@/lib/_utils/money';
@@ -23,6 +24,8 @@ export function PaymentStep({ title, onSuccess }: PaymentStepProps) {
             active = false;
         };
     }, [title.id]);
+
+    useBusyFlag(accounts === null, 'Carregando contas…');
 
     if (accounts === null) return <p className="text-muted-foreground text-sm">Carregando…</p>;
     if (accounts.length === 0) {
