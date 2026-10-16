@@ -3,9 +3,11 @@
 import { getSeriesAction } from '@/actions/titles';
 import { useBusyFlag } from '@/lib/_components/busy-provider';
 import { StepTitle } from '@/lib/_components/transactions/step-title';
+import { TransactionDialog } from '@/lib/_components/transactions/transaction-dialog';
 import { Button } from '@/lib/_components/ui/button';
 import { Dialog, DialogContent, DialogHeader } from '@/lib/_components/ui/dialog';
 import { cn } from '@/lib/_utils/cn';
+import { daysAgoLabel } from '@/lib/_utils/dates';
 import { formatAmount } from '@/lib/_utils/money';
 import {
     SERIES_FREQUENCY_LABELS,
@@ -13,7 +15,7 @@ import {
     TITLE_STATUS_LABELS,
     formatDate,
 } from '@/lib/_utils/title-labels';
-import type { Series, SeriesDetail } from '@/lib/api/schemas/title';
+import type { Series, SeriesDetail, Title } from '@/lib/api/schemas/title';
 import { useCallback, useEffect, useState } from 'react';
 import { CancelSeriesButton, ExtendSeriesForm } from './series-actions';
 
@@ -23,6 +25,7 @@ type SeriesDialogProps = { series: Series | null; onClose: () => void };
 export function SeriesDialog({ series, onClose }: SeriesDialogProps) {
     const [detail, setDetail] = useState<SeriesDetail | null>(null);
     const [step, setStep] = useState<'details' | 'extend'>('details');
+    const [picked, setPicked] = useState<Title | null>(null);
     const seriesId = series?.id;
 
     const load = useCallback(() => {
@@ -39,6 +42,7 @@ export function SeriesDialog({ series, onClose }: SeriesDialogProps) {
     useEffect(() => {
         setDetail(null);
         setStep('details');
+        setPicked(null);
         return load();
     }, [load]);
 
@@ -75,28 +79,33 @@ export function SeriesDialog({ series, onClose }: SeriesDialogProps) {
                         </div>
                         <ul className="divide-border/40 divide-y">
                             {detail.titles.map(title => (
-                                <li
-                                    key={title.id}
-                                    className="flex items-center justify-between gap-3 py-2 text-sm"
-                                >
-                                    <span className="min-w-0">
-                                        <span className="text-foreground font-medium">
-                                            {title.seriesIndex}. {formatDate(title.expirationDate)}
-                                        </span>
-                                        <span className="bg-muted text-muted-foreground ml-2 rounded-full px-2 py-0.5 text-[11px]">
-                                            {TITLE_STATUS_LABELS[title.status]}
-                                        </span>
-                                    </span>
-                                    <span
-                                        className={cn(
-                                            'font-semibold',
-                                            title.type === 'INCOME'
-                                                ? 'text-positive'
-                                                : 'text-negative',
-                                        )}
+                                <li key={title.id}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPicked(title)}
+                                        aria-haspopup="dialog"
+                                        className="group hover:bg-muted/50 focus-visible:ring-ring -mx-2 flex w-[calc(100%+1rem)] items-center justify-between gap-3 rounded-lg px-2 py-2 text-left text-sm focus-visible:ring-2 focus-visible:outline-none"
                                     >
-                                        {formatAmount(title.amount)}
-                                    </span>
+                                        <span className="min-w-0">
+                                            <span className="text-foreground font-medium">
+                                                {title.seriesIndex}.{' '}
+                                                {formatDate(title.expirationDate)}
+                                            </span>
+                                            <span className="bg-muted text-muted-foreground ml-2 rounded-full px-2 py-0.5 text-[11px]">
+                                                {TITLE_STATUS_LABELS[title.status]}
+                                            </span>
+                                        </span>
+                                        <span
+                                            className={cn(
+                                                'font-semibold',
+                                                title.type === 'INCOME'
+                                                    ? 'text-positive'
+                                                    : 'text-negative',
+                                            )}
+                                        >
+                                            {formatAmount(title.amount)}
+                                        </span>
+                                    </button>
                                 </li>
                             ))}
                         </ul>
@@ -122,6 +131,14 @@ export function SeriesDialog({ series, onClose }: SeriesDialogProps) {
                     />
                 )}
             </DialogContent>
+            <TransactionDialog
+                title={picked}
+                ago={picked ? daysAgoLabel(picked.createdAt, new Date()) : ''}
+                onClose={() => {
+                    setPicked(null);
+                    load();
+                }}
+            />
         </Dialog>
     );
 }

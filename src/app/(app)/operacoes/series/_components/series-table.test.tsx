@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 vi.mock('@/actions/titles', () => ({
+    getTitleEntriesAction: vi.fn(),
     getSeriesAction: vi.fn(),
     cancelSeriesAction: vi.fn(),
     extendSeriesAction: vi.fn(),
