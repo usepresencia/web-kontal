@@ -31,14 +31,13 @@ const HOME_PATH = '/home';
 
 const LIST_PATHS = { EXPENSE: '/operacoes/pagar', INCOME: '/operacoes/receber' } as const;
 
-/** Cria um título; com repetição, cria a série (parcelada ou recorrente) e abre o detalhe dela. */
+/** Cria um título; com repetição, cria a série (parcelada ou recorrente). */
 export async function createTitleAction(_prev: FormState, formData: FormData): Promise<FormState> {
     const parsed = titleCreateSchema.safeParse(formDataToObject(formData));
     if (!parsed.success) return stateFromZodError(parsed.error);
 
     const { repeat, frequency, count, until, isOpening, openingDate, settledAmount, ...title } =
         parsed.data;
-    let destination: string = LIST_PATHS[title.type];
     try {
         if (repeat === 'NONE') {
             await apiFetch('/titles', titleSchema, {
@@ -46,17 +45,17 @@ export async function createTitleAction(_prev: FormState, formData: FormData): P
                 body: isOpening ? { ...title, isOpening, openingDate, settledAmount } : title,
             });
         } else {
-            const series = await apiFetch('/title-series', seriesDetailSchema, {
+            await apiFetch('/title-series', seriesDetailSchema, {
                 method: 'POST',
                 body: { ...title, kind: repeat, frequency, count, until },
             });
-            destination = `/operacoes/series/${series.id}`;
         }
     } catch (error) {
         return stateFromApiError(error);
     }
     revalidatePath(LIST_PATHS[title.type]);
-    redirect(destination);
+    revalidatePath(HOME_PATH);
+    return { ok: true, message: 'Título criado.' };
 }
 
 /** Atualiza descrição, vencimento e juros de um título. */

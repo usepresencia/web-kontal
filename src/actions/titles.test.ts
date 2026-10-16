@@ -185,3 +185,34 @@ describe('getOpenTitlesAction', () => {
         expect(await getOpenTitlesAction('INCOME')).toEqual([]);
     });
 });
+
+describe('createTitleAction', () => {
+    const form = (extra: Record<string, string> = {}) => {
+        const data = new FormData();
+        const fields = {
+            type: 'EXPENSE',
+            presetId: '3f1c2b4e-5a6d-4e7f-8a9b-0c1d2e3f4a5b',
+            description: 'Aluguel',
+            amount: '1.234,50',
+            expirationDate: '2026-11-10',
+            ...extra,
+        };
+        Object.entries(fields).forEach(([key, value]) => data.set(key, value));
+        return data;
+    };
+
+    it('cria o título e devolve ok em vez de redirecionar, para o modal fechar', async () => {
+        const { createTitleAction } = await import('./titles');
+        apiFetch.mockResolvedValue({});
+        const result = await createTitleAction({ ok: false }, form());
+        expect(result.ok).toBe(true);
+        expect(apiFetch.mock.calls[0][0]).toBe('/titles');
+    });
+
+    it('devolve os erros dos campos sem chamar a API', async () => {
+        const { createTitleAction } = await import('./titles');
+        const result = await createTitleAction({ ok: false }, form({ description: '' }));
+        expect(result.ok).toBe(false);
+        expect(apiFetch).not.toHaveBeenCalled();
+    });
+});
