@@ -3,13 +3,12 @@ import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
 import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
 import { FilterForm } from '@/lib/_components/filter-form';
-import { Button } from '@/lib/_components/ui/button';
 import { parseIsoDate } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
 import { apiFetch } from '@/lib/api/client';
 import { journalPageSchema } from '@/lib/api/schemas/journal';
-import Link from 'next/link';
 import { EntriesTable } from './_components/entries-table';
+import { NewEntryDialog } from './_components/new-entry-dialog';
 
 export default async function JournalEntriesPage({
     searchParams,
@@ -29,10 +28,14 @@ export default async function JournalEntriesPage({
     return (
         <div className="space-y-6">
             <header className="flex items-center justify-between gap-4">
-                <h1 className="text-2xl font-bold">Lançamentos</h1>
-                <Button asChild>
-                    <Link href="/contabilidade/lancamentos/novo">Novo lançamento</Link>
-                </Button>
+                <div>
+                    <h1 className="text-2xl font-bold">Lançamentos contábeis</h1>
+                    <p className="text-muted-foreground text-sm">
+                        Registros de débito e crédito gerados pelas operações ou lançados
+                        manualmente
+                    </p>
+                </div>
+                <NewEntryDialog />
             </header>
 
             <FilterForm className="flex flex-wrap items-end gap-3">
