@@ -32,6 +32,16 @@ npm install
 npm run dev
 ```
 
+## Ambiente local com Docker
+
+Portas: api-kontal `3000`, web-presencia `3001`, web-kontal `3002`.
+
+1. Suba a api-kontal (`docker compose up -d` no banco e `npm run start:dev`) e o web-presencia (`npm run dev -- -p 3001`) com `NEXT_PUBLIC_KONTAL_DOMAIN=http://localhost:3002`.
+2. Aqui: `cp .env.example .env.local` e `docker compose up --build`.
+3. Entre no web-presencia como `INTERNAL_ADMIN`, clique em Kontal e confira que abre `http://localhost:3002`.
+
+A api-kontal precisa ter `http://localhost:3002` em `CORS_ALLOWED_ORIGINS`.
+
 ## Qualidade
 
 ```bash
