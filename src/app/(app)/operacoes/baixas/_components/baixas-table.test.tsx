@@ -1,7 +1,10 @@
+import { BusyProvider } from '@/lib/_components/busy-provider';
 import type { TitleEntry } from '@/lib/api/schemas/title';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
+vi.mock('server-only', () => ({}));
+vi.mock('@/actions/titles', () => ({ getTitleAction: vi.fn(), getTitleEntriesAction: vi.fn() }));
 vi.mock('@/lib/_hooks/use-pagination-query', () => ({
     usePaginationQuery: () => ({ onPageChange: vi.fn(), onPageSizeChange: vi.fn() }),
 }));
@@ -30,7 +33,9 @@ const entry = (id: string, overrides: Partial<TitleEntry> = {}): TitleEntry => (
 
 const render = (items: TitleEntry[]) =>
     renderToStaticMarkup(
-        <BaixasTable page={{ items, page: 1, pageSize: 10, total: items.length }} />,
+        <BusyProvider>
+            <BaixasTable page={{ items, page: 1, pageSize: 10, total: items.length }} />
+        </BusyProvider>,
     );
 
 describe('BaixasTable', () => {
@@ -49,9 +54,14 @@ describe('BaixasTable', () => {
         expect(expense).toContain('text-negative');
     });
 
-    it('leva ao título e mostra forma, conta e data da baixa', () => {
+    it('abre os detalhes em modal, sem navegar para outra página', () => {
         const html = render([entry('a')]);
-        expect(html).toContain('href="/operacoes/titulos/t-a"');
+        expect(html).toContain('aria-haspopup="dialog"');
+        expect(html).not.toContain('href="/operacoes/titulos');
+    });
+
+    it('mostra forma, conta e data da baixa', () => {
+        const html = render([entry('a')]);
         expect(html).toContain('Pix');
         expect(html).toContain('Caixa');
         expect(html).toContain('16/10/2026');
