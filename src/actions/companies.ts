@@ -34,7 +34,7 @@ export async function createCompanyAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas');
+    revalidatePath('/plataforma/empresas');
     return { ok: true, ...SUCCESS.companyCreated };
 }
 
@@ -51,7 +51,7 @@ export async function updateCompanyAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas');
+    revalidatePath('/plataforma/empresas');
     return { ok: true, ...SUCCESS.companyUpdated };
 }
 
@@ -67,7 +67,7 @@ export async function deactivateCompanyAction(companyId: string): Promise<FormSt
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas');
+    revalidatePath('/plataforma/empresas');
     return { ok: true };
 }
 
@@ -96,7 +96,7 @@ export async function saveLogoAction(url: string): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas');
+    revalidatePath('/plataforma/empresas');
     return { ok: true };
 }
 
@@ -107,7 +107,7 @@ export async function removeLogoAction(): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas');
+    revalidatePath('/plataforma/empresas');
     return { ok: true };
 }
 

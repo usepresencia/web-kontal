@@ -31,7 +31,7 @@ const INVALID_ID: FormState = { ok: false, message: 'Identificador inválido.' }
 const isUuid = (value: string) => z.uuid().safeParse(value).success;
 
 const HOME_PATH = '/home';
-const ENTRIES_PATH = '/operacoes/baixas';
+const ENTRIES_PATH = '/operacoes/transacoes';
 
 const LIST_PATHS = { EXPENSE: '/operacoes/pagar', INCOME: '/operacoes/receber' } as const;
 
@@ -224,7 +224,7 @@ export async function extendSeriesAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/operacoes/series');
+    revalidatePath('/operacoes/parcelamentos');
     Object.values(LIST_PATHS).forEach(path => revalidatePath(path));
     return { ok: true, ...SUCCESS.seriesExtended };
 }
@@ -237,9 +237,9 @@ export async function cancelSeriesAction(seriesId: string): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/operacoes/series');
+    revalidatePath('/operacoes/parcelamentos');
     await flash(SUCCESS.seriesCancelled);
-    redirect('/operacoes/series');
+    redirect('/operacoes/parcelamentos');
 }
 
 /** Baixas de um título (até 100), para o modal de detalhes; vazio se o título não existe. */

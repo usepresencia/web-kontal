@@ -33,8 +33,8 @@ export const NAV_SECTIONS: NavSection[] = [
         items: [
             { title: 'Contas a pagar', href: '/operacoes/pagar', icon: ArrowUpCircle },
             { title: 'Contas a receber', href: '/operacoes/receber', icon: ArrowDownCircle },
-            { title: 'Transações', href: '/operacoes/baixas', icon: Receipt },
-            { title: 'Parcelamentos', href: '/operacoes/series', icon: Repeat },
+            { title: 'Transações', href: '/operacoes/transacoes', icon: Receipt },
+            { title: 'Parcelamentos', href: '/operacoes/parcelamentos', icon: Repeat },
         ],
     },
     {
@@ -59,9 +59,9 @@ export const NAV_SECTIONS: NavSection[] = [
     {
         title: 'Cadastros',
         items: [
-            { title: 'Empresas', href: '/empresas', icon: Building2 },
-            { title: 'Plano de contas', href: '/configuracoes/planos', icon: ListTree },
-            { title: 'Presets', href: '/configuracoes/presets', icon: SlidersHorizontal },
+            { title: 'Empresas', href: '/plataforma/empresas', icon: Building2 },
+            { title: 'Plano de contas', href: '/cadastros/plano-de-contas', icon: ListTree },
+            { title: 'Presets', href: '/cadastros/presets', icon: SlidersHorizontal },
         ],
     },
 ];

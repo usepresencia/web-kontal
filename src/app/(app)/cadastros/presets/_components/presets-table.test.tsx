@@ -46,7 +46,7 @@ describe('PresetsTable', () => {
     it('abre o modal de edição, sem link para outra página', () => {
         const html = render([preset('a')]);
         expect(html).toContain('aria-haspopup="dialog"');
-        expect(html).not.toContain('href="/configuracoes/presets/');
+        expect(html).not.toContain('href="/cadastros/presets/');
     });
 
     it('mostra o plano, a descrição e a situação', () => {

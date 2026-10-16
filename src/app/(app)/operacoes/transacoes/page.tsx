@@ -12,7 +12,7 @@ import { apiFetch } from '@/lib/api/client';
 import { accountPageSchema } from '@/lib/api/schemas/billing';
 import { entryPageSchema } from '@/lib/api/schemas/title';
 import { z } from 'zod';
-import { BaixasTable } from './_components/baixas-table';
+import { TransactionsTable } from './_components/transactions-table';
 
 const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
 
@@ -108,7 +108,7 @@ export default async function EntriesPage({
             {entries.items.length === 0 ? (
                 <EmptyState title="Nenhuma transação encontrada" />
             ) : (
-                <BaixasTable page={entries} />
+                <TransactionsTable page={entries} />
             )}
         </div>
     );

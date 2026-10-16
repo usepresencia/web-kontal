@@ -30,7 +30,7 @@ export async function createPlanAction(_prev: FormState, formData: FormData): Pr
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/configuracoes/planos');
+    revalidatePath('/cadastros/plano-de-contas');
     return { ok: true, ...SUCCESS.planCreated };
 }
 
@@ -52,7 +52,7 @@ export async function updatePlanAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/configuracoes/planos');
+    revalidatePath('/cadastros/plano-de-contas');
     return { ok: true, ...SUCCESS.planUpdated };
 }
 
@@ -64,7 +64,7 @@ export async function deletePlanAction(planId: string): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/configuracoes/planos');
+    revalidatePath('/cadastros/plano-de-contas');
     return { ok: true };
 }
 
@@ -86,7 +86,7 @@ export async function createAccountAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath(`/configuracoes/planos/${planId}`);
+    revalidatePath(`/cadastros/plano-de-contas/${planId}`);
     return { ok: true, ...SUCCESS.accountCreated };
 }
 
@@ -109,7 +109,7 @@ export async function updateAccountAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath(`/configuracoes/planos/${planId}`);
+    revalidatePath(`/cadastros/plano-de-contas/${planId}`);
     return { ok: true, ...SUCCESS.accountUpdated };
 }
 
@@ -121,7 +121,7 @@ export async function deleteAccountAction(planId: string, accountId: string): Pr
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath(`/configuracoes/planos/${planId}`);
+    revalidatePath(`/cadastros/plano-de-contas/${planId}`);
     return { ok: true };
 }
 
