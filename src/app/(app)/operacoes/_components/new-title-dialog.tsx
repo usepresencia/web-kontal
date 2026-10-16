@@ -5,6 +5,7 @@ import {
     getTitleFormOptionsAction,
     type TitleFormOptions,
 } from '@/actions/titles';
+import { useBusyFlag } from '@/lib/_components/busy-provider';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { Button } from '@/lib/_components/ui/button';
 import {
@@ -32,6 +33,7 @@ type NewTitleDialogProps = {
 export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
     const [open, setOpen] = useState(false);
     const [options, setOptions] = useState<TitleFormOptions | null>(null);
+    useBusyFlag(open && options === null, 'Carregando…');
     const label = opening ? entryLabels(type).opening : entryLabels(type).create;
 
     useEffect(() => {
