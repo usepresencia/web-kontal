@@ -4,6 +4,8 @@ import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_util
 import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
 import { stateFromApiError } from '@/lib/api/form-state';
+import { accountPageSchema } from '@/lib/api/schemas/billing';
+import { presetPageSchema } from '@/lib/api/schemas/preset';
 import {
     entryCreateSchema,
     entryPageSchema,
@@ -23,12 +25,17 @@ import { z } from 'zod';
 const INVALID_ID: FormState = { ok: false, message: 'Identificador inválido.' };
 const isUuid = (value: string) => z.uuid().safeParse(value).success;
 
+const HOME_PATH = '/home';
+
 const LIST_PATHS = { EXPENSE: '/operacoes/pagar', INCOME: '/operacoes/receber' } as const;
 
 /** Cria um título; com repetição, cria a série (parcelada ou recorrente) e abre o detalhe dela. */
 export async function createTitleAction(_prev: FormState, formData: FormData): Promise<FormState> {
     const parsed = titleCreateSchema.safeParse(formDataToObject(formData));
     if (!parsed.success) return stateFromZodError(parsed.error);
+
+    // Só a home pode ser destino de retorno: qualquer outro valor é ignorado (open redirect).
+    const returnTo = formData.get('returnTo') === HOME_PATH ? HOME_PATH : null;
 
     const { repeat, frequency, count, until, isOpening, openingDate, settledAmount, ...title } =
         parsed.data;
@@ -50,6 +57,10 @@ export async function createTitleAction(_prev: FormState, formData: FormData): P
         return stateFromApiError(error);
     }
     revalidatePath(LIST_PATHS[title.type]);
+    if (returnTo) {
+        revalidatePath(returnTo);
+        return { ok: true, message: 'Transação criada.' };
+    }
     redirect(destination);
 }
 
@@ -190,4 +201,36 @@ export async function getTitleEntriesAction(titleId: string): Promise<TitleEntry
         if (error instanceof ApiError && error.status < 500) return [];
         throw error;
     }
+}
+
+export type TitleFormOptions = {
+    presets: { value: string; label: string }[];
+    destinationAccounts: { value: string; label: string }[];
+};
+
+const EMPTY_OPTIONS: TitleFormOptions = { presets: [], destinationAccounts: [] };
+
+/** Presets ativos e, no título a pagar, as contas de destino (ativo ou despesa) do formulário de cadastro. */
+export async function getTitleFormOptionsAction(
+    type: 'INCOME' | 'EXPENSE',
+): Promise<TitleFormOptions> {
+    if (type !== 'INCOME' && type !== 'EXPENSE') return EMPTY_OPTIONS;
+
+    const presets = await apiFetch('/presets?page=1&pageSize=100&isActive=true', presetPageSchema);
+    const accounts =
+        type === 'EXPENSE'
+            ? await apiFetch('/billing-accounts?page=1&pageSize=100', accountPageSchema)
+            : null;
+
+    return {
+        presets: presets.items.map(preset => ({ value: preset.id, label: preset.name })),
+        destinationAccounts: (accounts?.items ?? [])
+            .filter(
+                account =>
+                    account.accountType === 'ANALYTIC' &&
+                    account.isActive &&
+                    (account.nature === 'ASSET' || account.nature === 'EXPENSE'),
+            )
+            .map(account => ({ value: account.id, label: `${account.code} ${account.name}` })),
+    };
 }
