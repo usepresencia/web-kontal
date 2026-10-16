@@ -1,10 +1,11 @@
 'use client';
 
 import { AmountInput } from '@/lib/_components/amount-input';
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
-import { Button } from '@/lib/_components/ui/button';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import { entryLabels } from '@/lib/_utils/title-labels';
 import { useActionState, useEffect, useState } from 'react';
@@ -20,6 +21,7 @@ type OpeningTitleFormProps = {
 /** Cadastro de saldo ou despesa inicial (título de implantação), com a data de implantação e o valor já baixado. */
 export function OpeningTitleForm({ action, type, presets, onSuccess }: OpeningTitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
+    useActionToast(state);
     const [preset, setPreset] = useState(presets[0]?.value ?? '');
     const label = entryLabels(type).opening;
     const errors = (field: string) => state.fieldErrors?.[field];
@@ -93,20 +95,16 @@ export function OpeningTitleForm({ action, type, presets, onSuccess }: OpeningTi
                 />
             </div>
 
-            {state.message && !state.ok && (
-                <p role="alert" className="text-negative text-sm">
-                    {state.message}
-                </p>
-            )}
-
             <div className="flex justify-end">
-                <Button
-                    type="submit"
+                <ConfirmSubmitButton
+                    confirmTitle={label}
+                    confirmDescription={`Registrar ${label.toLowerCase()} deste título?`}
+                    confirmLabel="Registrar"
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
                     {pending ? 'Salvando…' : `Registrar ${label.toLowerCase()}`}
-                </Button>
+                </ConfirmSubmitButton>
             </div>
         </form>
     );

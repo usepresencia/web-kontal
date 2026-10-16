@@ -2,11 +2,14 @@
 
 import { cancelSeriesAction, extendSeriesAction } from '@/actions/titles';
 import { useBusyRun } from '@/lib/_components/busy-provider';
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FormField } from '@/lib/_components/form-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { Button } from '@/lib/_components/ui/button';
 import { ConfirmationDialog } from '@/lib/_components/ui/confirmation-dialog';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
+import { notify } from '@/lib/_utils/notify';
 import { useActionState, useState } from 'react';
 
 /** Acrescenta ocorrências à série por quantidade ou data final. */
@@ -15,6 +18,7 @@ export function ExtendSeriesForm({ seriesId }: { seriesId: string }) {
         extendSeriesAction.bind(null, seriesId),
         INITIAL_FORM_STATE,
     );
+    useActionToast(state);
 
     return (
         <form action={formAction} className="space-y-4">
@@ -35,17 +39,15 @@ export function ExtendSeriesForm({ seriesId }: { seriesId: string }) {
                     errors={state.fieldErrors?.until}
                 />
             </div>
-            {state.message && (
-                <p
-                    role={state.ok ? 'status' : 'alert'}
-                    className={state.ok ? 'text-positive' : 'text-negative'}
-                >
-                    {state.message}
-                </p>
-            )}
-            <Button type="submit" variant="outline" disabled={pending}>
+            <ConfirmSubmitButton
+                confirmTitle="Estender série"
+                confirmDescription="Novas ocorrências serão acrescentadas à série. Continuar?"
+                confirmLabel="Estender"
+                variant="outline"
+                disabled={pending}
+            >
                 {pending ? 'Estendendo…' : 'Estender'}
-            </Button>
+            </ConfirmSubmitButton>
         </form>
     );
 }
@@ -54,18 +56,12 @@ export function ExtendSeriesForm({ seriesId }: { seriesId: string }) {
 export function CancelSeriesButton({ seriesId }: { seriesId: string }) {
     const run = useBusyRun();
     const [open, setOpen] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     return (
         <div className="space-y-2">
             <Button variant="destructive" onClick={() => setOpen(true)}>
                 Cancelar série
             </Button>
-            {error && (
-                <p role="alert" className="text-negative text-sm">
-                    {error}
-                </p>
-            )}
             <ConfirmationDialog
                 open={open}
                 onOpenChange={setOpen}
@@ -79,7 +75,7 @@ export function CancelSeriesButton({ seriesId }: { seriesId: string }) {
                         'Cancelando série…',
                     );
                     if (result && !result.ok)
-                        setError(result.message ?? 'Não foi possível cancelar.');
+                        notify('error', result.message ?? 'Não foi possível cancelar.');
                     setOpen(false);
                 }}
             />

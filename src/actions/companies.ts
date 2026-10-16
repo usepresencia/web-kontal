@@ -1,5 +1,6 @@
 'use server';
 
+import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
@@ -34,6 +35,7 @@ export async function createCompanyAction(
         return stateFromApiError(error);
     }
     revalidatePath('/empresas');
+    await flash('Empresa criada.');
     redirect('/empresas');
 }
 

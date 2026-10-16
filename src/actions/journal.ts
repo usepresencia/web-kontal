@@ -1,5 +1,6 @@
 'use server';
 
+import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { apiFetch } from '@/lib/api/client';
 import { stateFromApiError } from '@/lib/api/form-state';
@@ -28,6 +29,7 @@ export async function createManualEntryAction(
         return stateFromApiError(error);
     }
     revalidatePath('/contabilidade/lancamentos');
+    await flash('Lançamento registrado.');
     redirect(`/contabilidade/lancamentos/${entryId}`);
 }
 
@@ -54,5 +56,6 @@ export async function reverseEntryAction(
         return stateFromApiError(error);
     }
     revalidatePath('/contabilidade/lancamentos');
+    await flash('Lançamento estornado.');
     redirect(`/contabilidade/lancamentos/${reversalId}`);
 }

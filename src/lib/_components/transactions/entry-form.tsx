@@ -2,10 +2,11 @@
 
 import { createEntryAction } from '@/actions/titles';
 import { AmountInput } from '@/lib/_components/amount-input';
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
-import { Button } from '@/lib/_components/ui/button';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import { PAYMENT_METHOD_LABELS, entryLabels } from '@/lib/_utils/title-labels';
 import { useActionState, useEffect, useState } from 'react';
@@ -39,6 +40,7 @@ export function EntryForm({
         createEntryAction.bind(null, titleId),
         INITIAL_FORM_STATE,
     );
+    useActionToast(state);
     const [account, setAccount] = useState('');
     const [method, setMethod] = useState('PIX');
     const errors = (field: string) => state.fieldErrors?.[field];
@@ -114,22 +116,16 @@ export function EntryForm({
                     errors={errors('description')}
                 />
             </div>
-            {state.message && (
-                <p
-                    role={state.ok ? 'status' : 'alert'}
-                    className={state.ok ? 'text-positive' : 'text-negative'}
-                >
-                    {state.message}
-                </p>
-            )}
             <div className="flex justify-end">
-                <Button
-                    type="submit"
+                <ConfirmSubmitButton
+                    confirmTitle={labels.action}
+                    confirmDescription={`Registrar ${paying ? 'o pagamento' : 'o recebimento'} deste título?`}
+                    confirmLabel={labels.submit}
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
                     {pending ? labels.pending : labels.submit}
-                </Button>
+                </ConfirmSubmitButton>
             </div>
         </form>
     );

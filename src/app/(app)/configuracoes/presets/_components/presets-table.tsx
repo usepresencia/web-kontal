@@ -15,6 +15,7 @@ import {
     TableRow,
 } from '@/lib/_components/ui/table';
 import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
+import { notifyResult } from '@/lib/_utils/notify';
 import type { Page } from '@/lib/_utils/pagination';
 import type { Preset } from '@/lib/api/schemas/preset';
 import Link from 'next/link';
@@ -25,7 +26,6 @@ export function PresetsTable({ page }: { page: Page<Preset> }) {
     const run = useBusyRun();
     const pagination = usePaginationQuery();
     const [toDelete, setToDelete] = useState<Preset | null>(null);
-    const [error, setError] = useState<string | null>(null);
 
     return (
         <div className="space-y-4">
@@ -65,12 +65,6 @@ export function PresetsTable({ page }: { page: Page<Preset> }) {
                 </TableBody>
             </Table>
 
-            {error && (
-                <p role="alert" className="text-negative text-sm">
-                    {error}
-                </p>
-            )}
-
             <Pagination
                 page={page.page}
                 pageSize={page.pageSize}
@@ -93,7 +87,7 @@ export function PresetsTable({ page }: { page: Page<Preset> }) {
                         () => deletePresetAction(toDelete.id),
                         'Excluindo preset…',
                     );
-                    setError(result.ok ? null : (result.message ?? 'Não foi possível excluir.'));
+                    notifyResult(result, 'Preset excluído.', 'Não foi possível excluir.');
                     setToDelete(null);
                 }}
             />

@@ -1,10 +1,10 @@
 'use client';
 
 import { createAccountAction, updateAccountAction } from '@/actions/billing';
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FormField } from '@/lib/_components/form-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { SelectField } from '@/lib/_components/select-field';
-import { Button } from '@/lib/_components/ui/button';
 import {
     Dialog,
     DialogContent,
@@ -12,6 +12,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/lib/_components/ui/dialog';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import {
     ACCOUNT_TYPE_LABELS,
     BALANCE_CATEGORIES_BY_NATURE,
@@ -52,6 +53,7 @@ export function AccountDialog({
         ? updateAccountAction.bind(null, planId, account.id)
         : createAccountAction.bind(null, planId);
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
+    useActionToast(state);
     const [nature, setNature] = useState(account?.nature ?? '');
     const errors = (field: string) => state.fieldErrors?.[field];
 
@@ -160,15 +162,14 @@ export function AccountDialog({
                         />
                     )}
 
-                    {state.message && !state.ok && (
-                        <p role="alert" className="text-negative text-sm">
-                            {state.message}
-                        </p>
-                    )}
-
-                    <Button type="submit" disabled={pending}>
+                    <ConfirmSubmitButton
+                        confirmTitle="Salvar conta"
+                        confirmDescription="Confirmar e salvar as informações da conta?"
+                        confirmLabel="Salvar"
+                        disabled={pending}
+                    >
                         {pending ? 'Salvando…' : 'Salvar'}
-                    </Button>
+                    </ConfirmSubmitButton>
                 </form>
             </DialogContent>
         </Dialog>
