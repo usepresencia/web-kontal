@@ -1,8 +1,8 @@
+import { TransactionList } from '@/lib/_components/transactions/transaction-list';
 import { daysAgoLabel } from '@/lib/_utils/dates';
 import type { Title } from '@/lib/api/schemas/title';
 import Link from 'next/link';
 import { NewTransactionDialog } from './new-transaction-dialog';
-import { TransactionList } from './transaction-list';
 
 type RecentTransactionsProps = {
     titles: Title[];
