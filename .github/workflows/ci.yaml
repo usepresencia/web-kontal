@@ -45,10 +45,13 @@ jobs:
             - name: Type Check
               run: npm run typecheck
 
+            - name: Test
+              run: npm test
+
             - name: Build Next.js
               run: npm run build
               env:
-                  NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+                  SKIP_ENV_VALIDATION: 1
 
     release:
         runs-on: ubuntu-latest

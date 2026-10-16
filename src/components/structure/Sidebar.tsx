@@ -114,7 +114,6 @@ function SidebarBase({ isOpen }: SidebarProps) {
                                 icon={Home}
                                 as={Link}
                                 href={`${route}home`}
-                                prefetch
                                 active={pathname === `${route}home`}
                             >
                                 Home
@@ -124,7 +123,6 @@ function SidebarBase({ isOpen }: SidebarProps) {
                                 icon={Building2}
                                 as={Link}
                                 href={`${route}company`}
-                                prefetch
                                 active={pathname === `${route}company`}
                             >
                                 Empresa
@@ -144,7 +142,6 @@ function SidebarBase({ isOpen }: SidebarProps) {
                                         icon={FilePlus}
                                         as={Link}
                                         href={`${route}operations/accounts-payable/create`}
-                                        prefetch
                                         active={
                                             pathname ===
                                             `${route}operations/accounts-payable/create`
@@ -157,7 +154,6 @@ function SidebarBase({ isOpen }: SidebarProps) {
                                         icon={FileDown}
                                         as={Link}
                                         href={`${route}operations/accounts-payable/pay`}
-                                        prefetch
                                         active={
                                             pathname === `${route}operations/accounts-payable/pay`
                                         }
@@ -175,7 +171,6 @@ function SidebarBase({ isOpen }: SidebarProps) {
                                         icon={FilePlus}
                                         as={Link}
                                         href={`${route}operations/accounts-receivable/create`}
-                                        prefetch
                                         active={
                                             pathname ===
                                             `${route}operations/accounts-receivable/create`
@@ -188,7 +183,6 @@ function SidebarBase({ isOpen }: SidebarProps) {
                                         icon={FileDown}
                                         as={Link}
                                         href={`${route}operations/accounts-receivable/receive`}
-                                        prefetch
                                         active={
                                             pathname ===
                                             `${route}operations/accounts-receivable/receive`
@@ -208,7 +202,6 @@ function SidebarBase({ isOpen }: SidebarProps) {
                                     icon={Network}
                                     as={Link}
                                     href={`${route}settings/billing-plans`}
-                                    prefetch
                                     active={pathname === `${route}settings/billing-plans`}
                                 >
                                     Plano de Contas
@@ -217,7 +210,6 @@ function SidebarBase({ isOpen }: SidebarProps) {
                                     icon={Landmark}
                                     as={Link}
                                     href={`${route}settings/history-presets`}
-                                    prefetch
                                     active={pathname === `${route}settings/history-presets`}
                                 >
                                     Históricos

@@ -7,3 +7,5 @@ coverage
 *.lock
 package-lock.json
 yarn.lock
+docs
+.flowbite-react

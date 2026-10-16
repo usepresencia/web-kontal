@@ -32,11 +32,10 @@ interface CompanyPayload {
     cnae: string;
     email: string;
     phone: string;
-
-    phone: string;
     state_registration: string;
     municipal_registration: string;
     tax_regime: string;
+    type_of?: string;
 
     logo: File | null;
 
@@ -61,7 +60,6 @@ export default function CompanyRegister() {
         opening_date: '',
         cnae: '',
         email: '',
-        phone: '',
         phone: '',
         state_registration: '',
         municipal_registration: '',
@@ -118,7 +116,7 @@ export default function CompanyRegister() {
         } catch (error) {
             console.error('Erro ao cadastrar empresa:', error);
             // Tenta extrair erros do backend (DRF) — pode ser objeto de campos ou mensagem
-            const respData = error?.response?.data;
+            const respData = (error as { response?: { data?: unknown } })?.response?.data;
             let message = 'Erro ao cadastrar empresa. Tente novamente.';
             if (respData) {
                 if (typeof respData === 'string') message = respData;

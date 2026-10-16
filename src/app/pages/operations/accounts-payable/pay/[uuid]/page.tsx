@@ -335,10 +335,7 @@ export default function PayableEntryPage() {
                                         setForm({
                                             ...form,
                                             payment_method: e.target.value as
-                                                | 'cash'
-                                                | 'debit'
-                                                | 'credit'
-                                                | 'pix',
+                                                'cash' | 'debit' | 'credit' | 'pix',
                                         })
                                     }
                                     className="w-full rounded-lg border border-gray-300 p-2.5 dark:border-gray-600 dark:bg-gray-700"
