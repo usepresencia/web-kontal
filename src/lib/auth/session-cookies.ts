@@ -43,3 +43,9 @@ export async function clearSession(): Promise<void> {
     store.delete(names.token);
     store.delete(names.tenant);
 }
+
+/** Apaga só a empresa ativa. */
+export async function clearTenantId(): Promise<void> {
+    const store = await cookies();
+    store.delete(cookieNames(isProduction()).tenant);
+}
