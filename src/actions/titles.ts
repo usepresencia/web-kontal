@@ -70,7 +70,10 @@ export async function createTitleAction(_prev: FormState, formData: FormData): P
         return stateFromApiError(error);
     }
 
-    let result: FormState = { ok: true, message: 'Título criado.' };
+    let result: FormState = {
+        ok: true,
+        message: repeat === 'NONE' ? 'Título criado.' : 'Parcelamento criado.',
+    };
     if (payNow && created) {
         try {
             await apiFetch(`/titles/${created.id}/entries`, entrySchema, {

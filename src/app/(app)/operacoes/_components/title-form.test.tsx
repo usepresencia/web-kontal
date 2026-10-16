@@ -96,3 +96,34 @@ describe('TitleForm como saldo ou despesa inicial', () => {
         expect(render('EXPENSE')).not.toContain('isOpening');
     });
 });
+
+const renderSeries = (type: 'INCOME' | 'EXPENSE') =>
+    renderToStaticMarkup(
+        <BusyProvider>
+            <TitleForm
+                action={vi.fn()}
+                type={type}
+                presets={[{ value: 'p1', label: 'Padrão' }]}
+                financialAccounts={[{ value: 'c1', label: '1.1 Caixa' }]}
+                series
+            />
+        </BusyProvider>,
+    );
+
+describe('TitleForm como parcelamento', () => {
+    it('exige a repetição: já vem parcelado, com quantidade e data final, sem "Sem repetição"', () => {
+        const html = renderSeries('EXPENSE');
+        expect(html).toMatch(/name="repeat" value="INSTALLMENT"/);
+        expect(html).toContain('name="count"');
+        expect(html).toContain('name="until"');
+        expect(html).not.toContain('Sem repetição');
+    });
+
+    it('não oferece pagar ou receber na hora', () => {
+        expect(renderSeries('INCOME')).not.toContain('payNow');
+    });
+
+    it('chama o botão de "Criar parcelamento"', () => {
+        expect(renderSeries('EXPENSE')).toContain('Criar parcelamento');
+    });
+});

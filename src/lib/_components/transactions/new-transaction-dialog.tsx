@@ -12,29 +12,22 @@ import {
     DialogTrigger,
     MODAL_CLASS,
 } from '@/lib/_components/ui/dialog';
-import { cn } from '@/lib/_utils/cn';
 import { entryLabels } from '@/lib/_utils/title-labels';
 import type { Title } from '@/lib/api/schemas/title';
-import { ArrowDownCircle, ArrowUpCircle, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { PaymentStep } from './payment-step';
 import { StepTitle } from './step-title';
 import { TitlePicker } from './title-picker';
+import { TitleTypeToggle, type TitleType } from './title-type-toggle';
 
-type TitleType = 'INCOME' | 'EXPENSE';
-
-const TYPES: { type: TitleType; label: string; icon: typeof ArrowUpCircle }[] = [
-    { type: 'EXPENSE', label: 'Contas a pagar', icon: ArrowDownCircle },
-    { type: 'INCOME', label: 'Contas a receber', icon: ArrowUpCircle },
-];
-
-/** Botão de nova transação (na home e na lista de transações): escolhe o tipo e o título em aberto e segue para o pagamento ou recebimento. */
 type NewTransactionDialogProps = {
     label?: string;
     /** `accent` é a pílula verde da home; `default` é o botão escuro das listas (ex.: "Novo pagamento"). */
     appearance?: 'accent' | 'default';
 };
 
+/** Botão de nova transação (na home e na lista de transações): escolhe o tipo e o título em aberto e segue para o pagamento ou recebimento. */
 export function NewTransactionDialog({
     label = 'Nova transação',
     appearance = 'accent',
@@ -107,35 +100,7 @@ export function NewTransactionDialog({
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        <div
-                            role="radiogroup"
-                            aria-label="Tipo do título"
-                            className="bg-muted/70 flex rounded-full p-1"
-                        >
-                            {TYPES.map(({ type: value, label, icon: Icon }) => (
-                                <button
-                                    key={value}
-                                    type="button"
-                                    role="radio"
-                                    aria-checked={type === value}
-                                    onClick={() => setType(value)}
-                                    className={cn(
-                                        'flex h-10 flex-1 items-center justify-center gap-2 rounded-full text-sm font-semibold transition-colors',
-                                        type === value
-                                            ? cn(
-                                                  'bg-card shadow-sm',
-                                                  value === 'INCOME'
-                                                      ? 'text-positive'
-                                                      : 'text-negative',
-                                              )
-                                            : 'text-muted-foreground',
-                                    )}
-                                >
-                                    <Icon className="size-4" aria-hidden="true" />
-                                    {label}
-                                </button>
-                            ))}
-                        </div>
+                        <TitleTypeToggle value={type} onChange={setType} />
                         <TitlePicker titles={titles[type]} onPick={setPicked} />
                     </div>
                 )}
