@@ -1,27 +1,24 @@
-import { logoutAction } from '@/actions/session';
-import { Button } from '@/lib/_components/ui/button';
-import { LogOut } from 'lucide-react';
-import { MobileNav } from './mobile-nav';
+import { ArrowLeftRight } from 'lucide-react';
+import Link from 'next/link';
 
-type TopbarProps = { companyName: string; userName: string };
-
-/** Barra superior com a empresa ativa, o usuário e o botão de sair. */
-export function Topbar({ companyName, userName }: TopbarProps) {
+/** Cabeçalho com a empresa ativa e o atalho para trocar de empresa. */
+export function Topbar({ companyName }: { companyName: string }) {
     return (
-        <header className="border-border bg-card flex items-center justify-between gap-4 border-b px-4 py-3">
-            <div className="flex items-center gap-2">
-                <MobileNav />
+        <header className="px-6 pt-6 pb-4 print:hidden">
+            <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
                 <div>
-                    <p className="font-display font-semibold">{companyName}</p>
-                    <p className="text-muted-foreground text-xs">{userName}</p>
+                    <p className="text-muted-foreground text-sm">Empresa ativa</p>
+                    <h2 className="font-display text-xl font-bold">{companyName}</h2>
                 </div>
+                <Link
+                    href="/empresa"
+                    className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm"
+                >
+                    <ArrowLeftRight className="size-4" aria-hidden="true" />
+                    Trocar empresa
+                </Link>
             </div>
-            <form action={logoutAction}>
-                <Button type="submit" variant="ghost" size="sm">
-                    <LogOut />
-                    Sair
-                </Button>
-            </form>
+            <div className="from-primary/30 mx-auto mt-4 h-px w-full max-w-7xl bg-gradient-to-r from-50% to-transparent" />
         </header>
     );
 }
