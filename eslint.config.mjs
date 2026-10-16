@@ -1,19 +1,31 @@
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import { FlatCompat } from '@eslint/eslintrc';
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import nextTs from 'eslint-config-next/typescript';
+import { defineConfig, globalIgnores } from 'eslint/config';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-    ...compat.extends('next/core-web-vitals', 'next/typescript'),
+const eslintConfig = defineConfig([
+    ...nextVitals,
+    ...nextTs,
+    globalIgnores([
+        '.next/**',
+        'out/**',
+        'build/**',
+        'next-env.d.ts',
+        'docs/**',
+        'coverage/**',
+        // Código legado do Django, removido pelas tasks de migração (a última limpa o que sobrar).
+        'src/app/pages/**',
+        'src/components/**',
+        'src/services/**',
+        'src/hooks/**',
+        'src/types/**',
+        'tailwind.config.ts',
+    ]),
     {
-        ignores: ['node_modules/**', '.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'docs/**'],
+        rules: {
+            // Permitimos setState em effects nos casos controlados deste projeto
+            'react-hooks/set-state-in-effect': 'off',
+        },
     },
-];
+]);
 
 export default eslintConfig;

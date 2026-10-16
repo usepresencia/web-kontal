@@ -1,6 +1,7 @@
 import FullLogo from '@/components/FullLogo';
 import Florest from '@/components/illustration/florest';
 import AuthLogin from '@/components/login/authform/AuthLogin';
+import { Suspense } from 'react';
 const gradientStyle = {
     background:
         'linear-gradient(45deg, rgb(238, 119, 82,0.2), rgb(231, 60, 126,0.2), rgb(35, 166, 213,0.2), rgb(35, 213, 171,0.2))',
@@ -11,7 +12,7 @@ const gradientStyle = {
 
 const Login = () => {
     return (
-        <>
+        <Suspense>
             <div className="hidden h-screen w-full sm:hidden md:flex">
                 <div className="bg-primary align-center flex w-[30%] flex-col justify-center p-4">
                     <div className="bg-primary align-center flex w-full flex-col justify-center p-4">
@@ -60,7 +61,7 @@ const Login = () => {
                     </div>
                 </div>
             </div>
-        </>
+        </Suspense>
     );
 };
 

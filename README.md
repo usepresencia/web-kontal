@@ -38,4 +38,7 @@ npm run dev
 npm run lint
 npm run typecheck
 npm run format
+npm test
 ```
+
+O CI roda commitlint, `prettier --check`, lint, typecheck, testes (Vitest) e build.
