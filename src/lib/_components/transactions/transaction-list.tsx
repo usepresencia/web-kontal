@@ -9,7 +9,8 @@ import { ChevronRight, Clock } from 'lucide-react';
 import { useState } from 'react';
 import { TransactionDialog } from './transaction-dialog';
 
-export type TransactionRow = { title: Title; ago: string };
+/** Linha da lista: o título, há quanto tempo foi criado e o texto de apoio à direita (padrão: o mesmo tempo). */
+export type TransactionRow = { title: Title; ago: string; caption?: string };
 
 /** Lista das transações; cada linha abre o modal de detalhes e mostra o chevron ao passar o mouse. */
 export function TransactionList({ rows }: { rows: TransactionRow[] }) {
@@ -62,7 +63,7 @@ export function TransactionList({ rows }: { rows: TransactionRow[] }) {
                                     </span>
                                     <span className="text-muted-foreground flex items-center gap-1 text-xs">
                                         <Clock className="size-3" aria-hidden="true" />
-                                        {row.ago}
+                                        {row.caption ?? row.ago}
                                     </span>
                                 </div>
                                 <ChevronRight

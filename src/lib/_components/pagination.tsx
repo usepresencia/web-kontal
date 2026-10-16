@@ -78,7 +78,7 @@ export function Pagination({
 
             {onPageSizeChange && (
                 <Select value={String(pageSize)} onValueChange={v => onPageSizeChange(Number(v))}>
-                    <SelectTrigger className="w-28" aria-label="Itens por página">
+                    <SelectTrigger className="w-36" aria-label="Itens por página">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
