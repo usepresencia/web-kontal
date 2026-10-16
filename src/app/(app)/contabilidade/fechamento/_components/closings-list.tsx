@@ -33,10 +33,10 @@ export function ClosingsList({ items }: { items: Closing[] }) {
                                 </p>
                             </div>
                             <div className="flex flex-col items-end gap-0.5 pr-3">
+                                <span className="text-muted-foreground text-xs">Fechado em</span>
                                 <span className="text-foreground text-sm font-semibold">
                                     {formatDate(item.throughDate)}
                                 </span>
-                                <span className="text-muted-foreground text-xs">Travado até</span>
                             </div>
                         </div>
                     </li>

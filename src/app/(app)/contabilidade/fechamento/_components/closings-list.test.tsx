@@ -23,9 +23,10 @@ describe('ClosingsList', () => {
         expect((html.match(/Último fechamento/g) ?? []).length).toBe(1);
     });
 
-    it('mostra até quando o período está travado e se houve apuração', () => {
+    it('mostra o rótulo "Fechado em" antes da data em que o período está travado e se houve apuração', () => {
         expect(html).toContain('31/12/2026');
-        expect(html).toContain('Travado até');
+        expect(html).toContain('Fechado em');
+        expect(html.indexOf('Fechado em')).toBeLessThan(html.indexOf('31/12/2026'));
         expect(html).toContain('Com apuração do resultado');
     });
 });
