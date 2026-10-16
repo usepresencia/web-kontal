@@ -232,7 +232,7 @@ describe('createTitleAction', () => {
     });
 });
 
-describe('createTitleAction com baixa na hora', () => {
+describe('createTitleAction com pagamento ou recebimento na hora', () => {
     const ACCOUNT_ID = '4a1c2b4e-5a6d-4e7f-8a9b-0c1d2e3f4a5b';
     const form = (extra: Record<string, string> = {}) => {
         const data = new FormData();
@@ -276,7 +276,7 @@ describe('createTitleAction com baixa na hora', () => {
             .mockRejectedValueOnce(new ApiError(422, 'INVALID', 'Conta inválida'));
         const result = await createTitleAction({ ok: false }, form());
         expect(result.ok).toBe(false);
-        expect(result.message).toContain('Título criado, mas a baixa não foi registrada');
+        expect(result.message).toContain('Título criado, mas a transação não foi registrada');
     });
 
     it('exige conta, forma e data quando marcado', async () => {
@@ -286,7 +286,7 @@ describe('createTitleAction com baixa na hora', () => {
         expect(apiFetch).not.toHaveBeenCalled();
     });
 
-    it('recusa a baixa na hora em título parcelado', async () => {
+    it('recusa o pagamento na hora em título parcelado', async () => {
         const { createTitleAction } = await import('./titles');
         const result = await createTitleAction(
             { ok: false },

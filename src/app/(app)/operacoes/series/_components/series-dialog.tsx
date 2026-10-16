@@ -6,7 +6,7 @@ import { Divider } from '@/lib/_components/divider';
 import { StepTitle } from '@/lib/_components/transactions/step-title';
 import { TransactionDialog } from '@/lib/_components/transactions/transaction-dialog';
 import { Button } from '@/lib/_components/ui/button';
-import { Dialog, DialogContent, DialogHeader } from '@/lib/_components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, MODAL_CLASS } from '@/lib/_components/ui/dialog';
 import { cn } from '@/lib/_utils/cn';
 import { daysAgoLabel } from '@/lib/_utils/dates';
 import { formatAmount } from '@/lib/_utils/money';
@@ -51,7 +51,7 @@ export function SeriesDialog({ series, onClose }: SeriesDialogProps) {
 
     return (
         <Dialog open={series !== null} onOpenChange={open => !open && onClose()}>
-            <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+            <DialogContent className={MODAL_CLASS}>
                 <DialogHeader>
                     {step === 'details' ? (
                         <StepTitle>Detalhes do parcelamento</StepTitle>

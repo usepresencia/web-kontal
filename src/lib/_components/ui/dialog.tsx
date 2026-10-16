@@ -25,6 +25,9 @@ const DialogOverlay = React.forwardRef<
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+/** Tamanho e acabamento padrão dos modais de transações, títulos e parcelamentos. */
+export const MODAL_CLASS = 'max-h-[90vh] max-w-2xl overflow-y-auto rounded-3xl p-6';
+
 const DialogContent = React.forwardRef<
     React.ElementRef<typeof DialogPrimitive.Content>,
     React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>

@@ -15,6 +15,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    MODAL_CLASS,
 } from '@/lib/_components/ui/dialog';
 import { entryLabels } from '@/lib/_utils/title-labels';
 import { Plus } from 'lucide-react';
@@ -59,7 +60,7 @@ export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
                     {label}
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-3xl p-6">
+            <DialogContent className={MODAL_CLASS}>
                 <DialogHeader className="space-y-0.5">
                     <DialogTitle className="font-display text-xl font-bold tracking-tight">
                         {label}
@@ -69,7 +70,7 @@ export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
                             ? type === 'EXPENSE'
                                 ? 'Registre a despesa que já existia antes de usar o sistema.'
                                 : 'Registre o saldo que já existia antes de usar o sistema.'
-                            : 'Cadastre o título e, se quiser, já registre a baixa.'}
+                            : 'Cadastre o título e, se quiser, já registre a transação.'}
                     </DialogDescription>
                 </DialogHeader>
                 {options === null ? (

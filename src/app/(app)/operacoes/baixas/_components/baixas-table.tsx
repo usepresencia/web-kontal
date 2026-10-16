@@ -19,7 +19,7 @@ import { useState } from 'react';
 /** Forma de pagamento ou "Perda", como aparece abaixo da descrição. */
 function entryMethodLabel(entry: TitleEntry): string {
     if (entry.kind === 'WRITE_OFF') return 'Perda';
-    if (!entry.paymentMethod) return 'Baixa';
+    if (!entry.paymentMethod) return 'Transação';
     return (
         PAYMENT_METHOD_LABELS[entry.paymentMethod as keyof typeof PAYMENT_METHOD_LABELS] ??
         entry.paymentMethod
@@ -103,7 +103,7 @@ export function BaixasTable({ page }: { page: Page<TitleEntry> }) {
                 total={page.total}
                 onPageChange={pagination.onPageChange}
                 onPageSizeChange={pagination.onPageSizeChange}
-                pageSizeLabel="Baixas por página:"
+                pageSizeLabel="Transações por página:"
             />
             <TransactionDialog
                 title={selected}

@@ -10,6 +10,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    MODAL_CLASS,
 } from '@/lib/_components/ui/dialog';
 import { cn } from '@/lib/_utils/cn';
 import { entryLabels } from '@/lib/_utils/title-labels';
@@ -27,7 +28,7 @@ const TYPES: { type: TitleType; label: string; icon: typeof ArrowUpCircle }[] = 
     { type: 'INCOME', label: 'Contas a receber', icon: ArrowUpCircle },
 ];
 
-/** Botão de nova baixa ("Nova transação" na home, "Nova baixa" na lista de baixas): escolhe o tipo e o título em aberto e segue para o pagamento ou recebimento. */
+/** Botão de nova transação (na home e na lista de transações): escolhe o tipo e o título em aberto e segue para o pagamento ou recebimento. */
 type NewTransactionDialogProps = {
     label?: string;
     /** `accent` é a pílula verde da home; `default` é o botão escuro das listas (ex.: "Novo pagamento"). */
@@ -81,7 +82,7 @@ export function NewTransactionDialog({
                     {label}
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto rounded-3xl p-6">
+            <DialogContent className={MODAL_CLASS}>
                 <DialogHeader className="space-y-0.5">
                     {picked ? (
                         <StepTitle onBack={() => setPicked(null)}>

@@ -33,7 +33,7 @@ export const NAV_SECTIONS: NavSection[] = [
         items: [
             { title: 'Contas a pagar', href: '/operacoes/pagar', icon: ArrowUpCircle },
             { title: 'Contas a receber', href: '/operacoes/receber', icon: ArrowDownCircle },
-            { title: 'Baixas', href: '/operacoes/baixas', icon: Receipt },
+            { title: 'Transações', href: '/operacoes/baixas', icon: Receipt },
             { title: 'Parcelamentos', href: '/operacoes/series', icon: Repeat },
         ],
     },

@@ -80,7 +80,7 @@ describe('TitleForm como saldo ou despesa inicial', () => {
         expect(html).not.toContain('name="issueDate"');
     });
 
-    it('não oferece repetição, conta de destino nem baixa na hora', () => {
+    it('não oferece repetição, conta de destino nem pagamento na hora', () => {
         const html = renderOpening('EXPENSE');
         expect(html).not.toContain('name="repeat"');
         expect(html).not.toContain('destinationAccountId');

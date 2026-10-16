@@ -82,7 +82,7 @@ export function CancelSeriesButton({ seriesId, onDone }: CancelSeriesButtonProps
                 open={open}
                 onOpenChange={setOpen}
                 title="Cancelar parcelamento"
-                description="Cancelar o parcelamento remove as ocorrências ainda sem baixa. As já baixadas permanecem."
+                description="Cancelar o parcelamento remove as ocorrências ainda sem transação. As já pagas ou recebidas permanecem."
                 confirmLabel="Cancelar parcelamento"
                 variant="destructive"
                 onConfirm={async () => {

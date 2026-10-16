@@ -166,7 +166,7 @@ export const titleCreateSchema = z
                 ctx.addIssue({
                     code: 'custom',
                     path: ['payNow'],
-                    message: 'A baixa na hora vale só para título simples',
+                    message: 'O pagamento ou recebimento na hora vale só para título simples',
                 });
             }
             if (!value.paymentAccountId || !z.uuid().safeParse(value.paymentAccountId).success) {

@@ -34,7 +34,7 @@ const ENTRIES_PATH = '/operacoes/baixas';
 
 const LIST_PATHS = { EXPENSE: '/operacoes/pagar', INCOME: '/operacoes/receber' } as const;
 
-/** Cria um título; com repetição, cria a série. Com "pagar/receber agora", registra a baixa do valor total em seguida. */
+/** Cria um título; com repetição, cria a série. Com "pagar/receber agora", registra a transação do valor total em seguida. */
 export async function createTitleAction(_prev: FormState, formData: FormData): Promise<FormState> {
     const parsed = titleCreateSchema.safeParse(formDataToObject(formData));
     if (!parsed.success) return stateFromZodError(parsed.error);
@@ -86,7 +86,7 @@ export async function createTitleAction(_prev: FormState, formData: FormData): P
             const failure = stateFromApiError(error);
             result = {
                 ok: false,
-                message: `Título criado, mas a baixa não foi registrada: ${failure.message ?? 'erro desconhecido'}`,
+                message: `Título criado, mas a transação não foi registrada: ${failure.message ?? 'erro desconhecido'}`,
             };
         }
     }
@@ -153,7 +153,7 @@ export async function createEntryAction(
     revalidatePath(HOME_PATH);
     revalidatePath(ENTRIES_PATH);
     Object.values(LIST_PATHS).forEach(path => revalidatePath(path));
-    return { ok: true, message: 'Baixa registrada.' };
+    return { ok: true, message: 'Transação registrada.' };
 }
 
 /** Dá baixa no saldo em aberto sem pagamento (perda). */
