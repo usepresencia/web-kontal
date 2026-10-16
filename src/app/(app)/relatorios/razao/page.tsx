@@ -1,14 +1,8 @@
 import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/lib/_components/ui/table';
+import { ReportPage } from '@/lib/_components/reports/report-page';
+import type { ReportSection } from '@/lib/_components/reports/report-types';
 import { parsePeriodParams } from '@/lib/_utils/dates';
 import { formatAmount } from '@/lib/_utils/money';
 import { parsePageParams } from '@/lib/_utils/pagination';
@@ -18,6 +12,7 @@ import { accountPageSchema } from '@/lib/api/schemas/billing';
 import { accountLedgerSchema } from '@/lib/api/schemas/reports';
 import { z } from 'zod';
 import { ReportFilters } from '../_components/report-filters';
+import { periodLabel } from '../_components/report-rows';
 import { formatSided } from '../_components/sided';
 import { SimplePagination } from '../_components/simple-pagination';
 
@@ -44,73 +39,73 @@ export default async function AccountLedgerPage({
           )
         : null;
 
-    return (
-        <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Razão da conta</h1>
-            <ReportFilters mode="period" start={start} end={end}>
-                <FilterField label="Conta">
-                    <DropdownSelect
-                        name="accountId"
-                        defaultValue={accountId.success ? accountId.data : ''}
-                        placeholder="Selecione"
-                        className={`${FILTER_PILL_CLASS} w-56`}
-                        options={options.map(account => ({
-                            value: account.id,
-                            label: `${account.code} ${account.name}`,
-                        }))}
-                    />
-                </FilterField>
-            </ReportFilters>
+    const sections: ReportSection[] = ledger
+        ? [
+              {
+                  title: `${ledger.account.code} ${ledger.account.name}`,
+                  note: `Saldo inicial ${formatSided(ledger.openingBalance)} · Saldo final ${formatSided(ledger.closingBalance)}`,
+                  columns: [
+                      { label: 'Data' },
+                      { label: 'Nº' },
+                      { label: 'Histórico' },
+                      { label: 'Débito', align: 'right' },
+                      { label: 'Crédito', align: 'right' },
+                      { label: 'Saldo', align: 'right' },
+                  ],
+                  rows: ledger.items.map(item => ({
+                      cells: [
+                          formatDate(item.date),
+                          String(item.number),
+                          item.description,
+                          formatAmount(item.debit),
+                          formatAmount(item.credit),
+                          formatSided(item.balance),
+                      ],
+                  })),
+              },
+          ]
+        : [];
 
-            {!ledger ? (
+    return (
+        <ReportPage
+            subtitle="Movimentação de uma conta no período, com o saldo a cada lançamento"
+            report={{
+                title: 'Razão da conta',
+                period: periodLabel(start, end, formatDate),
+                filename: `razao-${start}-a-${end}`,
+                sections,
+            }}
+            filters={
+                <ReportFilters mode="period" start={start} end={end}>
+                    <FilterField label="Conta">
+                        <DropdownSelect
+                            name="accountId"
+                            defaultValue={accountId.success ? accountId.data : ''}
+                            placeholder="Selecione"
+                            className={`${FILTER_PILL_CLASS} w-56`}
+                            options={options.map(account => ({
+                                value: account.id,
+                                label: `${account.code} ${account.name}`,
+                            }))}
+                        />
+                    </FilterField>
+                </ReportFilters>
+            }
+            empty={
                 <EmptyState
                     title="Escolha uma conta"
                     description="Selecione a conta e o período para ver o razão."
                 />
-            ) : (
-                <div className="space-y-4">
-                    <p className="text-muted-foreground text-sm">
-                        {ledger.account.code} {ledger.account.name} · Saldo inicial{' '}
-                        {formatSided(ledger.openingBalance)} · Saldo final{' '}
-                        {formatSided(ledger.closingBalance)}
-                    </p>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Data</TableHead>
-                                <TableHead>Nº</TableHead>
-                                <TableHead>Histórico</TableHead>
-                                <TableHead className="text-right">Débito</TableHead>
-                                <TableHead className="text-right">Crédito</TableHead>
-                                <TableHead className="text-right">Saldo</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {ledger.items.map((item, index) => (
-                                <TableRow key={`${item.number}-${index}`}>
-                                    <TableCell>{formatDate(item.date)}</TableCell>
-                                    <TableCell>{item.number}</TableCell>
-                                    <TableCell>{item.description}</TableCell>
-                                    <TableCell className="text-right">
-                                        {formatAmount(item.debit)}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {formatAmount(item.credit)}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {formatSided(item.balance)}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+            }
+            footer={
+                ledger && (
                     <SimplePagination
                         page={ledger.page}
                         pageSize={ledger.pageSize}
                         total={ledger.total}
                     />
-                </div>
-            )}
-        </div>
+                )
+            }
+        />
     );
 }
