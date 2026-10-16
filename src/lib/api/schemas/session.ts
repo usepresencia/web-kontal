@@ -5,6 +5,8 @@ export const meSchema = z.object({
     firebaseUid: z.string(),
     email: z.string(),
     name: z.string(),
+    isPlatformUser: z.boolean(),
+    platformRole: z.string().nullable(),
 });
 
 export type Me = z.infer<typeof meSchema>;

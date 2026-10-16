@@ -12,6 +12,8 @@ export const SERIES_FREQUENCIES = ['WEEKLY', 'MONTHLY', 'YEARLY'] as const;
 export const titleSchema = z.object({
     id: z.string(),
     presetId: z.string(),
+    partyId: z.string(),
+    partyName: z.string().nullable(),
     presetName: z.string().nullable(),
     seriesId: z.string().nullable(),
     seriesIndex: z.number().nullable(),
@@ -121,7 +123,12 @@ const optionalCount = z
 /** Cadastro de título simples, parcelado ou recorrente, como digitado no formulário. */
 export const titleCreateSchema = z
     .object({
-        presetId: z.uuid('Selecione o preset'),
+        partyId: z.uuid('Selecione o cliente ou fornecedor'),
+        presetId: z
+            .string()
+            .optional()
+            .transform(value => (value ? value : undefined))
+            .pipe(z.uuid('Selecione o preset').optional()),
         type: z.enum(TITLE_TYPES),
         description,
         amount,

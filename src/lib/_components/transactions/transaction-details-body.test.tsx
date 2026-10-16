@@ -7,6 +7,8 @@ const title: Title = {
     id: '3f1c2b4e-5a6d-4e7f-8a9b-0c1d2e3f4a5b',
     presetId: 'p',
     presetName: 'Padrão',
+    partyId: 'pt1',
+    partyName: 'Copel',
     seriesId: null,
     seriesIndex: null,
     type: 'EXPENSE',
