@@ -26,3 +26,20 @@ export function formatDate(isoDate: string): string {
     const [year, month, day] = isoDate.split('-');
     return `${day}/${month}/${year}`;
 }
+
+/** Textos da baixa conforme o tipo: pagamento no título a pagar e recebimento no título a receber. */
+export function entryLabels(type: 'INCOME' | 'EXPENSE') {
+    return type === 'EXPENSE'
+        ? {
+              action: 'Pagar título',
+              submit: 'Pagar',
+              pending: 'Pagando…',
+              overlay: 'Registrando pagamento…',
+          }
+        : {
+              action: 'Receber título',
+              submit: 'Receber',
+              pending: 'Recebendo…',
+              overlay: 'Registrando recebimento…',
+          };
+}

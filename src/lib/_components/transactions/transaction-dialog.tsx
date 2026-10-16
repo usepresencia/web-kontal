@@ -4,6 +4,7 @@ import { getTitleEntriesAction, getTitlePaymentAccountsAction } from '@/actions/
 import { EntryForm } from '@/lib/_components/transactions/entry-form';
 import { Dialog, DialogContent, DialogHeader } from '@/lib/_components/ui/dialog';
 import { toLocalIsoDate } from '@/lib/_utils/dates';
+import { entryLabels } from '@/lib/_utils/title-labels';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
 import { useEffect, useState } from 'react';
 import { StepTitle } from './step-title';
@@ -66,7 +67,9 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
                     {step === 'details' ? (
                         <StepTitle>Detalhes da transação</StepTitle>
                     ) : (
-                        <StepTitle onBack={() => setStep('details')}>Baixar título</StepTitle>
+                        <StepTitle onBack={() => setStep('details')}>
+                            {title ? entryLabels(title.type).action : 'Baixar título'}
+                        </StepTitle>
                     )}
                 </DialogHeader>
                 {title && step === 'details' && (
@@ -81,7 +84,6 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
                 )}
                 {title && step === 'pay' && (
                     <div className="space-y-4">
-                        <p className="text-foreground text-sm font-medium">{title.description}</p>
                         {accounts === null ? (
                             <p className="text-muted-foreground text-sm">Carregando…</p>
                         ) : accounts.length === 0 ? (

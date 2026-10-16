@@ -45,15 +45,24 @@ describe('EntryForm', () => {
         expect(html).toContain('value="PIX"');
     });
 
-    it('alinha o botão Registrar à direita', () => {
-        const html = render();
-        const area = html.match(/<div class="[^"]*justify-end[^"]*">[\s\S]*?Registrar/)?.[0] ?? '';
+    it('alinha o botão de envio à direita e o chama de Pagar ou Receber', () => {
+        const pay = render(true);
+        const area = pay.match(/<div class="[^"]*justify-end[^"]*">[\s\S]*?Pagar/)?.[0] ?? '';
         expect(area).toContain('justify-end');
-        expect(html).toContain('Registrar');
+        expect(pay).toContain('>Pagar<');
+        expect(render(false)).toContain('>Receber<');
+        expect(pay).not.toContain('>Registrar<');
     });
 
-    it('usa o título de recebimento em título a receber', () => {
-        expect(render(false)).toContain('Registrar recebimento');
-        expect(render(true)).toContain('Registrar pagamento');
+    it('não mostra o título "Registrar pagamento" nem "Registrar recebimento"', () => {
+        expect(render(true)).not.toContain('Registrar pagamento');
+        expect(render(false)).not.toContain('Registrar recebimento');
+    });
+
+    it('destaca o valor no estilo do modal de nova transação, com a cor do tipo', () => {
+        const pay = render(true);
+        expect(pay).toContain('R$');
+        expect(pay).toMatch(/text-negative[^"]*"[^>]*>R\$/);
+        expect(render(false)).toMatch(/text-positive[^"]*"[^>]*>R\$/);
     });
 });
