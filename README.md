@@ -4,14 +4,27 @@ Frontend do **Kontal** — gestão financeira e contábil para micro e
 pequenas empresas do Simples Nacional e escritórios de contabilidade
 terceirizados. Next.js + React.
 
-Extraído do monorepo original (`grupo04/accountflow-front`), sem
-histórico de commits. Vai ganhar seletor de empresa ativa, envio de
-contexto de tenant e migração de auth para Firebase, para falar com o
-novo backend em
-[`api-kontal`](https://github.com/usepresencia/api-kontal).
+Next.js 16 + React 19 sobre a [`api-kontal`](https://github.com/usepresencia/api-kontal), em
+`kontal.presencia.com.br` (a API fica em `api-kontal.presencia.com.br`). O acesso vem do Presencia por SSO.
 
-Contexto completo da migração:
-[spec de design](https://github.com/6-Semestre-Grupo-4/grupo04/blob/main/docs/superpowers/specs/2026-09-19-kontal-migration-design.md).
+## Arquitetura de pastas
+
+```
+src/
+  app/
+    (auth)/                  entrada: /sso-callback, /empresa, /acesso-negado
+    (app)/<rota>/            telas autenticadas, com o layout do shell
+      _components/ _hooks/ _utils/   exclusivos da rota
+    (dev)/design             conferência do tema (só em desenvolvimento)
+    api/session/expired      encerra a sessão local e volta ao Presencia
+  actions/                   Server Actions (tudo que escreve na API)
+  lib/
+    _components/             componentes compartilhados (ui/, shell/, paginação...)
+    _hooks/ _utils/          compartilhados (dinheiro, datas, paginação, formulários)
+    api/                     cliente server-only e schemas zod das respostas
+    auth/ security/          sessão em cookie httpOnly, CSP e cabeçalhos
+  proxy.ts                   CSP com nonce e checagem otimista de sessão
+```
 
 ## Como contribuir
 

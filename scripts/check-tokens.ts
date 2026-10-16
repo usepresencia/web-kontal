@@ -3,16 +3,7 @@ import { join } from 'node:path';
 import { findTokenViolations } from '../src/lib/_utils/token-rules';
 
 const ROOT = 'src';
-const EXEMPT = [
-    'src/app/globals.css',
-    // Legado do Django, removido pelas tasks de migração.
-    'src/app/pages/',
-    'src/app/auth/',
-    'src/components/',
-    'src/services/',
-    'src/hooks/',
-    'src/types/',
-];
+const EXEMPT = ['src/app/globals.css'];
 
 function listFiles(dir: string): string[] {
     return readdirSync(dir).flatMap(name => {

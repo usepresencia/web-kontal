@@ -4,7 +4,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm ci --legacy-peer-deps
+RUN npm ci
 
 FROM base AS dev
 COPY --from=deps /app/node_modules ./node_modules
@@ -24,7 +24,6 @@ FROM base AS runner
 ENV NODE_ENV=production
 RUN addgroup -S app && adduser -S app -G app
 COPY --from=build --chown=app:app /app/.next ./.next
-COPY --from=build --chown=app:app /app/public ./public
 COPY --from=build --chown=app:app /app/package.json ./package.json
 COPY --from=deps --chown=app:app /app/node_modules ./node_modules
 USER app
