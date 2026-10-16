@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatAmount, formatMoney, toApiAmount } from './money';
+import { amountToCents, formatAmount, formatMoney, toApiAmount } from './money';
 
 describe('formatMoney', () => {
     it('formata centavos em reais', () => {
@@ -63,4 +63,16 @@ describe('toApiAmount', () => {
             expect(toApiAmount(input)).toBeNull();
         },
     );
+});
+
+describe('amountToCents', () => {
+    it('converte o valor da API em centavos inteiros', () => {
+        expect(amountToCents('1234.50')).toBe(BigInt(123450));
+        expect(amountToCents('0.05')).toBe(BigInt(5));
+        expect(amountToCents('9999999999.99')).toBe(BigInt('999999999999'));
+    });
+
+    it('rejeita texto fora do formato da API', () => {
+        expect(() => amountToCents('12,50')).toThrow();
+    });
 });
