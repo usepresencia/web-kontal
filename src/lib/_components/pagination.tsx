@@ -40,7 +40,9 @@ export function Pagination({
         >
             {onPageSizeChange && (
                 <div className="flex w-fit flex-col gap-1">
-                    <span className="text-muted-foreground pl-4 text-xs">{pageSizeLabel}</span>
+                    <span className="text-muted-foreground text-center text-xs">
+                        {pageSizeLabel}
+                    </span>
                     <DropdownSelect
                         aria-label={pageSizeLabel.replace(/:$/, '')}
                         value={String(pageSize)}
@@ -53,7 +55,7 @@ export function Pagination({
                     />
                 </div>
             )}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 self-center">
                 <Button
                     variant="outline"
                     size="icon"

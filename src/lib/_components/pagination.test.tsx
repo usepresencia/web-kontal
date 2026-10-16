@@ -59,7 +59,7 @@ describe('Pagination', () => {
         expect(html).toContain('flex-col');
     });
 
-    it('alinha o rótulo ao recuo dos campos e iguala a largura do dropdown à dele', () => {
+    it('centraliza o rótulo sobre o dropdown e os botões na vertical do bloco', () => {
         const html = renderToStaticMarkup(
             <Pagination
                 page={1}
@@ -71,8 +71,11 @@ describe('Pagination', () => {
             />,
         );
         const label = html.match(/<span[^>]*>Títulos por página:<\/span>/)?.[0] ?? '';
-        expect(label).toContain('pl-4');
+        expect(label).toContain('text-center');
+        expect(label).not.toContain('pl-4');
         expect(html).toContain('w-fit');
+        expect(html).toMatch(/<nav[^>]*class="[^"]*items-center/);
+        expect(html).toContain('self-center');
     });
 
     it('estiliza o dropdown com 40 px e fundo preto, como a página selecionada', () => {
