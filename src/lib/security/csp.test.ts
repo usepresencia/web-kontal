@@ -20,6 +20,16 @@ describe('buildCsp', () => {
         expect(d['connect-src']).toBe("connect-src 'self' https://api.cloudinary.com");
     });
 
+    it('em produção os estilos exigem o nonce e não aceitam inline', () => {
+        const style = directives(buildCsp({ nonce: 'abc', isDev: false }))['style-src'];
+        expect(style).toBe("style-src 'self' 'nonce-abc'");
+    });
+
+    it('em desenvolvimento aceita estilos inline, sem nonce (o nonce faria o navegador ignorar o inline)', () => {
+        const style = directives(buildCsp({ nonce: 'abc', isDev: true }))['style-src'];
+        expect(style).toBe("style-src 'self' 'unsafe-inline'");
+    });
+
     it('não permite eval nem inline em produção', () => {
         const csp = buildCsp({ nonce: 'abc', isDev: false });
         expect(csp).not.toContain('unsafe-eval');
