@@ -51,6 +51,12 @@ describe('TransactionList', () => {
         expect(separator).toContain('ml-12');
     });
 
+    it('afasta o divisor das linhas, para o hover não encostar nele', () => {
+        const html = renderToStaticMarkup(<TransactionList rows={rows(2)} />);
+        const separator = html.match(/<div role="separator"[^>]*>/)?.[0] ?? '';
+        expect(separator).toContain('my-1');
+    });
+
     it('mostra o ícone de pagamento no lugar das iniciais', () => {
         const html = renderToStaticMarkup(<TransactionList rows={rows(2)} />);
         expect(html).toContain('lucide-credit-card');
