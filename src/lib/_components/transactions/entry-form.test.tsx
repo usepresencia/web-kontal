@@ -7,7 +7,7 @@ vi.mock('@/actions/titles', () => ({ createEntryAction: vi.fn() }));
 
 const { EntryForm } = await import('./entry-form');
 
-const render = (paying = true) =>
+const render = (paying = true, defaultAmount?: string) =>
     renderToStaticMarkup(
         <BusyProvider>
             <EntryForm
@@ -15,6 +15,7 @@ const render = (paying = true) =>
                 accounts={[{ value: 'a1', label: '1.1 Caixa' }]}
                 today="2026-10-16"
                 paying={paying}
+                defaultAmount={defaultAmount}
             />
         </BusyProvider>,
     );
@@ -79,5 +80,16 @@ describe('EntryForm', () => {
         expect(pay).toContain('R$');
         expect(pay).toMatch(/text-negative[^"]*"[^>]*>R\$/);
         expect(render(false)).toMatch(/text-positive[^"]*"[^>]*>R\$/);
+    });
+
+    it('preenche o valor com o saldo em aberto quando informado', () => {
+        expect(render(true, '612,90')).toContain('value="612,90"');
+        expect(render(true)).not.toContain('value="612,90"');
+    });
+
+    it('alinha o rótulo do valor e usa o divisor padrão em vez de uma linha cheia', () => {
+        const html = render();
+        expect(html).toContain('role="separator"');
+        expect(html).not.toMatch(/[\s"]border-b[\s"]/);
     });
 });

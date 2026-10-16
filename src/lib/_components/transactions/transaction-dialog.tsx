@@ -1,12 +1,11 @@
 'use client';
 
-import { getTitleEntriesAction, getTitlePaymentAccountsAction } from '@/actions/titles';
-import { EntryForm } from '@/lib/_components/transactions/entry-form';
+import { getTitleEntriesAction } from '@/actions/titles';
 import { Dialog, DialogContent, DialogHeader } from '@/lib/_components/ui/dialog';
-import { toLocalIsoDate } from '@/lib/_utils/dates';
 import { entryLabels } from '@/lib/_utils/title-labels';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
 import { useEffect, useState } from 'react';
+import { PaymentStep } from './payment-step';
 import { StepTitle } from './step-title';
 import { TransactionDetailsBody } from './transaction-details-body';
 
@@ -23,7 +22,6 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
     const [entries, setEntries] = useState<TitleEntry[] | null>(null);
     const [copied, setCopied] = useState(false);
     const [step, setStep] = useState<'details' | 'pay'>('details');
-    const [accounts, setAccounts] = useState<{ value: string; label: string }[] | null>(null);
     const titleId = title?.id;
 
     useEffect(() => {
@@ -32,7 +30,6 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
         setEntries(null);
         setCopied(false);
         setStep('details');
-        setAccounts(null);
         getTitleEntriesAction(titleId)
             .then(items => active && setEntries(items))
             .catch(() => active && setEntries([]));
@@ -40,14 +37,6 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
             active = false;
         };
     }, [titleId]);
-
-    const startPayment = () => {
-        if (!titleId) return;
-        setStep('pay');
-        getTitlePaymentAccountsAction(titleId)
-            .then(setAccounts)
-            .catch(() => setAccounts([]));
-    };
 
     const copy = () => {
         if (!titleId) return;
@@ -79,28 +68,10 @@ export function TransactionDialog({ title, ago, onClose }: TransactionDialogProp
                         entries={entries}
                         copied={copied}
                         onCopy={copy}
-                        onPay={startPayment}
+                        onPay={() => setStep('pay')}
                     />
                 )}
-                {title && step === 'pay' && (
-                    <div className="space-y-4">
-                        {accounts === null ? (
-                            <p className="text-muted-foreground text-sm">Carregando…</p>
-                        ) : accounts.length === 0 ? (
-                            <p className="text-muted-foreground text-sm">
-                                Nenhuma conta financeira disponível no plano deste título.
-                            </p>
-                        ) : (
-                            <EntryForm
-                                titleId={title.id}
-                                accounts={accounts}
-                                today={toLocalIsoDate(new Date())}
-                                paying={title.type === 'EXPENSE'}
-                                onSuccess={onClose}
-                            />
-                        )}
-                    </div>
-                )}
+                {title && step === 'pay' && <PaymentStep title={title} onSuccess={onClose} />}
             </DialogContent>
         </Dialog>
     );

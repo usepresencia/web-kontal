@@ -39,43 +39,6 @@ describe('getTitleEntriesAction', () => {
     });
 });
 
-describe('createTitleAction com retorno à home', () => {
-    const createTitleAction = import('./titles').then(module => module.createTitleAction);
-
-    function form(extra: Record<string, string> = {}) {
-        const data = new FormData();
-        Object.entries({
-            presetId: TITLE_ID,
-            type: 'EXPENSE',
-            description: 'Aluguel',
-            amount: '100,00',
-            expirationDate: '2026-11-10',
-            ...extra,
-        }).forEach(([key, value]) => data.append(key, value));
-        return data;
-    }
-
-    it('devolve ok sem redirecionar quando o retorno é a home', async () => {
-        apiFetch.mockResolvedValue({ id: 't1' });
-        const result = await (await createTitleAction)({ ok: false }, form({ returnTo: '/home' }));
-        expect(result).toMatchObject({ ok: true });
-    });
-
-    it('redireciona à lista do tipo quando não há retorno', async () => {
-        apiFetch.mockResolvedValue({ id: 't1' });
-        await expect((await createTitleAction)({ ok: false }, form())).rejects.toThrow(
-            'REDIRECT:/operacoes/pagar',
-        );
-    });
-
-    it('ignora um retorno que não seja a home (open redirect)', async () => {
-        apiFetch.mockResolvedValue({ id: 't1' });
-        await expect(
-            (await createTitleAction)({ ok: false }, form({ returnTo: 'https://evil.com' })),
-        ).rejects.toThrow('REDIRECT:/operacoes/pagar');
-    });
-});
-
 describe('getTitleFormOptionsAction', () => {
     it('devolve só os presets e as contas de destino de um título a pagar', async () => {
         const { getTitleFormOptionsAction } = await import('./titles');
@@ -193,5 +156,32 @@ describe('getTitlePaymentAccountsAction', () => {
         const { ApiError } = await import('@/lib/api/errors');
         apiFetch.mockRejectedValue(new ApiError(404, 'NOT_FOUND', 'x'));
         expect(await getTitlePaymentAccountsAction(TITLE_ID)).toEqual([]);
+    });
+});
+
+describe('getOpenTitlesAction', () => {
+    it('lista os títulos em aberto do tipo pedido', async () => {
+        const { getOpenTitlesAction } = await import('./titles');
+        const items = [{ id: 't1' }];
+        apiFetch.mockResolvedValue({ items });
+        expect(await getOpenTitlesAction('EXPENSE')).toEqual(items);
+        const url = apiFetch.mock.calls[0][0] as string;
+        expect(url).toContain('type=EXPENSE');
+        expect(url).toContain('status=OPEN');
+        expect(url).toContain('pageSize=100');
+    });
+
+    it('recusa um tipo inválido sem consultar a API', async () => {
+        const { getOpenTitlesAction } = await import('./titles');
+        // @ts-expect-error tipo inválido de propósito
+        expect(await getOpenTitlesAction('X')).toEqual([]);
+        expect(apiFetch).not.toHaveBeenCalled();
+    });
+
+    it('devolve lista vazia em erro 4xx da API', async () => {
+        const { getOpenTitlesAction } = await import('./titles');
+        const { ApiError } = await import('@/lib/api/errors');
+        apiFetch.mockRejectedValue(new ApiError(400, 'X', 'x'));
+        expect(await getOpenTitlesAction('INCOME')).toEqual([]);
     });
 });

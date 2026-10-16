@@ -1,5 +1,6 @@
 'use client';
 
+import { Divider } from '@/lib/_components/divider';
 import { cn } from '@/lib/_utils/cn';
 import { formatAmount } from '@/lib/_utils/money';
 import { TITLE_STATUS_LABELS, TITLE_TYPE_LABELS } from '@/lib/_utils/title-labels';
@@ -23,12 +24,7 @@ export function TransactionList({ rows }: { rows: TransactionRow[] }) {
                     const income = title.type === 'INCOME';
                     return (
                         <li key={title.id}>
-                            {index > 0 && (
-                                <div
-                                    role="separator"
-                                    className="from-primary/10 my-1 mr-3 ml-12 h-px bg-gradient-to-r from-50% to-transparent"
-                                />
-                            )}
+                            {index > 0 && <Divider className="my-1 mr-3 ml-12" />}
                             <button
                                 type="button"
                                 onClick={() => setSelected(row)}

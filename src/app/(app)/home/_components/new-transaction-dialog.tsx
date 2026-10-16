@@ -1,13 +1,9 @@
 'use client';
 
-import {
-    createTitleAction,
-    getTitleFormOptionsAction,
-    type TitleFormOptions,
-} from '@/actions/titles';
-import { AmountInput } from '@/lib/_components/amount-input';
-import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { FieldError, PILL_CLASS, PillInput, PillSelect } from '@/lib/_components/pill-fields';
+import { getOpenTitlesAction } from '@/actions/titles';
+import { PaymentStep } from '@/lib/_components/transactions/payment-step';
+import { StepTitle } from '@/lib/_components/transactions/step-title';
+import { TitlePicker } from '@/lib/_components/transactions/title-picker';
 import { Button } from '@/lib/_components/ui/button';
 import {
     Dialog,
@@ -18,217 +14,111 @@ import {
     DialogTrigger,
 } from '@/lib/_components/ui/dialog';
 import { cn } from '@/lib/_utils/cn';
-import { toLocalIsoDate } from '@/lib/_utils/dates';
-import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
-import { ArrowDownCircle, ArrowUpCircle, ChevronDown, Plus } from 'lucide-react';
-import Link from 'next/link';
-import { useActionState, useEffect, useState } from 'react';
-import { AdvancedFields } from './new-transaction-advanced';
+import { entryLabels } from '@/lib/_utils/title-labels';
+import type { Title } from '@/lib/api/schemas/title';
+import { ArrowDownCircle, ArrowUpCircle, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 type TitleType = 'INCOME' | 'EXPENSE';
 
 const TYPES: { type: TitleType; label: string; icon: typeof ArrowUpCircle }[] = [
-    { type: 'INCOME', label: 'Receita', icon: ArrowUpCircle },
-    { type: 'EXPENSE', label: 'Despesa', icon: ArrowDownCircle },
+    { type: 'EXPENSE', label: 'Contas a pagar', icon: ArrowDownCircle },
+    { type: 'INCOME', label: 'Contas a receber', icon: ArrowUpCircle },
 ];
 
-const ADVANCED_FIELDS = [
-    'issueDate',
-    'feesPercentageMonthly',
-    'destinationAccountId',
-    'isOpening',
-    'openingDate',
-    'settledAmount',
-    'repeat',
-    'frequency',
-    'count',
-    'until',
-];
-
-type FormProps = { options: TitleFormOptions; onDone: () => void };
-
-function NewTransactionForm({ options, onDone }: FormProps) {
-    const [state, formAction, pending] = useActionState(createTitleAction, INITIAL_FORM_STATE);
-    const [type, setType] = useState<TitleType>('INCOME');
-    const [category, setCategory] = useState('');
-    const [advancedOpen, setAdvancedOpen] = useState(false);
-    const errors = (field: string) => state.fieldErrors?.[field];
-
-    useEffect(() => {
-        if (state.ok) onDone();
-    }, [state, onDone]);
-
-    // Erro num campo escondido: abre as opções para o usuário ver onde corrigir.
-    useEffect(() => {
-        if (ADVANCED_FIELDS.some(field => state.fieldErrors?.[field])) setAdvancedOpen(true);
-    }, [state]);
-
-    const amountTone = type === 'INCOME' ? 'positive' : 'negative';
-
-    return (
-        <form action={formAction} className="space-y-4">
-            <FormPendingOverlay message="Salvando transação…" />
-            <input type="hidden" name="type" value={type} />
-            <input type="hidden" name="returnTo" value="/home" />
-
-            <div
-                role="radiogroup"
-                aria-label="Tipo da transação"
-                className="bg-muted/70 flex rounded-full p-1"
-            >
-                {TYPES.map(({ type: value, label, icon: Icon }) => (
-                    <button
-                        key={value}
-                        type="button"
-                        role="radio"
-                        aria-checked={type === value}
-                        onClick={() => setType(value)}
-                        className={cn(
-                            'flex h-10 flex-1 items-center justify-center gap-2 rounded-full text-sm font-semibold transition-colors',
-                            type === value
-                                ? cn(
-                                      'bg-card shadow-sm',
-                                      value === 'INCOME' ? 'text-positive' : 'text-negative',
-                                  )
-                                : 'text-muted-foreground',
-                        )}
-                    >
-                        <Icon className="size-4" aria-hidden="true" />
-                        {label}
-                    </button>
-                ))}
-            </div>
-
-            <AmountInput name="amount" label="Valor" tone={amountTone} errors={errors('amount')} />
-
-            <div>
-                <input
-                    name="description"
-                    placeholder="Descrição (ex: Venda de bolos)"
-                    aria-label="Descrição"
-                    required
-                    className={cn(PILL_CLASS, 'w-full')}
-                />
-                <FieldError errors={errors('description')} />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-                <PillSelect
-                    label="Categoria"
-                    name="presetId"
-                    value={category}
-                    onChange={setCategory}
-                    options={options.presets}
-                    placeholder="Categoria"
-                    errors={errors('presetId')}
-                />
-                <PillInput
-                    label="Vencimento"
-                    name="expirationDate"
-                    type="date"
-                    defaultValue={toLocalIsoDate(new Date())}
-                    required
-                    errors={errors('expirationDate')}
-                />
-            </div>
-
-            <button
-                type="button"
-                onClick={() => setAdvancedOpen(open => !open)}
-                aria-expanded={advancedOpen}
-                className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm font-medium"
-            >
-                Mais opções
-                <ChevronDown
-                    className={cn('size-4 transition-transform', advancedOpen && 'rotate-180')}
-                    aria-hidden="true"
-                />
-            </button>
-
-            {/* Fica montado (só escondido) para não perder o que foi digitado ao recolher. */}
-            <div hidden={!advancedOpen}>
-                <AdvancedFields
-                    isExpense={type === 'EXPENSE'}
-                    destinationAccounts={options.destinationAccounts}
-                    errors={errors}
-                />
-            </div>
-
-            {state.message && !state.ok && (
-                <p role="alert" className="text-negative text-sm">
-                    {state.message}
-                </p>
-            )}
-
-            <div className="flex items-center justify-end gap-2">
-                <Button
-                    type="button"
-                    variant="ghost"
-                    className="h-10 rounded-full px-5"
-                    onClick={onDone}
-                >
-                    Cancelar
-                </Button>
-                <Button
-                    type="submit"
-                    disabled={pending}
-                    className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
-                >
-                    {pending ? 'Salvando…' : 'Salvar transação'}
-                </Button>
-            </div>
-        </form>
-    );
-}
-
-/** Botão "Nova" que abre o modal de cadastro de uma receita ou despesa, com todos os campos do título. */
+/** Botão "Nova transação": escolhe o tipo e o título em aberto e segue para o pagamento ou recebimento. */
 export function NewTransactionDialog() {
     const [open, setOpen] = useState(false);
-    const [options, setOptions] = useState<TitleFormOptions | null>(null);
+    const [type, setType] = useState<TitleType>('EXPENSE');
+    const [titles, setTitles] = useState<Record<TitleType, Title[] | null>>({
+        EXPENSE: null,
+        INCOME: null,
+    });
+    const [picked, setPicked] = useState<Title | null>(null);
 
-    // Presets e contas de destino são pedidos na primeira vez que o modal abre.
+    // Os títulos em aberto de cada tipo são pedidos ao abrir o modal ou ao trocar de tipo.
     useEffect(() => {
-        if (!open || options !== null) return;
+        if (!open || titles[type] !== null) return;
         let active = true;
-        getTitleFormOptionsAction('EXPENSE')
-            .then(result => active && setOptions(result))
-            .catch(() => active && setOptions({ presets: [], destinationAccounts: [] }));
+        getOpenTitlesAction(type)
+            .then(items => active && setTitles(current => ({ ...current, [type]: items })))
+            .catch(() => active && setTitles(current => ({ ...current, [type]: [] })));
         return () => {
             active = false;
         };
-    }, [open, options]);
+    }, [open, type, titles]);
+
+    const close = () => {
+        setOpen(false);
+        setPicked(null);
+        // Depois de pagar ou receber, a lista de abertos muda: pede de novo na próxima abertura.
+        setTitles({ EXPENSE: null, INCOME: null });
+    };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={next => (next ? setOpen(true) : close())}>
             <DialogTrigger asChild>
                 <Button className="bg-accent text-accent-foreground hover:bg-accent/90 h-9 rounded-full px-4 font-semibold">
                     <Plus aria-hidden="true" />
-                    Nova
+                    Nova transação
                 </Button>
             </DialogTrigger>
             <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto rounded-3xl p-6">
                 <DialogHeader className="space-y-0.5">
-                    <DialogTitle className="font-display text-xl font-bold tracking-tight">
-                        Nova transação
-                    </DialogTitle>
-                    <DialogDescription className="text-sm">
-                        Registre uma entrada ou saída.
-                    </DialogDescription>
+                    {picked ? (
+                        <StepTitle onBack={() => setPicked(null)}>
+                            {entryLabels(picked.type).action}
+                        </StepTitle>
+                    ) : (
+                        <>
+                            <DialogTitle className="font-display text-xl font-bold tracking-tight">
+                                Nova transação
+                            </DialogTitle>
+                            <DialogDescription className="text-sm">
+                                Escolha o título que será pago ou recebido.
+                            </DialogDescription>
+                        </>
+                    )}
                 </DialogHeader>
 
-                {options === null ? (
-                    <p className="text-muted-foreground text-sm">Carregando…</p>
-                ) : options.presets.length === 0 ? (
-                    <div className="space-y-3">
-                        <p className="text-muted-foreground text-sm">
-                            Cadastre uma categoria (preset ativo) antes de criar transações.
-                        </p>
-                        <Button asChild variant="outline" className="rounded-full">
-                            <Link href="/configuracoes/presets/nova">Novo preset</Link>
-                        </Button>
+                {picked ? (
+                    <div className="space-y-2">
+                        <p className="text-muted-foreground pl-4 text-xs">{picked.description}</p>
+                        <PaymentStep title={picked} onSuccess={close} />
                     </div>
                 ) : (
-                    <NewTransactionForm options={options} onDone={() => setOpen(false)} />
+                    <div className="space-y-4">
+                        <div
+                            role="radiogroup"
+                            aria-label="Tipo do título"
+                            className="bg-muted/70 flex rounded-full p-1"
+                        >
+                            {TYPES.map(({ type: value, label, icon: Icon }) => (
+                                <button
+                                    key={value}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={type === value}
+                                    onClick={() => setType(value)}
+                                    className={cn(
+                                        'flex h-10 flex-1 items-center justify-center gap-2 rounded-full text-sm font-semibold transition-colors',
+                                        type === value
+                                            ? cn(
+                                                  'bg-card shadow-sm',
+                                                  value === 'INCOME'
+                                                      ? 'text-positive'
+                                                      : 'text-negative',
+                                              )
+                                            : 'text-muted-foreground',
+                                    )}
+                                >
+                                    <Icon className="size-4" aria-hidden="true" />
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+                        <TitlePicker titles={titles[type]} onPick={setPicked} />
+                    </div>
                 )}
             </DialogContent>
         </Dialog>
