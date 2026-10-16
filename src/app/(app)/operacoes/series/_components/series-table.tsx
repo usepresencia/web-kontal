@@ -62,6 +62,7 @@ export function SeriesTable({ page }: { page: Page<Series> }) {
                 total={page.total}
                 onPageChange={pagination.onPageChange}
                 onPageSizeChange={pagination.onPageSizeChange}
+                pageSizeLabel="Séries por página:"
             />
         </div>
     );

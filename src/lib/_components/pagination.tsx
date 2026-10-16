@@ -15,6 +15,8 @@ type PaginationProps = {
     onPageChange: (page: number) => void;
     /** Quando informado, mostra à esquerda o dropdown de itens por página. */
     onPageSizeChange?: (pageSize: number) => void;
+    /** Rótulo ao lado do dropdown de tamanho de página (ex.: "Títulos por página:"). */
+    pageSizeLabel?: string;
 };
 
 /** Paginação para listagens no envelope `{items, page, pageSize, total}`: itens por página à esquerda e botões à direita. */
@@ -24,6 +26,7 @@ export function Pagination({
     total,
     onPageChange,
     onPageSizeChange,
+    pageSizeLabel = 'Itens por página:',
 }: PaginationProps) {
     const totalPages = pageCount(total, pageSize);
 
@@ -36,16 +39,19 @@ export function Pagination({
             )}
         >
             {onPageSizeChange && (
-                <DropdownSelect
-                    aria-label="Itens por página"
-                    value={String(pageSize)}
-                    onChange={value => onPageSizeChange(Number(value))}
-                    className="w-36"
-                    options={PAGE_SIZE_OPTIONS.map(size => ({
-                        value: String(size),
-                        label: `${size} / página`,
-                    }))}
-                />
+                <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground text-sm">{pageSizeLabel}</span>
+                    <DropdownSelect
+                        aria-label={pageSizeLabel.replace(/:$/, '')}
+                        value={String(pageSize)}
+                        onChange={value => onPageSizeChange(Number(value))}
+                        className="w-20"
+                        options={PAGE_SIZE_OPTIONS.map(size => ({
+                            value: String(size),
+                            label: String(size),
+                        }))}
+                    />
+                </div>
             )}
             <div className="flex items-center gap-1">
                 <Button
