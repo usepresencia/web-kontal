@@ -3,7 +3,7 @@ export const TITLE_TYPE_LABELS = { INCOME: 'A receber', EXPENSE: 'A pagar' } as 
 export const TITLE_STATUS_LABELS = {
     OPEN: 'Em aberto',
     SETTLED: 'Quitado',
-    WRITTEN_OFF: 'Baixado por perda',
+    WRITTEN_OFF: 'Baixado',
 } as const;
 
 export const PAYMENT_METHOD_LABELS = {
