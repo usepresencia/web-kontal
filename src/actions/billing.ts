@@ -1,19 +1,20 @@
 'use server';
 
-import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { apiFetch } from '@/lib/api/client';
+import { ApiError } from '@/lib/api/errors';
 import { stateFromApiError } from '@/lib/api/form-state';
 import {
     accountCreateSchema,
     accountSchema,
+    accountsSchema,
     accountUpdateSchema,
     planInputSchema,
     planSchema,
+    type BillingAccount,
 } from '@/lib/api/schemas/billing';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const INVALID_ID: FormState = { ok: false, message: 'Identificador inválido.' };
@@ -24,17 +25,13 @@ export async function createPlanAction(_prev: FormState, formData: FormData): Pr
     const parsed = planInputSchema.safeParse(formDataToObject(formData));
     if (!parsed.success) return stateFromZodError(parsed.error);
 
-    let planId: string;
     try {
-        planId = (
-            await apiFetch('/billing-plans', planSchema, { method: 'POST', body: parsed.data })
-        ).id;
+        await apiFetch('/billing-plans', planSchema, { method: 'POST', body: parsed.data });
     } catch (error) {
         return stateFromApiError(error);
     }
     revalidatePath('/configuracoes/planos');
-    await flash(SUCCESS.planCreated);
-    redirect(`/configuracoes/planos/${planId}`);
+    return { ok: true, ...SUCCESS.planCreated };
 }
 
 /** Atualiza o nome e a descrição de um plano. */
@@ -126,4 +123,15 @@ export async function deleteAccountAction(planId: string, accountId: string): Pr
     }
     revalidatePath(`/configuracoes/planos/${planId}`);
     return { ok: true };
+}
+
+/** Contas de um plano, para os modais de preset e de plano; vazio se o plano não existir. */
+export async function getPlanAccountsAction(planId: string): Promise<BillingAccount[]> {
+    if (!isUuid(planId)) return [];
+    try {
+        return await apiFetch(`/billing-plans/${planId}/accounts`, accountsSchema);
+    } catch (error) {
+        if (error instanceof ApiError && error.status < 500) return [];
+        throw error;
+    }
 }

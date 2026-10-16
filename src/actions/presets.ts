@@ -1,13 +1,11 @@
 'use server';
 
-import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { apiFetch } from '@/lib/api/client';
 import { stateFromApiError } from '@/lib/api/form-state';
 import { presetCreateSchema, presetSchema, presetUpdateSchema } from '@/lib/api/schemas/preset';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const INVALID_ID: FormState = { ok: false, message: 'Identificador inválido.' };
@@ -24,8 +22,7 @@ export async function createPresetAction(_prev: FormState, formData: FormData): 
         return stateFromApiError(error);
     }
     revalidatePath('/configuracoes/presets');
-    await flash(SUCCESS.presetCreated);
-    redirect('/configuracoes/presets');
+    return { ok: true, ...SUCCESS.presetCreated };
 }
 
 /** Atualiza um preset; o plano dele não muda. */
