@@ -17,6 +17,7 @@ import {
 import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
 import { notifyResult } from '@/lib/_utils/notify';
 import type { Page } from '@/lib/_utils/pagination';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import type { Company } from '@/lib/api/schemas/company';
 import { useState, useTransition } from 'react';
 
@@ -94,7 +95,7 @@ export function CompaniesTable({ page }: { page: Page<Company> }) {
                         () => deactivateCompanyAction(toDeactivate.id),
                         'Desativando empresa…',
                     );
-                    notifyResult(result, 'Empresa desativada.', 'Não foi possível desativar.');
+                    notifyResult(result, SUCCESS.companyDeactivated, 'Não foi possível desativar.');
                     setToDeactivate(null);
                 }}
             />

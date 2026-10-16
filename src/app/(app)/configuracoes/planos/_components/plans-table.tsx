@@ -16,6 +16,7 @@ import {
 import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
 import { notifyResult } from '@/lib/_utils/notify';
 import type { Page } from '@/lib/_utils/pagination';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import type { BillingPlan } from '@/lib/api/schemas/billing';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -78,7 +79,7 @@ export function PlansTable({ page }: { page: Page<BillingPlan> }) {
                         () => deletePlanAction(toDelete.id),
                         'Excluindo plano…',
                     );
-                    notifyResult(result, 'Plano excluído.', 'Não foi possível excluir.');
+                    notifyResult(result, SUCCESS.planDeleted, 'Não foi possível excluir.');
                     setToDelete(null);
                 }}
             />

@@ -2,6 +2,7 @@
 
 import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
 import { stateFromApiError } from '@/lib/api/form-state';
@@ -35,7 +36,7 @@ export async function createCompanyAction(
         return stateFromApiError(error);
     }
     revalidatePath('/empresas');
-    await flash('Empresa criada.');
+    await flash(SUCCESS.companyCreated);
     redirect('/empresas');
 }
 
@@ -53,7 +54,7 @@ export async function updateCompanyAction(
         return stateFromApiError(error);
     }
     revalidatePath('/empresas');
-    return { ok: true, message: 'Empresa atualizada.' };
+    return { ok: true, ...SUCCESS.companyUpdated };
 }
 
 /** Desativa uma empresa (apenas administrador da plataforma; a API confirma). */

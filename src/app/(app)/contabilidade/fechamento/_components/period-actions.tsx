@@ -21,6 +21,7 @@ import {
 import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import { notifyResult } from '@/lib/_utils/notify';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { Plus } from 'lucide-react';
 import { useActionState, useEffect, useState } from 'react';
 
@@ -137,7 +138,7 @@ export function ReopenButton() {
                 variant="destructive"
                 onConfirm={async () => {
                     const result = await run(() => reopenPeriodAction(), 'Reabrindo período…');
-                    notifyResult(result, 'Período reaberto.', 'Não foi possível reabrir.');
+                    notifyResult(result, SUCCESS.periodReopened, 'Não foi possível reabrir.');
                     setOpen(false);
                 }}
             />

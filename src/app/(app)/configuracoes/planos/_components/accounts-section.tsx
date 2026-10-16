@@ -16,6 +16,7 @@ import {
 } from '@/lib/_components/ui/table';
 import { ACCOUNT_TYPE_LABELS, NATURE_LABELS } from '@/lib/_utils/billing-labels';
 import { notifyResult } from '@/lib/_utils/notify';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import type { BillingAccount } from '@/lib/api/schemas/billing';
 import { useState } from 'react';
 import { AccountDialog } from './account-dialog';
@@ -123,7 +124,7 @@ export function AccountsSection({ planId, accounts }: AccountsSectionProps) {
                         () => deleteAccountAction(planId, toDelete.id),
                         'Excluindo conta…',
                     );
-                    notifyResult(result, 'Conta excluída.', 'Não foi possível excluir.');
+                    notifyResult(result, SUCCESS.accountDeleted, 'Não foi possível excluir.');
                     setToDelete(null);
                 }}
             />
