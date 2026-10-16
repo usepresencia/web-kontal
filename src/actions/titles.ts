@@ -31,16 +31,29 @@ const HOME_PATH = '/home';
 
 const LIST_PATHS = { EXPENSE: '/operacoes/pagar', INCOME: '/operacoes/receber' } as const;
 
-/** Cria um título; com repetição, cria a série (parcelada ou recorrente). */
+/** Cria um título; com repetição, cria a série. Com "pagar/receber agora", registra a baixa do valor total em seguida. */
 export async function createTitleAction(_prev: FormState, formData: FormData): Promise<FormState> {
     const parsed = titleCreateSchema.safeParse(formDataToObject(formData));
     if (!parsed.success) return stateFromZodError(parsed.error);
 
-    const { repeat, frequency, count, until, isOpening, openingDate, settledAmount, ...title } =
-        parsed.data;
+    const {
+        repeat,
+        frequency,
+        count,
+        until,
+        isOpening,
+        openingDate,
+        settledAmount,
+        payNow,
+        paymentAccountId,
+        paymentMethod,
+        paidAt,
+        ...title
+    } = parsed.data;
+    let created: Title | null = null;
     try {
         if (repeat === 'NONE') {
-            await apiFetch('/titles', titleSchema, {
+            created = await apiFetch('/titles', titleSchema, {
                 method: 'POST',
                 body: isOpening ? { ...title, isOpening, openingDate, settledAmount } : title,
             });
@@ -53,9 +66,30 @@ export async function createTitleAction(_prev: FormState, formData: FormData): P
     } catch (error) {
         return stateFromApiError(error);
     }
+
+    let result: FormState = { ok: true, message: 'Título criado.' };
+    if (payNow && created) {
+        try {
+            await apiFetch(`/titles/${created.id}/entries`, entrySchema, {
+                method: 'POST',
+                body: {
+                    billingAccountId: paymentAccountId,
+                    principalAmount: created.amount,
+                    paidAt,
+                    paymentMethod,
+                },
+            });
+        } catch (error) {
+            const failure = stateFromApiError(error);
+            result = {
+                ok: false,
+                message: `Título criado, mas a baixa não foi registrada: ${failure.message ?? 'erro desconhecido'}`,
+            };
+        }
+    }
     revalidatePath(LIST_PATHS[title.type]);
     revalidatePath(HOME_PATH);
-    return { ok: true, message: 'Título criado.' };
+    return result;
 }
 
 /** Atualiza descrição, vencimento e juros de um título. */
@@ -202,32 +236,43 @@ export async function getTitleEntriesAction(titleId: string): Promise<TitleEntry
 export type TitleFormOptions = {
     presets: { value: string; label: string }[];
     destinationAccounts: { value: string; label: string }[];
+    /** Contas financeiras (ativo analítico ativo) para a baixa na hora. */
+    financialAccounts: { value: string; label: string }[];
 };
 
-const EMPTY_OPTIONS: TitleFormOptions = { presets: [], destinationAccounts: [] };
+const EMPTY_OPTIONS: TitleFormOptions = {
+    presets: [],
+    destinationAccounts: [],
+    financialAccounts: [],
+};
 
-/** Presets ativos e, no título a pagar, as contas de destino (ativo ou despesa) do formulário de cadastro. */
+/** Presets ativos, as contas financeiras da baixa na hora e, no título a pagar, as contas de destino (ativo ou despesa). */
 export async function getTitleFormOptionsAction(
     type: 'INCOME' | 'EXPENSE',
 ): Promise<TitleFormOptions> {
     if (type !== 'INCOME' && type !== 'EXPENSE') return EMPTY_OPTIONS;
 
-    const presets = await apiFetch('/presets?page=1&pageSize=100&isActive=true', presetPageSchema);
-    const accounts =
-        type === 'EXPENSE'
-            ? await apiFetch('/billing-accounts?page=1&pageSize=100', accountPageSchema)
-            : null;
+    const [presets, accounts] = await Promise.all([
+        apiFetch('/presets?page=1&pageSize=100&isActive=true', presetPageSchema),
+        apiFetch('/billing-accounts?page=1&pageSize=100', accountPageSchema),
+    ]);
+    const analytic = accounts.items.filter(
+        account => account.accountType === 'ANALYTIC' && account.isActive,
+    );
+    const toOption = (account: (typeof analytic)[number]) => ({
+        value: account.id,
+        label: `${account.code} ${account.name}`,
+    });
 
     return {
         presets: presets.items.map(preset => ({ value: preset.id, label: preset.name })),
-        destinationAccounts: (accounts?.items ?? [])
-            .filter(
-                account =>
-                    account.accountType === 'ANALYTIC' &&
-                    account.isActive &&
-                    (account.nature === 'ASSET' || account.nature === 'EXPENSE'),
-            )
-            .map(account => ({ value: account.id, label: `${account.code} ${account.name}` })),
+        destinationAccounts:
+            type === 'EXPENSE'
+                ? analytic
+                      .filter(account => account.nature === 'ASSET' || account.nature === 'EXPENSE')
+                      .map(toOption)
+                : [],
+        financialAccounts: analytic.filter(account => account.nature === 'ASSET').map(toOption),
     };
 }
 

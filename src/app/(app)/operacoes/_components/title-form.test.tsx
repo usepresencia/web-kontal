@@ -11,6 +11,7 @@ const render = (type: 'INCOME' | 'EXPENSE') =>
                 type={type}
                 presets={[{ value: 'p1', label: 'Padrão' }]}
                 destinationAccounts={[{ value: 'a1', label: '1.2 Estoque' }]}
+                financialAccounts={[{ value: 'c1', label: '1.1 Caixa' }]}
             />
         </BusyProvider>,
     );
@@ -37,5 +38,22 @@ describe('TitleForm', () => {
         const html = render('EXPENSE');
         expect(html).not.toContain('name="count"');
         expect(html).not.toContain('name="until"');
+    });
+
+    it('oferece "Pagar agora" no título a pagar e "Receber agora" no a receber', () => {
+        expect(render('EXPENSE')).toContain('Pagar agora');
+        expect(render('INCOME')).toContain('Receber agora');
+    });
+
+    it('mantém a conta e a forma de pagamento escondidas até marcar a opção', () => {
+        const html = render('EXPENSE');
+        expect(html).toContain('type="checkbox"');
+        expect(html).not.toContain('paymentAccountId');
+    });
+
+    it('não traz mais os campos de saldo inicial, que ganharam lugar próprio', () => {
+        const html = render('EXPENSE');
+        expect(html).not.toContain('openingDate');
+        expect(html).not.toContain('Implantação');
     });
 });

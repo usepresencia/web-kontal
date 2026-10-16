@@ -3,10 +3,16 @@
 import { AmountInput } from '@/lib/_components/amount-input';
 import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
+import { FieldError, PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { Button } from '@/lib/_components/ui/button';
+import { toLocalIsoDate } from '@/lib/_utils/dates';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
-import { SERIES_FREQUENCY_LABELS, SERIES_KIND_LABELS } from '@/lib/_utils/title-labels';
+import {
+    PAYMENT_METHOD_LABELS,
+    SERIES_FREQUENCY_LABELS,
+    SERIES_KIND_LABELS,
+    entryLabels,
+} from '@/lib/_utils/title-labels';
 import { useActionState, useEffect, useState } from 'react';
 
 type Option = { value: string; label: string };
@@ -17,6 +23,8 @@ type TitleFormProps = {
     presets: Option[];
     /** Contas de ativo ou despesa para a compra de ativo (só em título a pagar). */
     destinationAccounts?: Option[];
+    /** Contas financeiras onde a baixa na hora é registrada. */
+    financialAccounts?: Option[];
     /** Chamado depois que o título é criado. */
     onSuccess?: () => void;
 };
@@ -24,10 +32,7 @@ type TitleFormProps = {
 const toOptions = (labels: Record<string, string>) =>
     Object.entries(labels).map(([value, label]) => ({ value, label }));
 
-const YES_NO: Option[] = [
-    { value: 'false', label: 'Não' },
-    { value: 'true', label: 'Sim' },
-];
+const PAYMENT_METHODS = toOptions(PAYMENT_METHOD_LABELS);
 
 const REPEAT_OPTIONS: Option[] = [
     { value: 'NONE', label: 'Sem repetição' },
@@ -40,14 +45,19 @@ export function TitleForm({
     type,
     presets,
     destinationAccounts = [],
+    financialAccounts = [],
     onSuccess,
 }: TitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
     const [preset, setPreset] = useState(presets[0]?.value ?? '');
     const [destination, setDestination] = useState('');
-    const [isOpening, setIsOpening] = useState('false');
+    const [payNow, setPayNow] = useState(false);
+    const [account, setAccount] = useState('');
+    const [method, setMethod] = useState('PIX');
     const [repeat, setRepeat] = useState('NONE');
     const [frequency, setFrequency] = useState('');
+    const labels = entryLabels(type);
+    const canPayNow = repeat === 'NONE' && financialAccounts.length > 0;
     const errors = (field: string) => state.fieldErrors?.[field];
 
     useEffect(() => {
@@ -125,32 +135,6 @@ export function TitleForm({
                 )}
                 <PillSelect
                     className={FILTER_PILL_CLASS}
-                    label="Saldo inicial (implantação)"
-                    name="isOpening"
-                    value={isOpening}
-                    onChange={setIsOpening}
-                    options={YES_NO}
-                />
-                {isOpening === 'true' && (
-                    <>
-                        <PillInput
-                            className={FILTER_PILL_CLASS}
-                            label="Data de implantação"
-                            name="openingDate"
-                            type="date"
-                            errors={errors('openingDate')}
-                        />
-                        <PillInput
-                            className={FILTER_PILL_CLASS}
-                            label="Já baixado (R$, opcional)"
-                            name="settledAmount"
-                            inputMode="decimal"
-                            errors={errors('settledAmount')}
-                        />
-                    </>
-                )}
-                <PillSelect
-                    className={FILTER_PILL_CLASS}
                     label="Repetição"
                     name="repeat"
                     value={repeat}
@@ -190,6 +174,54 @@ export function TitleForm({
                     </>
                 )}
             </div>
+
+            {canPayNow && (
+                <div className="space-y-3">
+                    <label className="flex cursor-pointer items-center gap-3 pl-4 text-sm font-medium">
+                        <input
+                            type="checkbox"
+                            name="payNow"
+                            value="true"
+                            checked={payNow}
+                            onChange={event => setPayNow(event.target.checked)}
+                            className="accent-accent size-4"
+                        />
+                        {labels.now}
+                    </label>
+                    {payNow && (
+                        <div className="grid grid-cols-2 gap-3">
+                            <PillSelect
+                                className={FILTER_PILL_CLASS}
+                                label="Conta"
+                                name="paymentAccountId"
+                                value={account}
+                                onChange={setAccount}
+                                options={financialAccounts}
+                                placeholder="Conta"
+                                errors={errors('paymentAccountId')}
+                            />
+                            <PillInput
+                                className={FILTER_PILL_CLASS}
+                                label="Data"
+                                name="paidAt"
+                                type="date"
+                                defaultValue={toLocalIsoDate(new Date())}
+                                errors={errors('paidAt')}
+                            />
+                            <PillSelect
+                                className={FILTER_PILL_CLASS}
+                                label="Forma de pagamento"
+                                name="paymentMethod"
+                                value={method}
+                                onChange={setMethod}
+                                options={PAYMENT_METHODS}
+                                errors={errors('paymentMethod')}
+                            />
+                        </div>
+                    )}
+                    <FieldError errors={errors('payNow')} />
+                </div>
+            )}
 
             {state.message && !state.ok && (
                 <p role="alert" className="text-negative text-sm">

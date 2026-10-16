@@ -33,6 +33,7 @@ export function entryLabels(type: 'INCOME' | 'EXPENSE') {
         ? {
               action: 'Pagar título',
               create: 'Novo pagamento',
+              now: 'Pagar agora',
               submit: 'Pagar',
               pending: 'Pagando…',
               overlay: 'Registrando pagamento…',
@@ -40,6 +41,7 @@ export function entryLabels(type: 'INCOME' | 'EXPENSE') {
         : {
               action: 'Receber título',
               create: 'Novo recebimento',
+              now: 'Receber agora',
               submit: 'Receber',
               pending: 'Recebendo…',
               overlay: 'Registrando recebimento…',
