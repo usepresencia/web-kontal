@@ -72,10 +72,14 @@ describe('getTitleFormOptionsAction', () => {
                     },
                 ],
             });
+        apiFetch.mockResolvedValueOnce({
+            items: [{ id: 'pt1', kind: 'SUPPLIER', name: 'Copel', defaultPresetId: 'p1' }],
+        });
         expect(await getTitleFormOptionsAction('EXPENSE')).toEqual({
             presets: [{ value: 'p1', label: 'Padrão' }],
             destinationAccounts: [{ value: 'a1', label: '1.1 Caixa' }],
             financialAccounts: [{ value: 'a1', label: '1.1 Caixa' }],
+            parties: [{ value: 'pt1', label: 'Copel', defaultPresetId: 'p1' }],
         });
     });
 
@@ -95,6 +99,7 @@ describe('getTitleFormOptionsAction', () => {
                     },
                 ],
             });
+        apiFetch.mockResolvedValueOnce({ items: [] });
         const result = await getTitleFormOptionsAction('INCOME');
         expect(result.destinationAccounts).toEqual([]);
         expect(result.financialAccounts).toEqual([{ value: 'a1', label: '1.1 Caixa' }]);
@@ -104,6 +109,7 @@ describe('getTitleFormOptionsAction', () => {
         const { getTitleFormOptionsAction } = await import('./titles');
         // @ts-expect-error tipo inválido de propósito
         expect(await getTitleFormOptionsAction('X')).toEqual({
+            parties: [],
             presets: [],
             destinationAccounts: [],
             financialAccounts: [],

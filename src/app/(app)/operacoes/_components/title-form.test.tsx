@@ -9,6 +9,7 @@ const render = (type: 'INCOME' | 'EXPENSE') =>
             <TitleForm
                 action={vi.fn()}
                 type={type}
+                parties={[{ value: 'pt1', label: 'Copel', defaultPresetId: 'p1' }]}
                 presets={[{ value: 'p1', label: 'Padrão' }]}
                 destinationAccounts={[{ value: 'a1', label: '1.2 Estoque' }]}
                 financialAccounts={[{ value: 'c1', label: '1.1 Caixa' }]}
@@ -64,6 +65,7 @@ const renderOpening = (type: 'INCOME' | 'EXPENSE') =>
             <TitleForm
                 action={vi.fn()}
                 type={type}
+                parties={[{ value: 'pt1', label: 'Copel', defaultPresetId: 'p1' }]}
                 presets={[{ value: 'p1', label: 'Padrão' }]}
                 financialAccounts={[{ value: 'c1', label: '1.1 Caixa' }]}
                 opening
@@ -103,6 +105,7 @@ const renderSeries = (type: 'INCOME' | 'EXPENSE') =>
             <TitleForm
                 action={vi.fn()}
                 type={type}
+                parties={[{ value: 'pt1', label: 'Copel', defaultPresetId: 'p1' }]}
                 presets={[{ value: 'p1', label: 'Padrão' }]}
                 financialAccounts={[{ value: 'c1', label: '1.1 Caixa' }]}
                 series
@@ -125,5 +128,19 @@ describe('TitleForm como parcelamento', () => {
 
     it('chama o botão de "Criar parcelamento"', () => {
         expect(renderSeries('EXPENSE')).toContain('Criar parcelamento');
+    });
+
+    it('pede o fornecedor no título a pagar e o cliente no a receber, com o histórico (preset) depois', () => {
+        const expense = render('EXPENSE');
+        expect(expense).toContain('name="partyId"');
+        expect(expense).toContain('Fornecedor');
+        expect(render('INCOME')).toContain('Cliente');
+        expect(expense).toContain('Histórico (preset)');
+        expect(expense.indexOf('name="partyId"')).toBeLessThan(expense.indexOf('name="presetId"'));
+    });
+
+    it('mantém a contraparte no saldo inicial e no parcelamento', () => {
+        expect(renderOpening('EXPENSE')).toContain('name="partyId"');
+        expect(renderSeries('EXPENSE')).toContain('name="partyId"');
     });
 });

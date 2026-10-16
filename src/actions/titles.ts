@@ -1,5 +1,6 @@
 'use server';
 
+import { getTitlePartiesAction, type PartyOption } from '@/actions/parties';
 import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { SUCCESS } from '@/lib/_utils/toast-messages';
@@ -258,6 +259,8 @@ export async function getTitleEntriesAction(titleId: string): Promise<TitleEntry
 }
 
 export type TitleFormOptions = {
+    /** Clientes ou fornecedores ativos do tipo do título, com o preset padrão de cada um. */
+    parties: PartyOption[];
     presets: { value: string; label: string }[];
     destinationAccounts: { value: string; label: string }[];
     /** Contas financeiras (ativo analítico ativo) para a baixa na hora. */
@@ -265,20 +268,22 @@ export type TitleFormOptions = {
 };
 
 const EMPTY_OPTIONS: TitleFormOptions = {
+    parties: [],
     presets: [],
     destinationAccounts: [],
     financialAccounts: [],
 };
 
-/** Presets ativos, as contas financeiras da baixa na hora e, no título a pagar, as contas de destino (ativo ou despesa). */
+/** Clientes ou fornecedores, presets ativos, as contas financeiras da baixa na hora e, no título a pagar, as contas de destino (ativo ou despesa). */
 export async function getTitleFormOptionsAction(
     type: 'INCOME' | 'EXPENSE',
 ): Promise<TitleFormOptions> {
     if (type !== 'INCOME' && type !== 'EXPENSE') return EMPTY_OPTIONS;
 
-    const [presets, accounts] = await Promise.all([
+    const [presets, accounts, parties] = await Promise.all([
         apiFetch('/presets?page=1&pageSize=100&isActive=true', presetPageSchema),
         apiFetch('/billing-accounts?page=1&pageSize=100', accountPageSchema),
+        getTitlePartiesAction(type),
     ]);
     const analytic = accounts.items.filter(
         account => account.accountType === 'ANALYTIC' && account.isActive,
@@ -289,6 +294,7 @@ export async function getTitleFormOptionsAction(
     });
 
     return {
+        parties,
         presets: presets.items.map(preset => ({ value: preset.id, label: preset.name })),
         destinationAccounts:
             type === 'EXPENSE'
