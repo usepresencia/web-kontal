@@ -70,7 +70,7 @@ export function NewTransactionDialog() {
                 <DialogHeader className="space-y-0.5">
                     {picked ? (
                         <StepTitle onBack={() => setPicked(null)}>
-                            {entryLabels(picked.type).action}
+                            {entryLabels(picked.type, picked.seriesIndex !== null).action}
                         </StepTitle>
                     ) : (
                         <>

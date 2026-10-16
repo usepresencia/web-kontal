@@ -42,4 +42,10 @@ describe('entryLabels', () => {
             overlay: 'Registrando recebimento…',
         });
     });
+
+    it('diz parcela no lugar de título quando é de um parcelamento', () => {
+        expect(entryLabels('EXPENSE', true).action).toBe('Pagar parcela');
+        expect(entryLabels('INCOME', true).action).toBe('Receber parcela');
+        expect(entryLabels('EXPENSE').action).toBe('Pagar título');
+    });
 });

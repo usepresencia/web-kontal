@@ -141,7 +141,7 @@ export function TransactionDetailsBody({
             {title.status === 'OPEN' && (
                 <div className="flex justify-end">
                     <Button type="button" onClick={onPay}>
-                        {entryLabels(title.type).action}
+                        {entryLabels(title.type, title.seriesIndex !== null).action}
                     </Button>
                 </div>
             )}

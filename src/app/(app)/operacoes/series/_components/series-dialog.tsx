@@ -140,6 +140,7 @@ export function SeriesDialog({ series, onClose }: SeriesDialogProps) {
                     setPicked(null);
                     load();
                 }}
+                onBack={() => setPicked(null)}
             />
         </Dialog>
     );
