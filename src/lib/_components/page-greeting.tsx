@@ -76,7 +76,9 @@ export function PageGreeting({ name }: { name: string }) {
                         {now ? now.getDate() : ''}
                     </p>
                     <p className="text-muted-foreground mt-1 text-sm">
-                        {now ? `${MONTHS[now.getMonth()]} de ${now.getFullYear()}.` : ''}
+                        {now
+                            ? `de ${MONTHS[now.getMonth()].toLowerCase()} de ${now.getFullYear()}`
+                            : ''}
                     </p>
                 </div>
             </div>
