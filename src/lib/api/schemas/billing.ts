@@ -31,6 +31,7 @@ export const accountSchema = z.object({
     nature: z.enum(['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE']),
     dreCategory: z.string().nullable(),
     balanceCategory: z.string().nullable(),
+    costBehavior: z.string().nullable().optional(),
     isActive: z.boolean(),
     billingPlanId: z.string(),
     billingPlanName: z.string().nullable().optional(),
@@ -65,6 +66,7 @@ export const accountCreateSchema = z.object({
     ),
     dreCategory: optionalNullable,
     balanceCategory: optionalNullable,
+    costBehavior: optionalNullable,
 });
 
 export const accountUpdateSchema = z.object({
@@ -72,6 +74,7 @@ export const accountUpdateSchema = z.object({
     accountType: z.enum(['ANALYTIC', 'SYNTHETIC']),
     dreCategory: optionalNullable,
     balanceCategory: optionalNullable,
+    costBehavior: optionalNullable,
     isActive: z.enum(['true', 'false']).transform(value => value === 'true'),
 });
 

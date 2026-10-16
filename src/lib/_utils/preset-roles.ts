@@ -9,6 +9,7 @@ export const PRESET_ROLE_NATURE = {
     interestExpense: 'EXPENSE',
     discountObtained: 'REVENUE',
     debtForgiveness: 'REVENUE',
+    openingBalance: 'EQUITY',
 } as const;
 
 export type PresetRole = keyof typeof PRESET_ROLE_NATURE;
@@ -28,6 +29,7 @@ export const PRESET_ROLE_LABELS: Record<PresetRole, string> = {
     interestExpense: 'Despesa de juros',
     discountObtained: 'Desconto obtido',
     debtForgiveness: 'Perdão de dívida',
+    openingBalance: 'Saldos iniciais (implantação)',
 };
 
 type AccountLike = {

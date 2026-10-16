@@ -15,6 +15,7 @@ import {
     ACCOUNT_TYPE_LABELS,
     BALANCE_CATEGORIES_BY_NATURE,
     BALANCE_CATEGORY_LABELS,
+    COST_BEHAVIOR_LABELS,
     DRE_CATEGORIES_BY_NATURE,
     DRE_CATEGORY_LABELS,
     NATURE_LABELS,
@@ -133,6 +134,17 @@ export function AccountDialog({
                         allowEmpty
                         errors={errors('balanceCategory')}
                     />
+                    {(nature === 'EXPENSE' || (!editing && nature === '')) && (
+                        <SelectField
+                            label="Comportamento do custo (DRE gerencial)"
+                            name="costBehavior"
+                            options={toOptions(COST_BEHAVIOR_LABELS)}
+                            defaultValue={account?.costBehavior}
+                            allowEmpty
+                            placeholder="Padrão da categoria do DRE"
+                            errors={errors('costBehavior')}
+                        />
+                    )}
                     {editing && (
                         <SelectField
                             label="Status"

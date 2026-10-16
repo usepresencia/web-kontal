@@ -11,11 +11,14 @@ export const presetSchema = z.object({
     name: z.string(),
     description: z.string().nullable(),
     isActive: z.boolean(),
+    // O papel openingBalance só existe nas versões da API com título de implantação.
     accounts: z.object(
-        Object.fromEntries(PRESET_ROLES.map(role => [role, roleAccount])) as Record<
-            PresetRole,
-            typeof roleAccount
-        >,
+        Object.fromEntries(
+            PRESET_ROLES.map(role => [
+                role,
+                role === 'openingBalance' ? roleAccount.optional() : roleAccount,
+            ]),
+        ) as Record<PresetRole, typeof roleAccount>,
     ),
     createdAt: z.string(),
 });
@@ -43,6 +46,7 @@ const accountsInput = z.object({
     interestExpense: optional,
     discountObtained: optional,
     debtForgiveness: optional,
+    openingBalance: optional,
 });
 
 const base = z.object({

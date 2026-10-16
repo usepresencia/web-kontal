@@ -12,8 +12,8 @@ const account = (over: Record<string, unknown>) => ({
 });
 
 describe('PRESET_ROLES', () => {
-    it('lista os dez papéis, com contas a receber e a pagar obrigatórias', () => {
-        expect(PRESET_ROLES).toHaveLength(10);
+    it('lista os onze papéis, com contas a receber e a pagar obrigatórias', () => {
+        expect(PRESET_ROLES).toHaveLength(11);
         expect(REQUIRED_ROLES).toEqual(['receivable', 'payable']);
     });
 });
@@ -31,5 +31,6 @@ describe('accountsForRole', () => {
         expect(accountsForRole(accounts, 'receivable').map(a => a.id)).toEqual(['1']);
         expect(accountsForRole(accounts, 'payable').map(a => a.id)).toEqual(['2']);
         expect(accountsForRole(accounts, 'revenue').map(a => a.id)).toEqual(['5']);
+        expect(accountsForRole(accounts, 'openingBalance')).toEqual([]);
     });
 });
