@@ -18,6 +18,7 @@ import {
     titleSchema,
     titleUpdateSchema,
     writeOffSchema,
+    type SeriesDetail,
     type Title,
     type TitleEntry,
 } from '@/lib/api/schemas/title';
@@ -186,7 +187,18 @@ export async function deleteEntryAction(titleId: string, entryId: string): Promi
     return { ok: true };
 }
 
-/** Estende uma série com mais ocorrências (quantidade ou data final). */
+/** Busca um parcelamento (série) com as ocorrências, para os detalhes; `null` se não existir. */
+export async function getSeriesAction(seriesId: string): Promise<SeriesDetail | null> {
+    if (!isUuid(seriesId)) return null;
+    try {
+        return await apiFetch(`/title-series/${seriesId}`, seriesDetailSchema);
+    } catch (error) {
+        if (error instanceof ApiError && error.status < 500) return null;
+        throw error;
+    }
+}
+
+/** Estende um parcelamento com mais ocorrências (quantidade ou data final). */
 export async function extendSeriesAction(
     seriesId: string,
     _prev: FormState,
@@ -204,11 +216,12 @@ export async function extendSeriesAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath(`/operacoes/series/${seriesId}`);
-    return { ok: true, message: 'Série estendida.' };
+    revalidatePath('/operacoes/series');
+    Object.values(LIST_PATHS).forEach(path => revalidatePath(path));
+    return { ok: true, message: 'Parcelamento estendido.' };
 }
 
-/** Cancela uma série, removendo as ocorrências ainda sem baixa. */
+/** Cancela um parcelamento, removendo as ocorrências ainda sem baixa. */
 export async function cancelSeriesAction(seriesId: string): Promise<FormState> {
     if (!isUuid(seriesId)) return INVALID_ID;
     try {
@@ -217,7 +230,7 @@ export async function cancelSeriesAction(seriesId: string): Promise<FormState> {
         return stateFromApiError(error);
     }
     revalidatePath('/operacoes/series');
-    await flash('Série cancelada.');
+    await flash('Parcelamento cancelado.');
     redirect('/operacoes/series');
 }
 
