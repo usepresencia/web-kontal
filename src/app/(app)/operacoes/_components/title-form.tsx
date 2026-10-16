@@ -1,5 +1,6 @@
 'use client';
 
+import type { PartyOption } from '@/actions/parties';
 import { AmountInput } from '@/lib/_components/amount-input';
 import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
@@ -21,6 +22,8 @@ type Option = { value: string; label: string };
 type TitleFormProps = {
     action: (state: FormState, formData: FormData) => Promise<FormState>;
     type: 'INCOME' | 'EXPENSE';
+    /** Clientes ou fornecedores do tipo do título, com o preset padrão de cada um. */
+    parties: PartyOption[];
     presets: Option[];
     /** Contas de ativo ou despesa para a compra de ativo (só em título a pagar). */
     destinationAccounts?: Option[];
@@ -47,6 +50,7 @@ const REPEAT_OPTIONS: Option[] = [{ value: 'NONE', label: 'Sem repetição' }, .
 export function TitleForm({
     action,
     type,
+    parties,
     presets,
     destinationAccounts = [],
     financialAccounts = [],
@@ -56,6 +60,7 @@ export function TitleForm({
 }: TitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
     useActionToast(state);
+    const [party, setParty] = useState('');
     const [preset, setPreset] = useState(presets[0]?.value ?? '');
     const [destination, setDestination] = useState('');
     const [payNow, setPayNow] = useState(false);
@@ -94,6 +99,24 @@ export function TitleForm({
             />
 
             <div className="grid grid-cols-2 gap-3">
+                <PillSelect
+                    className={FILTER_PILL_CLASS}
+                    label={type === 'EXPENSE' ? 'Fornecedor' : 'Cliente'}
+                    name="partyId"
+                    value={party}
+                    onChange={value => {
+                        setParty(value);
+                        const standard = parties.find(
+                            item => item.value === value,
+                        )?.defaultPresetId;
+                        if (standard && presets.some(item => item.value === standard)) {
+                            setPreset(standard);
+                        }
+                    }}
+                    options={parties}
+                    placeholder="Selecione"
+                    errors={errors('partyId')}
+                />
                 <PillInput
                     className={FILTER_PILL_CLASS}
                     label="Descrição"
@@ -103,7 +126,7 @@ export function TitleForm({
                 />
                 <PillSelect
                     className={FILTER_PILL_CLASS}
-                    label="Preset"
+                    label="Histórico (preset)"
                     name="presetId"
                     value={preset}
                     onChange={setPreset}

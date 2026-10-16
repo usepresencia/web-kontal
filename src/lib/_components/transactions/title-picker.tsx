@@ -72,7 +72,8 @@ export function TitlePicker({ titles, onPick }: TitlePickerProps) {
                                             {title.description}
                                         </p>
                                         <p className="text-muted-foreground text-xs">
-                                            Vence {formatDate(title.expirationDate)}
+                                            {title.partyName && `${title.partyName} · `}Vence{' '}
+                                            {formatDate(title.expirationDate)}
                                         </p>
                                     </div>
                                     <span

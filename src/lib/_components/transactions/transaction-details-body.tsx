@@ -82,7 +82,8 @@ export function TransactionDetailsBody({
             </div>
 
             <dl className="grid grid-cols-2 gap-3">
-                <Field label="Preset">{title.presetName ?? '-'}</Field>
+                <Field label={income ? 'Cliente' : 'Fornecedor'}>{title.partyName ?? '-'}</Field>
+                <Field label="Histórico (preset)">{title.presetName ?? '-'}</Field>
                 <Field label="Juros mensais">
                     {fractionToPercent(title.feesPercentageMonthly)}%
                 </Field>

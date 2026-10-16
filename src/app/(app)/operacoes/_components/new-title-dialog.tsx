@@ -45,7 +45,12 @@ export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
             .catch(
                 () =>
                     active &&
-                    setOptions({ presets: [], destinationAccounts: [], financialAccounts: [] }),
+                    setOptions({
+                        parties: [],
+                        presets: [],
+                        destinationAccounts: [],
+                        financialAccounts: [],
+                    }),
             );
         return () => {
             active = false;
@@ -75,6 +80,22 @@ export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
                 </DialogHeader>
                 {options === null ? (
                     <p className="text-muted-foreground py-8 text-center text-sm">Carregando…</p>
+                ) : options.parties.length === 0 ? (
+                    <EmptyState
+                        title={
+                            type === 'EXPENSE'
+                                ? 'Nenhum fornecedor cadastrado'
+                                : 'Nenhum cliente cadastrado'
+                        }
+                        description="Cadastre o cliente ou fornecedor, com o preset padrão, antes de criar títulos."
+                        action={
+                            <Button asChild variant="outline">
+                                <Link href="/cadastros/clientes-fornecedores">
+                                    Novo cliente/fornecedor
+                                </Link>
+                            </Button>
+                        }
+                    />
                 ) : options.presets.length === 0 ? (
                     <EmptyState
                         title="Nenhum preset ativo"
@@ -89,6 +110,7 @@ export function NewTitleDialog({ type, opening = false }: NewTitleDialogProps) {
                     <TitleForm
                         action={createTitleAction}
                         type={type}
+                        parties={options.parties}
                         presets={options.presets}
                         destinationAccounts={options.destinationAccounts}
                         financialAccounts={options.financialAccounts}
