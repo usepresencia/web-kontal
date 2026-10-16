@@ -59,3 +59,11 @@ export function toApiAmount(input: string): string | null {
     if (integer.replace(/^0+(?=\d)/, '').length > MAX_INTEGER_DIGITS) return null;
     return `${integer.replace(/^0+(?=\d)/, '')}.${fraction.padEnd(2, '0')}`;
 }
+
+/** Converte o valor da API ("1234.50") em centavos inteiros (BigInt). */
+export function amountToCents(amount: string): bigint {
+    const match = AMOUNT_PATTERN.exec(amount.includes('.') ? amount : `${amount}.00`);
+    if (!match) throw new Error(`Valor monetário inválido: "${amount}"`);
+    const [, sign, integer, fraction] = match;
+    return BigInt(`${sign}${integer}${fraction}`);
+}
