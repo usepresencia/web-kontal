@@ -74,3 +74,5 @@ export const accountUpdateSchema = z.object({
     balanceCategory: optionalNullable,
     isActive: z.enum(['true', 'false']).transform(value => value === 'true'),
 });
+
+export const accountPageSchema = pageSchema(accountSchema);
