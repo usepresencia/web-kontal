@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatMoney } from './money';
+import { formatAmount, formatMoney } from './money';
 
 describe('formatMoney', () => {
     it('formata centavos em reais', () => {
@@ -22,5 +22,21 @@ describe('formatMoney', () => {
 
     it.each(['', 'abc', '12.5', '1e3', ' 10', '--5'])('rejeita "%s"', value => {
         expect(() => formatMoney(value)).toThrow();
+    });
+});
+
+describe('formatAmount', () => {
+    it('formata o valor decimal que a api-kontal envia', () => {
+        expect(formatAmount('1234.50')).toBe('R$ 1.234,50');
+        expect(formatAmount('0.05')).toBe('R$ 0,05');
+        expect(formatAmount('-1234.56')).toBe('-R$ 1.234,56');
+    });
+
+    it('não perde precisão em valores grandes', () => {
+        expect(formatAmount('9999999999999999.99')).toBe('R$ 9.999.999.999.999.999,99');
+    });
+
+    it.each(['', '12', '12.5', '12.345', 'abc', '1,50', '--1.00'])('rejeita "%s"', value => {
+        expect(() => formatAmount(value)).toThrow();
     });
 });
