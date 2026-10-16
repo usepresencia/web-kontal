@@ -1,7 +1,7 @@
 import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
 import { meSchema, type Me } from '@/lib/api/schemas/session';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { cache } from 'react';
 import 'server-only';
 
@@ -19,3 +19,17 @@ export const requireSession = cache(async (): Promise<Me> => {
         throw error;
     }
 });
+
+const PLATFORM_ADMIN_ROLE = 'INTERNAL_ADMIN';
+
+/** Indica se o usuário é o administrador da plataforma (`INTERNAL_ADMIN`). */
+export function isPlatformAdmin(me: Pick<Me, 'platformRole'>): boolean {
+    return me.platformRole === PLATFORM_ADMIN_ROLE;
+}
+
+/** Exige o administrador da plataforma: para qualquer outro usuário a página responde 404. */
+export async function requirePlatformAdmin(): Promise<Me> {
+    const me = await requireSession();
+    if (!isPlatformAdmin(me)) notFound();
+    return me;
+}

@@ -7,7 +7,7 @@ import { LinkPending } from '@/lib/_components/link-pending';
 import { SidebarBody, useSidebar } from '@/lib/_components/ui/sidebar';
 import { cn } from '@/lib/_utils/cn';
 import type { Tenant } from '@/lib/api/schemas/tenant';
-import { NAV_SECTIONS, type NavItem } from '@/lib/navigation';
+import { type NavItem, visibleSections } from '@/lib/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, LogOut } from 'lucide-react';
 import Link from 'next/link';
@@ -112,9 +112,10 @@ function SidebarCompany({ companies, currentCompanyId }: CompanyProps) {
 
 function SidebarContent({
     userName,
+    isPlatformAdmin,
     companies,
     currentCompanyId,
-}: CompanyProps & { userName: string }) {
+}: CompanyProps & { userName: string; isPlatformAdmin: boolean }) {
     const showLabels = useShowLabels();
 
     return (
@@ -148,7 +149,7 @@ function SidebarContent({
                 </div>
 
                 <nav aria-label="Principal" className="mt-4 flex flex-col gap-4">
-                    {NAV_SECTIONS.map(section => (
+                    {visibleSections(isPlatformAdmin).map(section => (
                         <div key={section.title} className="flex flex-col gap-1">
                             {showLabels ? (
                                 <p className="text-sidebar-foreground/60 mb-1 px-2 text-[10px] font-semibold tracking-wider uppercase">
@@ -199,13 +200,15 @@ function SidebarContent({
 /** Menu lateral em grupos: recolhido em ícones no desktop, gaveta no mobile. */
 export function Sidebar({
     userName,
+    isPlatformAdmin,
     companies,
     currentCompanyId,
-}: CompanyProps & { userName: string }) {
+}: CompanyProps & { userName: string; isPlatformAdmin: boolean }) {
     return (
         <SidebarBody>
             <SidebarContent
                 userName={userName}
+                isPlatformAdmin={isPlatformAdmin}
                 companies={companies}
                 currentCompanyId={currentCompanyId}
             />

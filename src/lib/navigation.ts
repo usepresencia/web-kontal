@@ -3,6 +3,7 @@ import {
     ArrowUpCircle,
     BookOpen,
     BookPlus,
+    Building2,
     Coins,
     Home,
     Landmark,
@@ -13,13 +14,19 @@ import {
     Receipt,
     Repeat,
     Scale,
+    Store,
     Users,
     type LucideIcon,
 } from 'lucide-react';
 
 export type NavItem = { title: string; href: string; icon: LucideIcon };
 
-export type NavSection = { title: string; items: NavItem[] };
+export type NavSection = {
+    title: string;
+    items: NavItem[];
+    /** Seção só para o administrador da plataforma (`INTERNAL_ADMIN`). */
+    platformOnly?: boolean;
+};
 
 /** Menu lateral em grupos; cada tela de migração acrescenta o seu item na seção certa. */
 export const NAV_SECTIONS: NavSection[] = [
@@ -66,4 +73,18 @@ export const NAV_SECTIONS: NavSection[] = [
             { title: 'Plano de contas', href: '/cadastros/plano-de-contas', icon: ListTree },
         ],
     },
+    {
+        title: 'Configurações',
+        items: [{ title: 'Minha empresa', href: '/configuracoes/minha-empresa', icon: Store }],
+    },
+    {
+        title: 'Plataforma',
+        platformOnly: true,
+        items: [{ title: 'Empresas da plataforma', href: '/plataforma/empresas', icon: Building2 }],
+    },
 ];
+
+/** Seções do menu que o usuário pode ver: as da plataforma só aparecem ao administrador. */
+export function visibleSections(isPlatformAdmin: boolean): NavSection[] {
+    return NAV_SECTIONS.filter(section => isPlatformAdmin || !section.platformOnly);
+}

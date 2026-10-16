@@ -2,6 +2,7 @@
 
 import { getCurrentCompanyAction, updateCompanyAction } from '@/actions/companies';
 import { useBusyFlag } from '@/lib/_components/busy-provider';
+import { CompanyForm } from '@/lib/_components/company-form';
 import { Button } from '@/lib/_components/ui/button';
 import {
     Dialog,
@@ -14,7 +15,6 @@ import {
 } from '@/lib/_components/ui/dialog';
 import type { Company } from '@/lib/api/schemas/company';
 import { useEffect, useState } from 'react';
-import { CompanyForm } from './company-form';
 import { LogoUpload } from './logo-upload';
 
 /** Botão "Editar empresa atual": abre em modal o logo e os dados da empresa ativa, carregados ao abrir. */
