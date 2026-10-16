@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
         'coverage/**',
         // Código legado do Django, removido pelas tasks de migração (a última limpa o que sobrar).
         'src/app/pages/**',
+        'src/app/auth/**',
         'src/components/**',
         'src/services/**',
         'src/hooks/**',

@@ -1,4 +1,23 @@
+import type { Metadata } from 'next';
+import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
+
+const spaceGrotesk = Space_Grotesk({
+    subsets: ['latin'],
+    variable: '--font-space-grotesk',
+    display: 'swap',
+});
+
+const inter = Inter({
+    subsets: ['latin'],
+    variable: '--font-inter',
+    display: 'swap',
+});
+
+export const metadata: Metadata = {
+    title: 'Kontal',
+    description: 'Gestão financeira e contábil para pequenas empresas e escritórios.',
+};
 
 export default function RootLayout({
     children,
@@ -6,25 +25,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning>
-            <head>
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `
-              (function() {
-                try {
-                  const theme = localStorage.getItem('theme');
-                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
-                } catch (e) {}
-              })();
-            `,
-                    }}
-                />
-            </head>
+        <html lang="pt-BR" className={`${spaceGrotesk.variable} ${inter.variable}`}>
             <body className="bg-background text-foreground antialiased">{children}</body>
         </html>
     );
