@@ -21,14 +21,14 @@ const base = {
 
 describe('titleCreateSchema: contraparte e preset', () => {
     it('exige o cliente ou fornecedor', () => {
-        const { partyId: _partyId, ...withoutParty } = base;
+        const withoutParty = { ...base, partyId: undefined };
         expect(titleCreateSchema.safeParse(withoutParty).success).toBe(false);
         expect(titleCreateSchema.safeParse({ ...base, partyId: 'x' }).success).toBe(false);
     });
 
     it('aceita o preset vazio ou ausente, para valer o padrão da contraparte', () => {
         expect(titleCreateSchema.parse({ ...base, presetId: '' }).presetId).toBeUndefined();
-        const { presetId: _presetId, ...withoutPreset } = base;
+        const withoutPreset = { ...base, presetId: undefined };
         expect(titleCreateSchema.parse(withoutPreset).presetId).toBeUndefined();
         expect(titleCreateSchema.safeParse({ ...base, presetId: 'x' }).success).toBe(false);
     });
