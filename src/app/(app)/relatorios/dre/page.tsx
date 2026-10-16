@@ -1,17 +1,12 @@
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/lib/_components/ui/table';
+import { ReportPage } from '@/lib/_components/reports/report-page';
+import type { ReportSection } from '@/lib/_components/reports/report-types';
 import { parsePeriodParams } from '@/lib/_utils/dates';
 import { formatAmount } from '@/lib/_utils/money';
+import { formatDate } from '@/lib/_utils/title-labels';
 import { apiFetch } from '@/lib/api/client';
 import { dreSchema } from '@/lib/api/schemas/reports';
 import { ReportFilters } from '../_components/report-filters';
-import { TreeRows } from '../_components/tree-rows';
+import { periodLabel, treeToRows } from '../_components/report-rows';
 
 const LINE_LABELS: Record<string, string> = {
     grossRevenue: 'Receita bruta',
@@ -46,77 +41,54 @@ export default async function DrePage({
     const { start, end } = parsePeriodParams(await searchParams, new Date());
     const dre = await apiFetch(`/reports/dre?start=${start}&end=${end}`, dreSchema);
 
+    const sections: ReportSection[] = [
+        {
+            columns: [{ label: 'Linha' }, { label: 'Valor', align: 'right' }],
+            rows: Object.entries(LINE_LABELS).flatMap(([key, label]) =>
+                dre.lines[key] === undefined
+                    ? []
+                    : [
+                          {
+                              cells: [label, formatAmount(dre.lines[key])],
+                              kind: TOTAL_LINES.has(key) ? ('total' as const) : undefined,
+                          },
+                      ],
+            ),
+        },
+        {
+            title: 'Receitas por conta',
+            columns: [{ label: 'Conta' }, { label: 'Valor', align: 'right' }],
+            rows: treeToRows(dre.revenueTree),
+        },
+        {
+            title: 'Despesas por conta',
+            columns: [{ label: 'Conta' }, { label: 'Valor', align: 'right' }],
+            rows: treeToRows(dre.expenseTree),
+        },
+        ...(dre.unclassified.length > 0
+            ? [
+                  {
+                      title: 'Contas sem categoria de DRE',
+                      note: 'Estas contas têm movimento, mas não entram nas linhas acima até receberem categoria.',
+                      columns: [{ label: 'Conta' }, { label: 'Valor', align: 'right' as const }],
+                      rows: dre.unclassified.map(item => ({
+                          cells: [`${item.code} ${item.name}`, formatAmount(item.amount)],
+                      })),
+                  },
+              ]
+            : []),
+    ];
+
     return (
-        <div className="space-y-6">
-            <h1 className="text-2xl font-bold">DRE</h1>
-            <ReportFilters mode="period" start={start} end={end} />
-
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Linha</TableHead>
-                        <TableHead className="text-right">Valor</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {Object.entries(LINE_LABELS).map(([key, label]) =>
-                        dre.lines[key] === undefined ? null : (
-                            <TableRow
-                                key={key}
-                                className={TOTAL_LINES.has(key) ? 'bg-muted font-semibold' : ''}
-                            >
-                                <TableCell>{label}</TableCell>
-                                <TableCell className="text-right">
-                                    {formatAmount(dre.lines[key])}
-                                </TableCell>
-                            </TableRow>
-                        ),
-                    )}
-                </TableBody>
-            </Table>
-
-            <section className="space-y-2">
-                <h2 className="font-display text-lg font-semibold">Receitas por conta</h2>
-                <Table>
-                    <TableBody>
-                        <TreeRows nodes={dre.revenueTree} />
-                    </TableBody>
-                </Table>
-            </section>
-
-            <section className="space-y-2">
-                <h2 className="font-display text-lg font-semibold">Despesas por conta</h2>
-                <Table>
-                    <TableBody>
-                        <TreeRows nodes={dre.expenseTree} />
-                    </TableBody>
-                </Table>
-            </section>
-
-            {dre.unclassified.length > 0 && (
-                <section className="space-y-2">
-                    <h2 className="font-display text-lg font-semibold">
-                        Contas sem categoria de DRE
-                    </h2>
-                    <p className="text-muted-foreground text-sm">
-                        Estas contas têm movimento, mas não entram nas linhas acima até receberem
-                        categoria.
-                    </p>
-                    <Table>
-                        <TableBody>
-                            {dre.unclassified.map(item => (
-                                <TableRow key={item.accountId}>
-                                    <TableCell className="font-mono text-sm">{item.code}</TableCell>
-                                    <TableCell>{item.name}</TableCell>
-                                    <TableCell className="text-right">
-                                        {formatAmount(item.amount)}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </section>
-            )}
-        </div>
+        <ReportPage
+            subtitle="Receitas, custos e despesas do período, até o resultado líquido"
+            report={{
+                title: 'DRE',
+                period: periodLabel(start, end, formatDate),
+                filename: `dre-${start}-a-${end}`,
+                sections,
+            }}
+            filters={<ReportFilters mode="period" start={start} end={end} />}
+        />
     );
 }

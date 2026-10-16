@@ -33,7 +33,7 @@ export function ReportFilters({ mode, start, end, children }: ReportFiltersProps
                 />
             </FilterField>
             {children}
-            <FilterButton label="Gerar" />
+            <FilterButton />
         </FilterForm>
     );
 }
