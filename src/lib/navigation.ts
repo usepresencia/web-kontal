@@ -40,7 +40,7 @@ export const NAV_SECTIONS: NavSection[] = [
     {
         title: 'Contabilidade',
         items: [
-            { title: 'Lançamentos', href: '/contabilidade/lancamentos', icon: BookPlus },
+            { title: 'Lançamentos contábeis', href: '/contabilidade/lancamentos', icon: BookPlus },
             { title: 'Fechamento', href: '/contabilidade/fechamento', icon: Lock },
         ],
     },
