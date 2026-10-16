@@ -17,10 +17,15 @@ export default async function SeriesPage({
 
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Séries de títulos</h1>
+            <header>
+                <h1 className="text-2xl font-bold">Parcelamentos</h1>
+                <p className="text-muted-foreground text-sm">
+                    Gerencie seus parcelamentos e recorrências
+                </p>
+            </header>
             {series.items.length === 0 ? (
                 <EmptyState
-                    title="Nenhuma série"
+                    title="Nenhum parcelamento"
                     description="Parcelamentos e recorrências criados nos títulos aparecem aqui."
                 />
             ) : (

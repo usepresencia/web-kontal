@@ -73,6 +73,8 @@ export const seriesPageSchema = pageSchema(seriesSchema);
 
 export const seriesDetailSchema = seriesSchema.extend({ titles: z.array(titleSchema) });
 
+export type SeriesDetail = z.infer<typeof seriesDetailSchema>;
+
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida');
 
 const amount = z

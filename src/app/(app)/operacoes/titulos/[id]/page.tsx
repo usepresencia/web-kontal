@@ -54,11 +54,8 @@ export default async function TitlePage({ params }: { params: Promise<{ id: stri
                         <>
                             {' '}
                             ·{' '}
-                            <Link
-                                href={`/operacoes/series/${title.seriesId}`}
-                                className="underline"
-                            >
-                                ver série
+                            <Link href="/operacoes/series" className="underline">
+                                ver parcelamentos
                             </Link>
                         </>
                     )}

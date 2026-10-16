@@ -318,3 +318,18 @@ describe('getTitleAction', () => {
         expect(await getTitleAction(TITLE_ID)).toBeNull();
     });
 });
+
+describe('getSeriesAction', () => {
+    it('devolve o parcelamento pedido', async () => {
+        const { getSeriesAction } = await import('./titles');
+        apiFetch.mockResolvedValue({ id: TITLE_ID, titles: [] });
+        expect(await getSeriesAction(TITLE_ID)).toEqual({ id: TITLE_ID, titles: [] });
+        expect(apiFetch.mock.calls[0][0]).toBe(`/title-series/${TITLE_ID}`);
+    });
+
+    it('recusa identificador inválido sem consultar a API', async () => {
+        const { getSeriesAction } = await import('./titles');
+        expect(await getSeriesAction('x')).toBeNull();
+        expect(apiFetch).not.toHaveBeenCalled();
+    });
+});
