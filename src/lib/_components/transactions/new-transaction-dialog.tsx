@@ -2,9 +2,6 @@
 
 import { getOpenTitlesAction } from '@/actions/titles';
 import { useBusyFlag } from '@/lib/_components/busy-provider';
-import { PaymentStep } from '@/lib/_components/transactions/payment-step';
-import { StepTitle } from '@/lib/_components/transactions/step-title';
-import { TitlePicker } from '@/lib/_components/transactions/title-picker';
 import { Button } from '@/lib/_components/ui/button';
 import {
     Dialog,
@@ -19,6 +16,9 @@ import { entryLabels } from '@/lib/_utils/title-labels';
 import type { Title } from '@/lib/api/schemas/title';
 import { ArrowDownCircle, ArrowUpCircle, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { PaymentStep } from './payment-step';
+import { StepTitle } from './step-title';
+import { TitlePicker } from './title-picker';
 
 type TitleType = 'INCOME' | 'EXPENSE';
 
@@ -27,8 +27,17 @@ const TYPES: { type: TitleType; label: string; icon: typeof ArrowUpCircle }[] = 
     { type: 'INCOME', label: 'Contas a receber', icon: ArrowUpCircle },
 ];
 
-/** Botão "Nova transação": escolhe o tipo e o título em aberto e segue para o pagamento ou recebimento. */
-export function NewTransactionDialog() {
+/** Botão de nova baixa ("Nova transação" na home, "Nova baixa" na lista de baixas): escolhe o tipo e o título em aberto e segue para o pagamento ou recebimento. */
+type NewTransactionDialogProps = {
+    label?: string;
+    /** `accent` é a pílula verde da home; `default` é o botão escuro das listas (ex.: "Novo pagamento"). */
+    appearance?: 'accent' | 'default';
+};
+
+export function NewTransactionDialog({
+    label = 'Nova transação',
+    appearance = 'accent',
+}: NewTransactionDialogProps) {
     const [open, setOpen] = useState(false);
     const [type, setType] = useState<TitleType>('EXPENSE');
     const [titles, setTitles] = useState<Record<TitleType, Title[] | null>>({
@@ -61,9 +70,15 @@ export function NewTransactionDialog() {
     return (
         <Dialog open={open} onOpenChange={next => (next ? setOpen(true) : close())}>
             <DialogTrigger asChild>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 h-9 rounded-full px-4 font-semibold">
+                <Button
+                    className={
+                        appearance === 'accent'
+                            ? 'bg-accent text-accent-foreground hover:bg-accent/90 h-9 rounded-full px-4 font-semibold'
+                            : undefined
+                    }
+                >
                     <Plus aria-hidden="true" />
-                    Nova transação
+                    {label}
                 </Button>
             </DialogTrigger>
             <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto rounded-3xl p-6">
@@ -75,7 +90,7 @@ export function NewTransactionDialog() {
                     ) : (
                         <>
                             <DialogTitle className="font-display text-xl font-bold tracking-tight">
-                                Nova transação
+                                {label}
                             </DialogTitle>
                             <DialogDescription className="text-sm">
                                 Escolha o título que será pago ou recebido.

@@ -4,6 +4,7 @@ import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
 import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
 import { FilterForm } from '@/lib/_components/filter-form';
+import { NewTransactionDialog } from '@/lib/_components/transactions/new-transaction-dialog';
 import { parseIsoDate } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
 import { TITLE_TYPE_LABELS } from '@/lib/_utils/title-labels';
@@ -46,11 +47,14 @@ export default async function EntriesPage({
 
     return (
         <div className="space-y-6">
-            <header>
-                <h1 className="text-2xl font-bold">Baixas</h1>
-                <p className="text-muted-foreground text-sm">
-                    Acompanhe os pagamentos e recebimentos registrados
-                </p>
+            <header className="flex items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold">Baixas</h1>
+                    <p className="text-muted-foreground text-sm">
+                        Acompanhe os pagamentos e recebimentos registrados
+                    </p>
+                </div>
+                <NewTransactionDialog label="Nova baixa" appearance="default" />
             </header>
 
             <FilterForm className="flex flex-wrap items-end gap-3">
