@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { Pagination } from './pagination';
+import { PAGE_SIZE_OPTIONS, Pagination } from './pagination';
 
 const render = (page: number, total: number, pageSize = 10) =>
     renderToStaticMarkup(
@@ -10,17 +10,37 @@ const render = (page: number, total: number, pageSize = 10) =>
 describe('Pagination', () => {
     it('mostra só os botões de página, alinhados à direita', () => {
         const html = render(1, 9);
-        expect(html).toContain('justify-end');
         expect(html).toContain('aria-label="Página anterior"');
         expect(html).toContain('aria-label="Próxima página"');
         expect(html).toContain('aria-current="page"');
     });
 
-    it('não mostra o resumo "Mostrando" nem o seletor de itens por página', () => {
-        const html = render(1, 100);
-        expect(html).not.toContain('Mostrando');
-        expect(html).not.toContain('Itens por página');
-        expect(html).not.toContain('/ página');
+    it('não mostra o resumo "Mostrando"', () => {
+        expect(render(1, 100)).not.toContain('Mostrando');
+    });
+
+    it('não mostra o seletor de itens por página quando não há como trocá-lo', () => {
+        expect(render(1, 100)).not.toContain('/ página');
+        expect(render(1, 100)).toContain('justify-end');
+    });
+
+    it('mostra o seletor de itens por página à esquerda, antes dos botões', () => {
+        const html = renderToStaticMarkup(
+            <Pagination
+                page={1}
+                pageSize={25}
+                total={100}
+                onPageChange={() => undefined}
+                onPageSizeChange={() => undefined}
+            />,
+        );
+        expect(html).toContain('justify-between');
+        expect(html).toContain('25 / página');
+        expect(html.indexOf('25 / página')).toBeLessThan(html.indexOf('Página anterior'));
+    });
+
+    it('oferece 10, 25, 50 e 100 itens por página', () => {
+        expect(PAGE_SIZE_OPTIONS).toEqual([10, 25, 50, 100]);
     });
 
     it('desabilita o anterior na primeira página e o próximo na última', () => {
