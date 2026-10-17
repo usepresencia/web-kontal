@@ -24,17 +24,20 @@ describe('titleCreateSchema', () => {
         expect(parsed.repeat).toBe('NONE');
     });
 
-    it('lê a taxa com vírgula e recusa fora de 0 a 1', () => {
-        expect(
-            titleCreateSchema.parse({ ...base, feesPercentageMonthly: '0,02' })
-                .feesPercentageMonthly,
-        ).toBe(0.02);
-        expect(titleCreateSchema.safeParse({ ...base, feesPercentageMonthly: '2' }).success).toBe(
+    it('lê o juros como percentual inteiro de 0 a 100 e converte para fração', () => {
+        const fee = (value: string) =>
+            titleCreateSchema.parse({ ...base, feesPercentageMonthly: value })
+                .feesPercentageMonthly;
+        expect(fee('2')).toBe(0.02);
+        expect(fee('0')).toBe(0);
+        expect(fee('100')).toBe(1);
+        expect(fee('')).toBeUndefined();
+    });
+
+    it.each(['101', '-1', '2,5', '2.5', 'abc', '1e2'])('recusa o juros "%s"', value => {
+        expect(titleCreateSchema.safeParse({ ...base, feesPercentageMonthly: value }).success).toBe(
             false,
         );
-        expect(
-            titleCreateSchema.safeParse({ ...base, feesPercentageMonthly: '0,005' }).success,
-        ).toBe(false);
     });
 
     it('recusa valor inválido e data fora do formato', () => {
@@ -107,6 +110,17 @@ describe('titleCreateSchema (implantação e compra de ativo)', () => {
 
     it('trata isOpening ausente como falso', () => {
         expect(titleCreateSchema.parse(base).isOpening).toBe(false);
+    });
+});
+
+describe('titleUpdateSchema (juros)', () => {
+    it('converte o percentual inteiro em fração', () => {
+        const parsed = titleUpdateSchema.parse({
+            description: 'x',
+            expirationDate: '2026-11-10',
+            feesPercentageMonthly: '5',
+        });
+        expect(parsed.feesPercentageMonthly).toBe(0.05);
     });
 });
 

@@ -1,4 +1,5 @@
 import { toApiAmount } from '@/lib/_utils/money';
+import { percentToFraction } from '@/lib/_utils/percent';
 import { z } from 'zod';
 import { pageSchema } from './page';
 
@@ -90,18 +91,19 @@ const optionalDate = z
     .transform(value => (value ? value : undefined))
     .pipe(isoDate.optional());
 
+/** Juros mensais digitados como percentual inteiro (0 a 100) e enviados como fração (0 a 1). */
 const fees = z
     .string()
     .optional()
-    .transform(value => (value ? Number(value.replace(',', '.')) : undefined))
-    .pipe(
-        z
-            .number('Taxa inválida')
-            .min(0, 'Use um valor entre 0 e 1')
-            .max(1, 'Use um valor entre 0 e 1')
-            .refine(value => Math.round(value * 100) / 100 === value, 'Use até 2 casas decimais')
-            .optional(),
-    );
+    .transform((value, ctx) => {
+        if (!value || value.trim() === '') return undefined;
+        const fraction = percentToFraction(value);
+        if (fraction === null) {
+            ctx.addIssue({ code: 'custom', message: 'Use um número inteiro de 0 a 100' });
+            return z.NEVER;
+        }
+        return fraction;
+    });
 
 const description = z.string().trim().min(1, 'Obrigatório').max(255, 'Máximo de 255 caracteres');
 
