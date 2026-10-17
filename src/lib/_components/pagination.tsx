@@ -20,6 +20,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
             <Button
                 variant="outline"
                 size="icon"
+                className="size-8 [&_svg]:size-3.5"
                 aria-label="Página anterior"
                 disabled={page <= 1}
                 onClick={() => onPageChange(page - 1)}
@@ -37,6 +38,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
                         key={item}
                         variant={item === page ? 'default' : 'outline'}
                         size="icon"
+                        className={item === page ? 'size-10' : 'size-8 text-xs'}
                         aria-label={`Página ${item}`}
                         aria-current={item === page ? 'page' : undefined}
                         onClick={() => onPageChange(item)}
@@ -49,6 +51,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
             <Button
                 variant="outline"
                 size="icon"
+                className="size-8 [&_svg]:size-3.5"
                 aria-label="Próxima página"
                 disabled={page >= totalPages}
                 onClick={() => onPageChange(page + 1)}

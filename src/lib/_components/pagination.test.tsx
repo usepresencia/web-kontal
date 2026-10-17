@@ -31,4 +31,15 @@ describe('Pagination', () => {
             /aria-label="Próxima página"[^>]*disabled|disabled[^>]*aria-label="Próxima página"/,
         );
     });
+
+    it('deixa a página atual maior que as demais e que os botões de anterior e próxima', () => {
+        const html = render(2, 50);
+        const button = (label: string) =>
+            html.match(new RegExp(`<button[^>]*aria-label="${label}"[^>]*>`))?.[0] ?? '';
+        expect(button('Página 2')).toContain('size-10');
+        expect(button('Página 1')).toContain('size-8');
+        expect(button('Página 3')).toContain('size-8');
+        expect(button('Página anterior')).toContain('size-8');
+        expect(button('Próxima página')).toContain('size-8');
+    });
 });
