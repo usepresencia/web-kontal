@@ -39,8 +39,8 @@ export function Pagination({
             )}
         >
             {onPageSizeChange && (
-                <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground text-sm">{pageSizeLabel}</span>
+                <div className="flex flex-col gap-1">
+                    <span className="text-muted-foreground text-xs">{pageSizeLabel}</span>
                     <DropdownSelect
                         aria-label={pageSizeLabel.replace(/:$/, '')}
                         value={String(pageSize)}
