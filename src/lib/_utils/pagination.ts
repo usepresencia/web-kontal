@@ -42,3 +42,23 @@ export function buildPageWindow(page: number, totalPages: number): PageWindowIte
     });
     return result;
 }
+
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_PAGE_SIZE = 100;
+
+function positiveInt(value: string | string[] | undefined): number | null {
+    const raw = Array.isArray(value) ? value[0] : value;
+    return raw !== undefined && /^[1-9]\d*$/.test(raw) ? Number(raw) : null;
+}
+
+/** Lê `page` e `pageSize` da query da URL, com os mesmos limites da api-kontal (1 a 100 por página). */
+export function parsePageParams(query: Record<string, string | string[] | undefined>): {
+    page: number;
+    pageSize: number;
+} {
+    const pageSize = positiveInt(query.pageSize);
+    return {
+        page: positiveInt(query.page) ?? 1,
+        pageSize: pageSize !== null && pageSize <= MAX_PAGE_SIZE ? pageSize : DEFAULT_PAGE_SIZE,
+    };
+}
