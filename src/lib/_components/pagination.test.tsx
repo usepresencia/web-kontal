@@ -59,6 +59,39 @@ describe('Pagination', () => {
         expect(html).toContain('flex-col');
     });
 
+    it('alinha o rótulo ao recuo dos campos e iguala a largura do dropdown à dele', () => {
+        const html = renderToStaticMarkup(
+            <Pagination
+                page={1}
+                pageSize={10}
+                total={100}
+                onPageChange={() => undefined}
+                onPageSizeChange={() => undefined}
+                pageSizeLabel="Títulos por página:"
+            />,
+        );
+        const label = html.match(/<span[^>]*>Títulos por página:<\/span>/)?.[0] ?? '';
+        expect(label).toContain('pl-4');
+        expect(html).toContain('w-fit');
+    });
+
+    it('estiliza o dropdown com 40 px e fundo preto, como a página selecionada', () => {
+        const html = renderToStaticMarkup(
+            <Pagination
+                page={1}
+                pageSize={10}
+                total={100}
+                onPageChange={() => undefined}
+                onPageSizeChange={() => undefined}
+            />,
+        );
+        const trigger = html.match(/<button[^>]*aria-label="Itens por página"[^>]*>/)?.[0] ?? '';
+        expect(trigger).toContain('h-10');
+        expect(trigger).toContain('bg-primary');
+        expect(trigger).toContain('text-primary-foreground');
+        expect(trigger).toContain('w-full');
+    });
+
     it('usa "Itens por página:" quando nenhum rótulo é informado', () => {
         const html = renderToStaticMarkup(
             <Pagination
