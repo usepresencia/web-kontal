@@ -1,3 +1,4 @@
+import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { EmptyState } from '@/lib/_components/empty-state';
 import {
     Table,
@@ -46,24 +47,19 @@ export default async function AccountLedgerPage({
         <div className="space-y-6">
             <h1 className="text-2xl font-bold">Razão da conta</h1>
             <ReportFilters mode="period" start={start} end={end}>
-                <label className="space-y-1 text-sm">
+                <div className="space-y-1 text-sm">
                     <span className="text-muted-foreground">Conta</span>
-                    <select
+                    <DropdownSelect
                         name="accountId"
                         defaultValue={accountId.success ? accountId.data : ''}
-                        required
-                        className="border-input bg-background block h-10 max-w-xs rounded-md border px-3"
-                    >
-                        <option value="" disabled>
-                            Selecione
-                        </option>
-                        {options.map(account => (
-                            <option key={account.id} value={account.id}>
-                                {account.code} {account.name}
-                            </option>
-                        ))}
-                    </select>
-                </label>
+                        placeholder="Selecione"
+                        className="w-72"
+                        options={options.map(account => ({
+                            value: account.id,
+                            label: `${account.code} ${account.name}`,
+                        }))}
+                    />
+                </div>
             </ReportFilters>
 
             {!ledger ? (

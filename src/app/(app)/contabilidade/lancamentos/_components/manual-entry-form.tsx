@@ -1,6 +1,7 @@
 'use client';
 
 import { createManualEntryAction } from '@/actions/journal';
+import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { FormField } from '@/lib/_components/form-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { Button } from '@/lib/_components/ui/button';
@@ -77,19 +78,13 @@ export function ManualEntryForm({ accounts, today }: ManualEntryFormProps) {
                         key={line.key}
                         className="grid items-end gap-2 md:grid-cols-[2fr_1fr_1fr_2fr_auto]"
                     >
-                        <select
+                        <DropdownSelect
                             aria-label="Conta"
                             value={line.accountId}
-                            onChange={event => update(line.key, 'accountId', event.target.value)}
-                            className="border-input bg-background h-10 rounded-md border px-3 text-sm"
-                        >
-                            <option value="">Conta…</option>
-                            {accounts.map(account => (
-                                <option key={account.value} value={account.value}>
-                                    {account.label}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={value => update(line.key, 'accountId', value)}
+                            placeholder="Conta…"
+                            options={accounts}
+                        />
                         <Input
                             aria-label="Débito"
                             placeholder="Débito"
