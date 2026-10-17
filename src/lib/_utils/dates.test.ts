@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
     currentMonthRange,
+    daysAgoLabel,
     formatMonth,
+    monthAbbreviation,
     nextMonth,
     parseIsoDate,
     parsePeriodParams,
+    previousMonthRange,
 } from './dates';
 
 describe('currentMonthRange', () => {
@@ -83,5 +86,46 @@ describe('nextMonth', () => {
 describe('formatMonth', () => {
     it('converte YYYY-MM em MM/YYYY', () => {
         expect(formatMonth('2026-03')).toBe('03/2026');
+    });
+});
+
+describe('daysAgoLabel', () => {
+    const now = new Date(2026, 9, 15, 20, 0);
+
+    it.each([
+        ['2026-10-15T08:00:00.000Z', 'hoje'],
+        ['2026-10-14T23:00:00.000Z', 'ontem'],
+        ['2026-10-13T10:00:00.000Z', '2d atrás'],
+        ['2026-06-17T10:00:00.000Z', '120d atrás'],
+    ])('%s é "%s"', (iso, expected) => {
+        expect(daysAgoLabel(iso, now)).toBe(expected);
+    });
+
+    it('trata data futura como hoje', () => {
+        expect(daysAgoLabel('2026-11-01T00:00:00.000Z', now)).toBe('hoje');
+    });
+});
+
+describe('previousMonthRange', () => {
+    it('devolve o mês anterior', () => {
+        expect(previousMonthRange(new Date(2026, 9, 16))).toEqual({
+            start: '2026-09-01',
+            end: '2026-09-30',
+        });
+    });
+
+    it('vira o ano em janeiro', () => {
+        expect(previousMonthRange(new Date(2027, 0, 5))).toEqual({
+            start: '2026-12-01',
+            end: '2026-12-31',
+        });
+    });
+});
+
+describe('monthAbbreviation', () => {
+    it('abrevia o mês em minúsculas, a partir de 0', () => {
+        expect(monthAbbreviation(0)).toBe('jan');
+        expect(monthAbbreviation(8)).toBe('set');
+        expect(monthAbbreviation(11)).toBe('dez');
     });
 });
