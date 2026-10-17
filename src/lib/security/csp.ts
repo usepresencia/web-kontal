@@ -11,7 +11,8 @@ export function buildCsp({ nonce, isDev }: CspInput): string {
         "'strict-dynamic'",
         ...(isDev ? ["'unsafe-eval'"] : []),
     ];
-    const style = ["'self'", `'nonce-${nonce}'`, ...(isDev ? ["'unsafe-inline'"] : [])];
+    // Com nonce o navegador ignora 'unsafe-inline'; o modo dev injeta <style> sem nonce (indicador do Next).
+    const style = isDev ? ["'self'", "'unsafe-inline'"] : ["'self'", `'nonce-${nonce}'`];
 
     return [
         "default-src 'self'",
