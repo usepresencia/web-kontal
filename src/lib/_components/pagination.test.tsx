@@ -32,11 +32,27 @@ describe('Pagination', () => {
                 total={100}
                 onPageChange={() => undefined}
                 onPageSizeChange={() => undefined}
+                pageSizeLabel="Títulos por página:"
             />,
         );
         expect(html).toContain('justify-between');
-        expect(html).toContain('25 / página');
-        expect(html.indexOf('25 / página')).toBeLessThan(html.indexOf('Página anterior'));
+        expect(html).toContain('Títulos por página:');
+        expect(html).not.toContain('25 / página');
+        expect(html.indexOf('Títulos por página:')).toBeLessThan(html.indexOf('>25<'));
+        expect(html.indexOf('>25<')).toBeLessThan(html.indexOf('Página anterior'));
+    });
+
+    it('usa "Itens por página:" quando nenhum rótulo é informado', () => {
+        const html = renderToStaticMarkup(
+            <Pagination
+                page={1}
+                pageSize={10}
+                total={100}
+                onPageChange={() => undefined}
+                onPageSizeChange={() => undefined}
+            />,
+        );
+        expect(html).toContain('Itens por página:');
     });
 
     it('oferece 10, 25, 50 e 100 itens por página', () => {

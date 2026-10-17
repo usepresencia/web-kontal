@@ -77,6 +77,7 @@ export function PresetsTable({ page }: { page: Page<Preset> }) {
                 total={page.total}
                 onPageChange={pagination.onPageChange}
                 onPageSizeChange={pagination.onPageSizeChange}
+                pageSizeLabel="Presets por página:"
             />
 
             <ConfirmationDialog
