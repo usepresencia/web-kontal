@@ -34,3 +34,15 @@ export function parsePeriodParams(
     const end = parseIsoDate(query.end) ?? fallback.end;
     return start <= end ? { start, end } : { start: end, end: start };
 }
+
+/** Mês seguinte a um mês `YYYY-MM`, virando o ano em dezembro. */
+export function nextMonth(month: string): string {
+    const [year, number] = month.split('-').map(Number);
+    return number === 12 ? `${year + 1}-01` : `${year}-${pad(number + 1)}`;
+}
+
+/** Mês `YYYY-MM` no formato brasileiro `MM/YYYY`. */
+export function formatMonth(month: string): string {
+    const [year, number] = month.split('-');
+    return `${number}/${year}`;
+}

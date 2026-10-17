@@ -36,6 +36,16 @@ describe('presetCreateSchema', () => {
         ).toBe(false);
     });
 
+    it('aceita a conta de saldos iniciais e a trata como opcional', () => {
+        expect(presetCreateSchema.parse(valid).accounts.openingBalance).toBeNull();
+        expect(
+            presetCreateSchema.parse({
+                ...valid,
+                accounts: { ...valid.accounts, openingBalance: ID(5) },
+            }).accounts.openingBalance,
+        ).toBe(ID(5));
+    });
+
     it('trata isActive ausente como ativo e "false" como inativo', () => {
         expect(presetCreateSchema.parse({ ...valid, isActive: undefined }).isActive).toBe(true);
         expect(presetCreateSchema.parse({ ...valid, isActive: 'false' }).isActive).toBe(false);

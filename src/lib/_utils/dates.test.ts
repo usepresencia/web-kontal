@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { currentMonthRange, parseIsoDate, parsePeriodParams } from './dates';
+import {
+    currentMonthRange,
+    formatMonth,
+    nextMonth,
+    parseIsoDate,
+    parsePeriodParams,
+} from './dates';
 
 describe('currentMonthRange', () => {
     it('devolve o primeiro e o último dia do mês', () => {
@@ -61,5 +67,21 @@ describe('parseIsoDate', () => {
         expect(parseIsoDate('2027-02-29')).toBeNull();
         expect(parseIsoDate(undefined)).toBeNull();
         expect(parseIsoDate(['2026-01-01'])).toBe('2026-01-01');
+    });
+});
+
+describe('nextMonth', () => {
+    it.each([
+        ['2026-10', '2026-11'],
+        ['2026-12', '2027-01'],
+        ['2028-02', '2028-03'],
+    ])('o mês depois de %s é %s', (month, expected) => {
+        expect(nextMonth(month)).toBe(expected);
+    });
+});
+
+describe('formatMonth', () => {
+    it('converte YYYY-MM em MM/YYYY', () => {
+        expect(formatMonth('2026-03')).toBe('03/2026');
     });
 });

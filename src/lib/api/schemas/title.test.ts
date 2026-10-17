@@ -64,6 +64,52 @@ describe('titleCreateSchema', () => {
     });
 });
 
+describe('titleCreateSchema (implantação e compra de ativo)', () => {
+    const ACCOUNT = '3f1c2b4e-5a6d-4e7f-8a9b-0c1d2e3f4a77';
+
+    it('aceita a conta de destino e a ignora quando vazia', () => {
+        expect(
+            titleCreateSchema.parse({ ...base, destinationAccountId: ACCOUNT })
+                .destinationAccountId,
+        ).toBe(ACCOUNT);
+        expect(
+            titleCreateSchema.parse({ ...base, destinationAccountId: '' }).destinationAccountId,
+        ).toBeUndefined();
+        expect(titleCreateSchema.safeParse({ ...base, destinationAccountId: 'x' }).success).toBe(
+            false,
+        );
+    });
+
+    it('exige a data de implantação quando o título é de implantação', () => {
+        expect(titleCreateSchema.safeParse({ ...base, isOpening: 'true' }).success).toBe(false);
+        const ok = titleCreateSchema.parse({
+            ...base,
+            isOpening: 'true',
+            openingDate: '2026-01-01',
+            settledAmount: '100,00',
+        });
+        expect(ok.isOpening).toBe(true);
+        expect(ok.settledAmount).toBe('100.00');
+    });
+
+    it('recusa implantação combinada com repetição', () => {
+        expect(
+            titleCreateSchema.safeParse({
+                ...base,
+                isOpening: 'true',
+                openingDate: '2026-01-01',
+                repeat: 'INSTALLMENT',
+                frequency: 'MONTHLY',
+                count: '2',
+            }).success,
+        ).toBe(false);
+    });
+
+    it('trata isOpening ausente como falso', () => {
+        expect(titleCreateSchema.parse(base).isOpening).toBe(false);
+    });
+});
+
 describe('titleUpdateSchema', () => {
     it('exige descrição e vencimento', () => {
         expect(

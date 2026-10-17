@@ -36,6 +36,7 @@ describe('accountCreateSchema', () => {
             nature: undefined,
             dreCategory: null,
             balanceCategory: 'CURRENT_ASSET',
+            costBehavior: null,
         });
     });
 
@@ -57,6 +58,25 @@ describe('accountCreateSchema', () => {
                 accountType: 'ANALYTIC',
             }).success,
         ).toBe(false);
+    });
+});
+
+describe('costBehavior', () => {
+    it('é opcional e vazio vira nulo na criação e na edição', () => {
+        const create = accountCreateSchema.parse({
+            billingPlanId: PLAN_ID,
+            name: 'Frete',
+            accountType: 'ANALYTIC',
+            costBehavior: '',
+        });
+        expect(create.costBehavior).toBeNull();
+        const update = accountUpdateSchema.parse({
+            name: 'Frete',
+            accountType: 'ANALYTIC',
+            isActive: 'true',
+            costBehavior: 'VARIABLE',
+        });
+        expect(update.costBehavior).toBe('VARIABLE');
     });
 });
 

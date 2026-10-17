@@ -27,11 +27,15 @@ export async function createTitleAction(_prev: FormState, formData: FormData): P
     const parsed = titleCreateSchema.safeParse(formDataToObject(formData));
     if (!parsed.success) return stateFromZodError(parsed.error);
 
-    const { repeat, frequency, count, until, ...title } = parsed.data;
+    const { repeat, frequency, count, until, isOpening, openingDate, settledAmount, ...title } =
+        parsed.data;
     let destination: string = LIST_PATHS[title.type];
     try {
         if (repeat === 'NONE') {
-            await apiFetch('/titles', titleSchema, { method: 'POST', body: title });
+            await apiFetch('/titles', titleSchema, {
+                method: 'POST',
+                body: isOpening ? { ...title, isOpening, openingDate, settledAmount } : title,
+            });
         } else {
             const series = await apiFetch('/title-series', seriesDetailSchema, {
                 method: 'POST',

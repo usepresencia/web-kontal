@@ -141,3 +141,68 @@ export const accountLedgerSchema = z.object({
     pageSize: z.number(),
     total: z.number(),
 });
+
+const flowSchema = z.object({ inflows: z.string(), outflows: z.string(), net: z.string() });
+
+export const cashFlowSchema = z.object({
+    start: z.string(),
+    end: z.string(),
+    totals: flowSchema,
+    accounts: z.array(
+        flowSchema.extend({ accountId: z.string(), code: z.string(), name: z.string() }),
+    ),
+    months: z.array(flowSchema.extend({ month: z.string() })).optional(),
+    days: z
+        .array(
+            flowSchema.extend({
+                date: z.string(),
+                payments: z.array(
+                    z.object({
+                        entryId: z.string(),
+                        titleId: z.string(),
+                        titleDescription: z.string().nullable(),
+                        type: z.string(),
+                        accountCode: z.string().nullable(),
+                        accountName: z.string().nullable(),
+                        paymentMethod: z.string().nullable(),
+                        amount: z.string(),
+                    }),
+                ),
+            }),
+        )
+        .optional(),
+});
+
+export const managementDreSchema = z.object({
+    start: z.string(),
+    end: z.string(),
+    lines: z.record(z.string(), z.string()),
+    contributionMarginPercent: z.string().nullable(),
+    unclassified: z.array(
+        z.object({ accountId: z.string(), code: z.string(), name: z.string(), amount: z.string() }),
+    ),
+    months: z
+        .array(
+            z.object({
+                month: z.string(),
+                netRevenue: z.string(),
+                contributionMargin: z.string(),
+                operatingResult: z.string(),
+                netResult: z.string(),
+            }),
+        )
+        .optional(),
+});
+
+export const periodClosingsSchema = z.object({
+    closedThrough: z.string().nullable(),
+    items: z.array(
+        z.object({
+            id: z.string(),
+            month: z.string(),
+            throughDate: z.string(),
+            closingEntryId: z.string().nullable(),
+            createdAt: z.string(),
+        }),
+    ),
+});
