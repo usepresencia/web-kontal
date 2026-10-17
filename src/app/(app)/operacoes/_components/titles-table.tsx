@@ -25,7 +25,6 @@ export function TitlesTable({ rows, page }: TitlesTableProps) {
                 pageSize={page.pageSize}
                 total={page.total}
                 onPageChange={pagination.onPageChange}
-                onPageSizeChange={pagination.onPageSizeChange}
             />
         </section>
     );

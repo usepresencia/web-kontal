@@ -13,16 +13,6 @@ export function pageCount(total: number, pageSize: number): number {
     return Math.max(1, Math.ceil(total / pageSize));
 }
 
-/** Intervalo de itens exibido na página atual (0 e 0 quando não há itens). */
-export function pageRange(
-    page: number,
-    pageSize: number,
-    total: number,
-): { from: number; to: number } {
-    if (total === 0) return { from: 0, to: 0 };
-    return { from: (page - 1) * pageSize + 1, to: Math.min(page * pageSize, total) };
-}
-
 /** Monta a janela de páginas a exibir: primeira, última, vizinhas da atual e lacunas. */
 export function buildPageWindow(page: number, totalPages: number): PageWindowItem[] {
     if (totalPages < 1) return [];

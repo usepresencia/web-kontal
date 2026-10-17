@@ -83,7 +83,6 @@ export function CompaniesTable({ page }: { page: Page<Company> }) {
                 pageSize={page.pageSize}
                 total={page.total}
                 onPageChange={pagination.onPageChange}
-                onPageSizeChange={pagination.onPageSizeChange}
             />
 
             <ConfirmationDialog
