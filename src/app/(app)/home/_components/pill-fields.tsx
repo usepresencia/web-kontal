@@ -1,0 +1,104 @@
+'use client';
+
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/lib/_components/ui/select';
+import { cn } from '@/lib/_utils/cn';
+import type { ComponentProps } from 'react';
+
+export const PILL_CLASS =
+    'bg-background border-border h-10 rounded-full border px-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring';
+
+const NONE = '__none__';
+
+export function FieldError({ errors }: { errors?: string[] }) {
+    if (!errors) return null;
+    return (
+        <p role="alert" className="text-negative mt-1 text-xs">
+            {errors.join(' ')}
+        </p>
+    );
+}
+
+type PillFieldProps = ComponentProps<'input'> & { label: string; errors?: string[] };
+
+/** Campo de texto em pílula com rótulo pequeno e mensagem de erro. */
+export function PillInput({ label, errors, className, id, name, ...props }: PillFieldProps) {
+    const fieldId = id ?? name;
+    return (
+        <div className="min-w-0">
+            <label
+                htmlFor={fieldId}
+                className="text-muted-foreground mb-1 block text-xs font-medium"
+            >
+                {label}
+            </label>
+            <input
+                id={fieldId}
+                name={name}
+                aria-invalid={errors ? true : undefined}
+                className={cn(PILL_CLASS, 'w-full', className)}
+                {...props}
+            />
+            <FieldError errors={errors} />
+        </div>
+    );
+}
+
+type PillSelectProps = {
+    label: string;
+    name: string;
+    value: string;
+    onChange: (value: string) => void;
+    options: { value: string; label: string }[];
+    placeholder?: string;
+    /** Permite escolher "Nenhum" (valor vazio). */
+    allowEmpty?: boolean;
+    /** Texto da opção vazia (padrão "Nenhum"). */
+    emptyLabel?: string;
+    errors?: string[];
+};
+
+/** Seleção em pílula que envia o valor no formulário por um campo oculto. */
+export function PillSelect({
+    label,
+    name,
+    value,
+    onChange,
+    options,
+    placeholder = 'Selecione',
+    allowEmpty = false,
+    emptyLabel = 'Nenhum',
+    errors,
+}: PillSelectProps) {
+    return (
+        <div className="min-w-0">
+            <span className="text-muted-foreground mb-1 block text-xs font-medium">{label}</span>
+            <input type="hidden" name={name} value={value} />
+            <Select
+                value={value === '' && allowEmpty ? NONE : value}
+                onValueChange={next => onChange(next === NONE ? '' : next)}
+            >
+                <SelectTrigger
+                    aria-label={label}
+                    className={cn(PILL_CLASS, 'w-full justify-between')}
+                >
+                    <SelectValue placeholder={placeholder} />
+                </SelectTrigger>
+                <SelectContent>
+                    {allowEmpty && <SelectItem value={NONE}>{emptyLabel}</SelectItem>}
+                    {options.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            <FieldError errors={errors} />
+        </div>
+    );
+}
