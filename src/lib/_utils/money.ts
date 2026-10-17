@@ -24,3 +24,38 @@ export function formatAmount(amount: string): string {
     const [, sign, integer, fraction] = match;
     return formatMoney(`${sign}${integer}${fraction}`);
 }
+
+const MAX_INTEGER_DIGITS = 10;
+
+/**
+ * Converte o valor digitado ("1.234,50", "R$ 10", "1234.5") no formato da api-kontal ("1234.50").
+ * Devolve null quando o texto não é um valor positivo com até 2 casas decimais.
+ */
+export function toApiAmount(input: string): string | null {
+    const cleaned = input.replace(/R\$/g, '').replace(/\s/g, '');
+    if (cleaned === '') return null;
+
+    let integer: string;
+    let fraction = '';
+    if (cleaned.includes(',')) {
+        const parts = cleaned.split(',');
+        if (parts.length !== 2) return null;
+        integer = parts[0].replace(/\./g, '');
+        fraction = parts[1];
+    } else {
+        const dots = cleaned.split('.');
+        if (dots.length === 1) {
+            integer = cleaned;
+        } else if (dots.length === 2 && dots[1].length <= 2) {
+            [integer, fraction] = dots;
+        } else if (dots.slice(1).every(group => group.length === 3)) {
+            integer = dots.join('');
+        } else {
+            return null;
+        }
+    }
+
+    if (!/^\d+$/.test(integer) || !/^\d{0,2}$/.test(fraction)) return null;
+    if (integer.replace(/^0+(?=\d)/, '').length > MAX_INTEGER_DIGITS) return null;
+    return `${integer.replace(/^0+(?=\d)/, '')}.${fraction.padEnd(2, '0')}`;
+}

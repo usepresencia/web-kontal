@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatAmount, formatMoney } from './money';
+import { formatAmount, formatMoney, toApiAmount } from './money';
 
 describe('formatMoney', () => {
     it('formata centavos em reais', () => {
@@ -39,4 +39,28 @@ describe('formatAmount', () => {
     it.each(['', '12', '12.5', '12.345', 'abc', '1,50', '--1.00'])('rejeita "%s"', value => {
         expect(() => formatAmount(value)).toThrow();
     });
+});
+
+describe('toApiAmount', () => {
+    it.each([
+        ['1234.50', '1234.50'],
+        ['1234,5', '1234.50'],
+        ['1.234,50', '1234.50'],
+        ['R$ 1.234,50', '1234.50'],
+        ['  10  ', '10.00'],
+        ['0,05', '0.05'],
+        ['0.5', '0.50'],
+        ['1.000', '1000.00'],
+        ['1.234.567,89', '1234567.89'],
+        ['9999999999.99', '9999999999.99'],
+    ])('converte "%s" em "%s"', (input, expected) => {
+        expect(toApiAmount(input)).toBe(expected);
+    });
+
+    it.each(['', 'abc', '-5', '1,234', '1.2.3', '10,5,5', '12345678901', '1e3', 'R$', ',50'])(
+        'recusa "%s"',
+        input => {
+            expect(toApiAmount(input)).toBeNull();
+        },
+    );
 });
