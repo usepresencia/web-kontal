@@ -5,7 +5,7 @@ import { SelectField } from '@/lib/_components/select-field';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import { SERIES_FREQUENCY_LABELS, SERIES_KIND_LABELS } from '@/lib/_utils/title-labels';
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 
 type TitleFormProps = {
     action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -13,21 +13,36 @@ type TitleFormProps = {
     presets: { value: string; label: string }[];
     /** Contas de ativo ou despesa para a compra de ativo (só em título a pagar). */
     destinationAccounts?: { value: string; label: string }[];
+    /** Quando é a home, o cadastro não navega: devolve ok e o chamador fecha o modal. */
+    returnTo?: '/home';
+    onSuccess?: () => void;
 };
 
 const toOptions = (labels: Record<string, string>) =>
     Object.entries(labels).map(([value, label]) => ({ value, label }));
 
 /** Formulário de título, com opção de parcelamento ou recorrência. */
-export function TitleForm({ action, type, presets, destinationAccounts = [] }: TitleFormProps) {
+export function TitleForm({
+    action,
+    type,
+    presets,
+    destinationAccounts = [],
+    returnTo,
+    onSuccess,
+}: TitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
     const [repeat, setRepeat] = useState('NONE');
     const [isOpening, setIsOpening] = useState(false);
     const errors = (field: string) => state.fieldErrors?.[field];
 
+    useEffect(() => {
+        if (state.ok) onSuccess?.();
+    }, [state, onSuccess]);
+
     return (
         <form action={formAction} className="space-y-6">
             <input type="hidden" name="type" value={type} />
+            {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
 
             <div className="grid gap-4 md:grid-cols-2">
                 <SelectField

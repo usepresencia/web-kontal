@@ -38,3 +38,98 @@ describe('getTitleEntriesAction', () => {
         expect(await getTitleEntriesAction(TITLE_ID)).toEqual([]);
     });
 });
+
+describe('createTitleAction com retorno à home', () => {
+    const createTitleAction = import('./titles').then(module => module.createTitleAction);
+
+    function form(extra: Record<string, string> = {}) {
+        const data = new FormData();
+        Object.entries({
+            presetId: TITLE_ID,
+            type: 'EXPENSE',
+            description: 'Aluguel',
+            amount: '100,00',
+            expirationDate: '2026-11-10',
+            ...extra,
+        }).forEach(([key, value]) => data.append(key, value));
+        return data;
+    }
+
+    it('devolve ok sem redirecionar quando o retorno é a home', async () => {
+        apiFetch.mockResolvedValue({ id: 't1' });
+        const result = await (await createTitleAction)({ ok: false }, form({ returnTo: '/home' }));
+        expect(result).toMatchObject({ ok: true });
+    });
+
+    it('redireciona à lista do tipo quando não há retorno', async () => {
+        apiFetch.mockResolvedValue({ id: 't1' });
+        await expect((await createTitleAction)({ ok: false }, form())).rejects.toThrow(
+            'REDIRECT:/operacoes/pagar',
+        );
+    });
+
+    it('ignora um retorno que não seja a home (open redirect)', async () => {
+        apiFetch.mockResolvedValue({ id: 't1' });
+        await expect(
+            (await createTitleAction)({ ok: false }, form({ returnTo: 'https://evil.com' })),
+        ).rejects.toThrow('REDIRECT:/operacoes/pagar');
+    });
+});
+
+describe('getTitleFormOptionsAction', () => {
+    it('devolve só os presets e as contas de destino de um título a pagar', async () => {
+        const { getTitleFormOptionsAction } = await import('./titles');
+        apiFetch
+            .mockResolvedValueOnce({ items: [{ id: 'p1', name: 'Padrão' }] })
+            .mockResolvedValueOnce({
+                items: [
+                    {
+                        id: 'a1',
+                        code: '1.1',
+                        name: 'Caixa',
+                        accountType: 'ANALYTIC',
+                        isActive: true,
+                        nature: 'ASSET',
+                    },
+                    {
+                        id: 'a2',
+                        code: '2.1',
+                        name: 'Fornecedores',
+                        accountType: 'ANALYTIC',
+                        isActive: true,
+                        nature: 'LIABILITY',
+                    },
+                    {
+                        id: 'a3',
+                        code: '3',
+                        name: 'Sintética',
+                        accountType: 'SYNTHETIC',
+                        isActive: true,
+                        nature: 'EXPENSE',
+                    },
+                ],
+            });
+        expect(await getTitleFormOptionsAction('EXPENSE')).toEqual({
+            presets: [{ value: 'p1', label: 'Padrão' }],
+            destinationAccounts: [{ value: 'a1', label: '1.1 Caixa' }],
+        });
+    });
+
+    it('não busca contas de destino em título a receber', async () => {
+        const { getTitleFormOptionsAction } = await import('./titles');
+        apiFetch.mockResolvedValueOnce({ items: [{ id: 'p1', name: 'Padrão' }] });
+        const result = await getTitleFormOptionsAction('INCOME');
+        expect(result.destinationAccounts).toEqual([]);
+        expect(apiFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('devolve vazio para um tipo inválido sem consultar a API', async () => {
+        const { getTitleFormOptionsAction } = await import('./titles');
+        // @ts-expect-error tipo inválido de propósito
+        expect(await getTitleFormOptionsAction('X')).toEqual({
+            presets: [],
+            destinationAccounts: [],
+        });
+        expect(apiFetch).not.toHaveBeenCalled();
+    });
+});
