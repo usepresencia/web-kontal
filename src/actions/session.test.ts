@@ -27,7 +27,8 @@ vi.mock('next/navigation', () => ({
     },
 }));
 
-const { createSessionAction, selectCompanyAction, logoutAction } = await import('./session');
+const { createSessionAction, selectCompanyAction, switchCompanyAction, logoutAction } =
+    await import('./session');
 
 beforeEach(() => {
     vi.clearAllMocks();
@@ -86,6 +87,27 @@ describe('selectCompanyAction', () => {
         expect(await selectCompanyAction('')).toEqual({ ok: false });
         expect(await selectCompanyAction('x'.repeat(200))).toEqual({ ok: false });
         expect(apiFetch).not.toHaveBeenCalled();
+    });
+});
+
+describe('switchCompanyAction', () => {
+    const tenants = [
+        { companyId: 'c1', name: 'A', role: 'OWNER', isActive: true },
+        { companyId: 'c2', name: 'B', role: 'OWNER', isActive: false },
+    ];
+
+    it('grava a empresa sem redirecionar, para a tela atual recarregar', async () => {
+        apiFetch.mockResolvedValue(tenants);
+        expect(await switchCompanyAction('c1')).toEqual({ ok: true });
+        expect(writeTenantId).toHaveBeenCalledWith('c1');
+    });
+
+    it('recusa empresa fora da lista, inativa ou malformada', async () => {
+        apiFetch.mockResolvedValue(tenants);
+        expect(await switchCompanyAction('outra')).toEqual({ ok: false });
+        expect(await switchCompanyAction('c2')).toEqual({ ok: false });
+        expect(await switchCompanyAction('')).toEqual({ ok: false });
+        expect(writeTenantId).not.toHaveBeenCalled();
     });
 });
 
