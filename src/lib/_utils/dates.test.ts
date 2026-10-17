@@ -8,6 +8,7 @@ import {
     parseIsoDate,
     parsePeriodParams,
     previousMonthRange,
+    toLocalIsoDate,
 } from './dates';
 
 describe('currentMonthRange', () => {
@@ -127,5 +128,13 @@ describe('monthAbbreviation', () => {
         expect(monthAbbreviation(0)).toBe('jan');
         expect(monthAbbreviation(8)).toBe('set');
         expect(monthAbbreviation(11)).toBe('dez');
+    });
+});
+
+describe('toLocalIsoDate', () => {
+    it('usa o dia local, não o UTC', () => {
+        // 23:30 locais: em UTC já seria o dia seguinte em fusos a oeste de Greenwich.
+        expect(toLocalIsoDate(new Date(2026, 9, 16, 23, 30))).toBe('2026-10-16');
+        expect(toLocalIsoDate(new Date(2026, 0, 5, 0, 10))).toBe('2026-01-05');
     });
 });
