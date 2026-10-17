@@ -1,6 +1,7 @@
 'use client';
 
 import { FormField } from '@/lib/_components/form-field';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { Button } from '@/lib/_components/ui/button';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import type { BillingPlan } from '@/lib/api/schemas/billing';
@@ -18,6 +19,7 @@ export function PlanForm({ action, plan, submitLabel }: PlanFormProps) {
 
     return (
         <form action={formAction} className="max-w-xl space-y-4">
+            <FormPendingOverlay message="Salvando plano…" />
             <FormField
                 label="Nome"
                 name="name"

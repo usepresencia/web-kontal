@@ -1,6 +1,9 @@
 'use client';
 
 import { logoutAction, switchCompanyAction } from '@/actions/session';
+import { useBusyFlag } from '@/lib/_components/busy-provider';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
+import { LinkPending } from '@/lib/_components/link-pending';
 import { SidebarBody, useSidebar } from '@/lib/_components/ui/sidebar';
 import { cn } from '@/lib/_utils/cn';
 import type { Tenant } from '@/lib/api/schemas/tenant';
@@ -35,6 +38,7 @@ function NavLinkButton({ title, href, icon: Icon }: NavItem) {
                     : 'text-sidebar-foreground hover:bg-sidebar-muted',
             )}
         >
+            <LinkPending />
             <Icon className="size-5 shrink-0" aria-hidden="true" />
             {showLabels && <span className="text-sm whitespace-nowrap">{title}</span>}
         </Link>
@@ -48,6 +52,7 @@ function SidebarCompany({ companies, currentCompanyId }: CompanyProps) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [pending, startTransition] = useTransition();
+    useBusyFlag(pending, 'Trocando de empresa…');
 
     const current = companies.find(company => company.companyId === currentCompanyId);
     const others = companies.filter(company => company.companyId !== currentCompanyId);
@@ -174,6 +179,7 @@ function SidebarContent({
                                 {userName}
                             </p>
                             <form action={logoutAction}>
+                                <FormPendingOverlay message="Saindo…" />
                                 <button
                                     type="submit"
                                     className="text-sidebar-foreground/70 hover:text-sidebar-foreground shrink-0"

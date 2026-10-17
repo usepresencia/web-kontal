@@ -2,6 +2,7 @@
 
 import { createManualEntryAction } from '@/actions/journal';
 import { FormField } from '@/lib/_components/form-field';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { Button } from '@/lib/_components/ui/button';
 import { Input } from '@/lib/_components/ui/input';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
@@ -49,6 +50,7 @@ export function ManualEntryForm({ accounts, today }: ManualEntryFormProps) {
 
     return (
         <form action={formAction} className="space-y-6">
+            <FormPendingOverlay message="Lançando…" />
             <input type="hidden" name="linesJson" value={linesJson} />
 
             <div className="grid max-w-2xl gap-4 md:grid-cols-2">

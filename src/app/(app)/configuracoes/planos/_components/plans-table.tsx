@@ -1,6 +1,7 @@
 'use client';
 
 import { deletePlanAction } from '@/actions/billing';
+import { useBusyRun } from '@/lib/_components/busy-provider';
 import { Pagination } from '@/lib/_components/pagination';
 import { Button } from '@/lib/_components/ui/button';
 import { ConfirmationDialog } from '@/lib/_components/ui/confirmation-dialog';
@@ -20,6 +21,7 @@ import { useState } from 'react';
 
 /** Lista paginada de planos de contas. */
 export function PlansTable({ page }: { page: Page<BillingPlan> }) {
+    const run = useBusyRun();
     const pagination = usePaginationQuery();
     const [toDelete, setToDelete] = useState<BillingPlan | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -77,7 +79,10 @@ export function PlansTable({ page }: { page: Page<BillingPlan> }) {
                 variant="destructive"
                 onConfirm={async () => {
                     if (!toDelete) return;
-                    const result = await deletePlanAction(toDelete.id);
+                    const result = await run(
+                        () => deletePlanAction(toDelete.id),
+                        'Excluindo plano…',
+                    );
                     setError(result.ok ? null : (result.message ?? 'Não foi possível excluir.'));
                     setToDelete(null);
                 }}

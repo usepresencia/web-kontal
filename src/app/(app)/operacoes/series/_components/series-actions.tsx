@@ -1,7 +1,9 @@
 'use client';
 
 import { cancelSeriesAction, extendSeriesAction } from '@/actions/titles';
+import { useBusyRun } from '@/lib/_components/busy-provider';
 import { FormField } from '@/lib/_components/form-field';
+import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { Button } from '@/lib/_components/ui/button';
 import { ConfirmationDialog } from '@/lib/_components/ui/confirmation-dialog';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
@@ -16,6 +18,7 @@ export function ExtendSeriesForm({ seriesId }: { seriesId: string }) {
 
     return (
         <form action={formAction} className="space-y-4">
+            <FormPendingOverlay message="Estendendo série…" />
             <h2 className="font-display text-lg font-semibold">Estender série</h2>
             <div className="grid gap-4 md:grid-cols-2">
                 <FormField
@@ -49,6 +52,7 @@ export function ExtendSeriesForm({ seriesId }: { seriesId: string }) {
 
 /** Cancelamento da série, com confirmação. */
 export function CancelSeriesButton({ seriesId }: { seriesId: string }) {
+    const run = useBusyRun();
     const [open, setOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -70,7 +74,10 @@ export function CancelSeriesButton({ seriesId }: { seriesId: string }) {
                 confirmLabel="Cancelar série"
                 variant="destructive"
                 onConfirm={async () => {
-                    const result = await cancelSeriesAction(seriesId);
+                    const result = await run(
+                        () => cancelSeriesAction(seriesId),
+                        'Cancelando série…',
+                    );
                     if (result && !result.ok)
                         setError(result.message ?? 'Não foi possível cancelar.');
                     setOpen(false);

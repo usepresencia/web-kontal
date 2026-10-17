@@ -1,6 +1,7 @@
 'use client';
 
 import { deletePresetAction } from '@/actions/presets';
+import { useBusyRun } from '@/lib/_components/busy-provider';
 import { Pagination } from '@/lib/_components/pagination';
 import { Badge } from '@/lib/_components/ui/badge';
 import { Button } from '@/lib/_components/ui/button';
@@ -21,6 +22,7 @@ import { useState } from 'react';
 
 /** Lista paginada de presets. */
 export function PresetsTable({ page }: { page: Page<Preset> }) {
+    const run = useBusyRun();
     const pagination = usePaginationQuery();
     const [toDelete, setToDelete] = useState<Preset | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -86,7 +88,10 @@ export function PresetsTable({ page }: { page: Page<Preset> }) {
                 variant="destructive"
                 onConfirm={async () => {
                     if (!toDelete) return;
-                    const result = await deletePresetAction(toDelete.id);
+                    const result = await run(
+                        () => deletePresetAction(toDelete.id),
+                        'Excluindo preset…',
+                    );
                     setError(result.ok ? null : (result.message ?? 'Não foi possível excluir.'));
                     setToDelete(null);
                 }}
