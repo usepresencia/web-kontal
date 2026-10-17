@@ -1,7 +1,8 @@
 import { EmptyState } from '@/lib/_components/empty-state';
 import { Button } from '@/lib/_components/ui/button';
+import { daysAgoLabel } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
-import { TITLE_STATUS_LABELS } from '@/lib/_utils/title-labels';
+import { TITLE_STATUS_LABELS, formatDate } from '@/lib/_utils/title-labels';
 import { apiFetch } from '@/lib/api/client';
 import { TITLE_STATUSES, titlePageSchema } from '@/lib/api/schemas/title';
 import Link from 'next/link';
@@ -31,6 +32,12 @@ export async function TitlesView({ type, basePath, heading, searchParams }: Titl
     if (dueTo) query.set('dueTo', dueTo);
 
     const titles = await apiFetch(`/titles?${query}`, titlePageSchema);
+    const now = new Date();
+    const rows = titles.items.map(title => ({
+        title,
+        ago: daysAgoLabel(title.createdAt, now),
+        caption: `Vence ${formatDate(title.expirationDate)}`,
+    }));
 
     return (
         <div className="space-y-6">
@@ -83,7 +90,7 @@ export async function TitlesView({ type, basePath, heading, searchParams }: Titl
             {titles.items.length === 0 ? (
                 <EmptyState title="Nenhum título encontrado" />
             ) : (
-                <TitlesTable page={titles} />
+                <TitlesTable rows={rows} page={titles} />
             )}
         </div>
     );
