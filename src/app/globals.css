@@ -64,6 +64,11 @@
     --color-positive-foreground: var(--ink);
     --color-negative: var(--negative);
     --color-negative-foreground: var(--ink);
+    --color-destructive: var(--negative);
+    --color-destructive-foreground: var(--ink);
+    --color-warning: var(--accent-soft);
+    --color-warning-foreground: var(--ink);
+    --color-overlay: color-mix(in oklab, var(--ink) 60%, transparent);
     --color-sidebar: var(--ink);
     --color-sidebar-foreground: var(--surface);
     --color-sidebar-muted: var(--ink-raised);
