@@ -31,9 +31,7 @@ interface CreateEntryModalProps {
     onClose: () => void;
     onSave: (entry: Entry, uuid?: string) => void; // consumer monta payload no service
     entry?: Partial<Entry> | null; // pode vir sem uuid no create
-    titles: (Title & {
-        /* ensure id */
-    })[];
+    titles: (Title & {/* ensure id */})[];
     // força tipo (ex.: 'income' para Receber, 'expense' para Pagar)
     forceType?: 'income' | 'expense';
 }
@@ -108,7 +106,7 @@ export default function CreateEntryModal({
                     getBillingAccounts(),
                     getPresets(),
                 ]);
-                setBillingAccounts(accountsRes || []);
+                setBillingAccounts((accountsRes || []) as unknown as BillingAccountOption[]);
                 setPresets(presetsRes || []);
             } catch (error) {
                 console.error('Erro ao carregar contas/presets para lançamentos', error);

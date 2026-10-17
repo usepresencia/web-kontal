@@ -4,5 +4,9 @@ yarn-error.log
 .next
 out
 dist
+coverage
 .env
+.env.local
+.git
+docs
 .DS_Store

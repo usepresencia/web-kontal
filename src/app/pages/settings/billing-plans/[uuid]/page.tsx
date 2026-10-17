@@ -102,8 +102,7 @@ export default function BillingAccountPage() {
         const payload = {
             name: newAccount.name.trim(),
             account_type: (newAccount.type_of === 'Analítica' ? 'analytic' : 'synthetic') as
-                | 'analytic'
-                | 'synthetic',
+                'analytic' | 'synthetic',
             parent: newAccount.parentId || null,
             billing_plan: uuid,
         };
