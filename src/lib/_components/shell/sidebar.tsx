@@ -180,7 +180,7 @@ function SidebarContent({
                                 {userName}
                             </p>
                             <form action={logoutAction}>
-                                <FormPendingOverlay message="Saindo…" />
+                                <FormPendingOverlay message="Saindo…" untilNavigation />
                                 <button
                                     type="submit"
                                     className="text-sidebar-foreground/70 hover:text-sidebar-foreground shrink-0"
