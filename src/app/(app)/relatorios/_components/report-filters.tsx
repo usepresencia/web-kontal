@@ -20,7 +20,7 @@ export function ReportFilters({ mode, start, end, children }: ReportFiltersProps
                     <DatePickerField
                         name="start"
                         defaultValue={start}
-                        className={`${FILTER_PILL_CLASS} w-44`}
+                        className={`${FILTER_PILL_CLASS} w-36`}
                     />
                 </FilterField>
             )}
@@ -28,7 +28,7 @@ export function ReportFilters({ mode, start, end, children }: ReportFiltersProps
                 <DatePickerField
                     name={mode === 'period' ? 'end' : 'date'}
                     defaultValue={end}
-                    className={`${FILTER_PILL_CLASS} w-44`}
+                    className={`${FILTER_PILL_CLASS} w-36`}
                 />
             </FilterField>
             {children}
