@@ -22,7 +22,7 @@ export function buildCsp({ nonce, isDev }: CspInput): string {
         "style-src-attr 'unsafe-inline'",
         "img-src 'self' data: blob: https://res.cloudinary.com",
         "font-src 'self'",
-        `connect-src 'self' https://api.cloudinary.com${isDev ? ' ws: wss:' : ''}`,
+        `connect-src 'self' https://api.cloudinary.com https://brasilapi.com.br${isDev ? ' ws: wss:' : ''}`,
         "frame-ancestors 'none'",
         "form-action 'self'",
         "base-uri 'none'",

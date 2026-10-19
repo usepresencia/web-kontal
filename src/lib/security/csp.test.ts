@@ -15,9 +15,11 @@ describe('buildCsp', () => {
         expect(d['default-src']).toBe("default-src 'self'");
     });
 
-    it('libera o envio de imagens só ao Cloudinary', () => {
+    it('libera conexões externas apenas para Cloudinary e BrasilAPI', () => {
         const d = directives(buildCsp({ nonce: 'abc', isDev: false }));
-        expect(d['connect-src']).toBe("connect-src 'self' https://api.cloudinary.com");
+        expect(d['connect-src']).toBe(
+            "connect-src 'self' https://api.cloudinary.com https://brasilapi.com.br",
+        );
     });
 
     it('em produção os estilos exigem o nonce e não aceitam inline', () => {

@@ -53,9 +53,18 @@ export function PillInput({
             </label>
             {props.type === 'date' ? (
                 <DatePickerField
+                    key={
+                        typeof (props.value ?? props.defaultValue) === 'string'
+                            ? String(props.value ?? props.defaultValue)
+                            : ''
+                    }
                     id={fieldId}
                     name={name ?? fieldId ?? 'date'}
-                    defaultValue={typeof props.defaultValue === 'string' ? props.defaultValue : ''}
+                    defaultValue={
+                        typeof (props.value ?? props.defaultValue) === 'string'
+                            ? String(props.value ?? props.defaultValue)
+                            : ''
+                    }
                     aria-invalid={errors ? true : undefined}
                     className={cn(PILL_CLASS, 'w-full justify-between', className)}
                 />
