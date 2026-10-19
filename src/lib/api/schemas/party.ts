@@ -3,6 +3,8 @@ import { pageSchema } from './page';
 
 export const PARTY_KINDS = ['CLIENT', 'SUPPLIER', 'BOTH'] as const;
 
+export type PartyKind = (typeof PARTY_KINDS)[number];
+
 export const PARTY_KIND_LABELS = {
     CLIENT: 'Cliente',
     SUPPLIER: 'Fornecedor',

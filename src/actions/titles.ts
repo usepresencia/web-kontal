@@ -36,6 +36,14 @@ const ENTRIES_PATH = '/operacoes/transacoes';
 
 const LIST_PATHS = { EXPENSE: '/operacoes/pagar', INCOME: '/operacoes/receber' } as const;
 
+/** Atualiza as telas que mostram o título e suas transações: detalhes, listas, transações e home. */
+function revalidateTitleViews(titleId: string): void {
+    revalidatePath(`/operacoes/titulos/${titleId}`);
+    revalidatePath(HOME_PATH);
+    revalidatePath(ENTRIES_PATH);
+    Object.values(LIST_PATHS).forEach(path => revalidatePath(path));
+}
+
 /** Cria um título; com repetição, cria a série. Com "pagar/receber agora", registra a transação do valor total em seguida. */
 export async function createTitleAction(_prev: FormState, formData: FormData): Promise<FormState> {
     const parsed = titleCreateSchema.safeParse(formDataToObject(formData));
@@ -89,8 +97,9 @@ export async function createTitleAction(_prev: FormState, formData: FormData): P
             });
         } catch (error) {
             const failure = stateFromApiError(error);
+            // O título já existe: devolve ok para o modal fechar e não duplicar o título num novo envio.
             result = {
-                ok: false,
+                ok: true,
                 title: 'Título criado, sem transação',
                 message: `O título foi criado, mas a transação não foi registrada: ${failure.message ?? 'erro desconhecido'}`,
             };
@@ -126,7 +135,7 @@ export async function deleteTitleAction(
     titleId: string,
     type: keyof typeof LIST_PATHS,
 ): Promise<FormState> {
-    if (!isUuid(titleId) || !(type in LIST_PATHS)) return INVALID_ID;
+    if (!isUuid(titleId) || !Object.hasOwn(LIST_PATHS, type)) return INVALID_ID;
     try {
         await apiFetch(`/titles/${titleId}`, z.undefined(), { method: 'DELETE' });
     } catch (error) {
@@ -155,10 +164,7 @@ export async function createEntryAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath(`/operacoes/titulos/${titleId}`);
-    revalidatePath(HOME_PATH);
-    revalidatePath(ENTRIES_PATH);
-    Object.values(LIST_PATHS).forEach(path => revalidatePath(path));
+    revalidateTitleViews(titleId);
     return { ok: true, ...SUCCESS.transactionCreated };
 }
 
@@ -180,7 +186,7 @@ export async function writeOffTitleAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath(`/operacoes/titulos/${titleId}`);
+    revalidateTitleViews(titleId);
     return { ok: true, ...SUCCESS.writeOff };
 }
 
@@ -192,7 +198,7 @@ export async function deleteEntryAction(titleId: string, entryId: string): Promi
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath(`/operacoes/titulos/${titleId}`);
+    revalidateTitleViews(titleId);
     return { ok: true };
 }
 

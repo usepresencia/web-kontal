@@ -13,7 +13,8 @@ const MAX_PAGES = 200;
 const JOURNAL_PAGE_SIZE = 31;
 const LEDGER_PAGE_SIZE = 100;
 
-const period = (start: string, end: string) => `${formatDate(start)} a ${formatDate(end)}`;
+const period = (start: string, end: string, truncated = false) =>
+    `${formatDate(start)} a ${formatDate(end)}${truncated ? ' (relatório truncado no limite de páginas)' : ''}`;
 
 /** Livro diário completo do período (todas as páginas), para o PDF. */
 export async function getFullJournalReportAction(
@@ -25,14 +26,15 @@ export async function getFullJournalReportAction(
     if (!from || !to) return null;
 
     const days: Awaited<ReturnType<typeof fetchJournalPage>>['items'] = [];
-    for (let page = 1; page <= MAX_PAGES; page += 1) {
+    let complete = false;
+    for (let page = 1; page <= MAX_PAGES && !complete; page += 1) {
         const result = await fetchJournalPage(from, to, page);
         days.push(...result.items);
-        if (days.length >= result.total || result.items.length === 0) break;
+        complete = days.length >= result.total || result.items.length === 0;
     }
     return {
         title: 'Livro diário',
-        period: period(from, to),
+        period: period(from, to, !complete),
         filename: `livro-diario-${from}-a-${to}`,
         sections: journalSections(days),
     };
@@ -56,16 +58,17 @@ export async function getFullLedgerReportAction(
 
     let first: Awaited<ReturnType<typeof fetchLedgerPage>> | null = null;
     const items: Awaited<ReturnType<typeof fetchLedgerPage>>['items'] = [];
-    for (let page = 1; page <= MAX_PAGES; page += 1) {
+    let complete = false;
+    for (let page = 1; page <= MAX_PAGES && !complete; page += 1) {
         const result = await fetchLedgerPage(accountId, from, to, page);
         first ??= result;
         items.push(...result.items);
-        if (items.length >= result.total || result.items.length === 0) break;
+        complete = items.length >= result.total || result.items.length === 0;
     }
     if (!first) return null;
     return {
         title: 'Razão da conta',
-        period: period(from, to),
+        period: period(from, to, !complete),
         filename: `razao-${from}-a-${to}`,
         sections: ledgerSections({ ...first, items }),
     };

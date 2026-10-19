@@ -7,7 +7,7 @@ import { FilterForm } from '@/lib/_components/filter-form';
 import { parsePageParams } from '@/lib/_utils/pagination';
 import { apiFetch } from '@/lib/api/client';
 import { PARTY_KIND_LABELS, PARTY_KINDS, partyPageSchema } from '@/lib/api/schemas/party';
-import { NewPartyDialog } from './_components/new-party-dialog';
+import { NewPartyDropdown } from './_components/new-party-dropdown';
 import { PartiesTable } from './_components/parties-table';
 
 const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
@@ -45,7 +45,7 @@ export default async function PartiesPage({
                         Gerencie quem compra de você e de quem você compra
                     </p>
                 </div>
-                <NewPartyDialog presets={presets} />
+                <NewPartyDropdown presets={presets} />
             </header>
 
             <FilterForm className="flex flex-wrap items-end gap-3">
@@ -53,7 +53,7 @@ export default async function PartiesPage({
                     <input
                         name="search"
                         defaultValue={search ?? ''}
-                        placeholder="Nome ou documento"
+                        placeholder="Nome, CPF ou CNPJ"
                         className={`${FILTER_PILL_CLASS} placeholder:text-muted-foreground focus-visible:ring-ring w-56 text-sm outline-none focus-visible:ring-2`}
                     />
                 </FilterField>

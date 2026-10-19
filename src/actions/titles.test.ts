@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
@@ -283,7 +284,8 @@ describe('createTitleAction com pagamento ou recebimento na hora', () => {
             .mockResolvedValueOnce({ id: TITLE_ID, amount: '500.00' })
             .mockRejectedValueOnce(new ApiError(422, 'INVALID', 'Conta inválida'));
         const result = await createTitleAction({ ok: false }, form());
-        expect(result.ok).toBe(false);
+        expect(result.ok).toBe(true);
+        expect(revalidatePath).toHaveBeenCalledWith('/home');
         expect(result.title).toBe('Título criado, sem transação');
         expect(result.message).toContain('a transação não foi registrada');
     });
