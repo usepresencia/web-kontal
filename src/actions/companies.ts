@@ -16,6 +16,13 @@ import { isPlatformAdmin, requireSession } from '@/lib/auth/session';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
+/** Atualiza as telas que mostram a empresa ativa: Minha empresa, a lista da plataforma e o layout (barra lateral). */
+function revalidateCompanyViews(): void {
+    revalidatePath('/configuracoes/minha-empresa');
+    revalidatePath('/plataforma/empresas');
+    revalidatePath('/', 'layout');
+}
+
 const FORBIDDEN_MESSAGE = 'Apenas o administrador da plataforma pode fazer isso.';
 const FALLBACK_MESSAGE = 'Não foi possível concluir a operação. Tente novamente.';
 
@@ -54,7 +61,7 @@ export async function updateCompanyAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/plataforma/empresas');
+    revalidateCompanyViews();
     return { ok: true, ...SUCCESS.companyUpdated };
 }
 
@@ -100,7 +107,7 @@ export async function saveLogoAction(url: string): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/plataforma/empresas');
+    revalidateCompanyViews();
     return { ok: true };
 }
 
@@ -111,7 +118,7 @@ export async function removeLogoAction(): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/plataforma/empresas');
+    revalidateCompanyViews();
     return { ok: true };
 }
 
