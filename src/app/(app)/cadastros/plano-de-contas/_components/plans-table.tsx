@@ -26,8 +26,13 @@ export function PlansTable({ page }: { page: Page<BillingPlan> }) {
                                 <ListTree className="size-4" aria-hidden="true" />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <p className="text-foreground truncate text-sm font-medium">
+                                <p className="text-foreground flex items-center gap-2 truncate text-sm font-medium">
                                     {plan.name}
+                                    {plan.isDefault && (
+                                        <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[11px] font-medium">
+                                            Padrão
+                                        </span>
+                                    )}
                                 </p>
                                 <p className="text-muted-foreground truncate text-xs">
                                     {plan.description || 'Sem descrição'}

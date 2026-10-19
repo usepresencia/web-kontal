@@ -4,6 +4,7 @@ import {
     deleteAccountAction,
     deletePlanAction,
     getPlanAccountsAction,
+    setDefaultPlanAction,
     updatePlanAction,
 } from '@/actions/billing';
 import { useBusyRun } from '@/lib/_components/busy-provider';
@@ -33,6 +34,7 @@ import {
     MoreHorizontal,
     Pencil,
     Plus,
+    Star,
     Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -53,7 +55,10 @@ type AccountModalState = {
 };
 
 type ConfirmState =
-    { kind: 'account'; account: BillingAccount } | { kind: 'plan'; plan: BillingPlan } | null;
+    | { kind: 'account'; account: BillingAccount }
+    | { kind: 'plan'; plan: BillingPlan }
+    | { kind: 'default'; plan: BillingPlan }
+    | null;
 
 /**
  * Exibe a árvore hierárquica de contas de um plano seguindo o padrão de UI de tabelas/listas do sistema.
@@ -154,6 +159,19 @@ export function AccountsTreeTable({ plan, initialAccounts }: AccountsTreeTablePr
 
     const handleConfirmDelete = async () => {
         if (!confirm) return;
+        if (confirm.kind === 'default') {
+            const result = await run(
+                () => setDefaultPlanAction(confirm.plan.id),
+                'Definindo plano padrão…',
+            );
+            notifyResult(result, SUCCESS.planDefaulted, 'Não foi possível definir o padrão.');
+            setConfirm(null);
+            if (result.ok) {
+                setCurrentPlan(current => ({ ...current, isDefault: true }));
+                router.refresh();
+            }
+            return;
+        }
         if (confirm.kind === 'plan') {
             const result = await run(() => deletePlanAction(confirm.plan.id), 'Excluindo plano…');
             notifyResult(result, SUCCESS.planDeleted, 'Não foi possível excluir.');
@@ -230,8 +248,13 @@ export function AccountsTreeTable({ plan, initialAccounts }: AccountsTreeTablePr
                 {/* Barra superior de controle do plano e ações */}
                 <div className="flex items-center justify-between gap-4">
                     <div className="min-w-0">
-                        <h2 className="text-foreground truncate text-base font-semibold">
+                        <h2 className="text-foreground flex items-center gap-2 truncate text-base font-semibold">
                             {currentPlan.name}
+                            {currentPlan.isDefault && (
+                                <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[11px] font-medium">
+                                    Padrão
+                                </span>
+                            )}
                         </h2>
                         {currentPlan.description && (
                             <p className="text-muted-foreground truncate text-xs">
@@ -263,6 +286,20 @@ export function AccountsTreeTable({ plan, initialAccounts }: AccountsTreeTablePr
                                 />
                                 Editar plano
                             </DropdownMenuItem>
+                            {!currentPlan.isDefault && (
+                                <DropdownMenuItem
+                                    onClick={() =>
+                                        setConfirm({ kind: 'default', plan: currentPlan })
+                                    }
+                                    className="gap-2"
+                                >
+                                    <Star
+                                        className="text-muted-foreground size-4"
+                                        aria-hidden="true"
+                                    />
+                                    Definir como padrão
+                                </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem
                                 onClick={() => setConfirm({ kind: 'plan', plan: currentPlan })}
                                 className="text-destructive focus:text-destructive gap-2"
@@ -454,14 +491,22 @@ export function AccountsTreeTable({ plan, initialAccounts }: AccountsTreeTablePr
                 <ConfirmationDialog
                     open={confirm !== null}
                     onOpenChange={open => !open && setConfirm(null)}
-                    title={confirm?.kind === 'account' ? 'Excluir conta' : 'Excluir plano'}
-                    description={
-                        confirm?.kind === 'account'
-                            ? `Excluir ${confirm.account.code} ${confirm.account.name}? Contas com movimento ou com filhas não podem ser excluídas.`
-                            : `Excluir o plano ${confirm?.plan.name ?? ''}? Planos com contas em uso não podem ser excluídos.`
+                    title={
+                        confirm?.kind === 'default'
+                            ? 'Definir plano padrão'
+                            : confirm?.kind === 'account'
+                              ? 'Excluir conta'
+                              : 'Excluir plano'
                     }
-                    confirmLabel="Excluir"
-                    variant="destructive"
+                    description={
+                        confirm?.kind === 'default'
+                            ? `Usar o plano ${confirm.plan.name} como padrão nos relatórios e no fechamento do período?`
+                            : confirm?.kind === 'account'
+                              ? `Excluir ${confirm.account.code} ${confirm.account.name}? Contas com movimento ou com filhas não podem ser excluídas.`
+                              : `Excluir o plano ${confirm?.plan.name ?? ''}? O plano padrão só pode ser excluído depois de escolher outro. Planos com contas em uso não podem ser excluídos.`
+                    }
+                    confirmLabel={confirm?.kind === 'default' ? 'Definir' : 'Excluir'}
+                    variant={confirm?.kind === 'default' ? 'default' : 'destructive'}
                     onConfirm={handleConfirmDelete}
                 />
             </section>

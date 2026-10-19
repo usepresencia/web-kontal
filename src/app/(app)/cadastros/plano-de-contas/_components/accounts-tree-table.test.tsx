@@ -11,6 +11,7 @@ vi.mock('@/actions/billing', () => ({
     getPlanAccountsAction: vi.fn(),
     updatePlanAction: vi.fn(),
     deletePlanAction: vi.fn(),
+    setDefaultPlanAction: vi.fn(),
     deleteAccountAction: vi.fn(),
     createPlanAction: vi.fn(),
     createAccountAction: vi.fn(),
@@ -23,6 +24,7 @@ const plan: BillingPlan = {
     id: 'p1',
     name: 'Plano Geral',
     description: 'Plano padrão da empresa',
+    isDefault: false,
     createdAt: '2026-01-01',
 };
 
@@ -71,14 +73,19 @@ const sampleAccounts: BillingAccount[] = [
     },
 ];
 
-const renderTree = (accounts: BillingAccount[] = sampleAccounts) =>
+const renderTree = (accounts: BillingAccount[] = sampleAccounts, current: BillingPlan = plan) =>
     renderToStaticMarkup(
         <BusyProvider>
-            <AccountsTreeTable plan={plan} initialAccounts={accounts} />
+            <AccountsTreeTable plan={current} initialAccounts={accounts} />
         </BusyProvider>,
     );
 
 describe('AccountsTreeTable (Árvore de contas nos detalhes do plano)', () => {
+    it('marca o plano padrão com o selo e não marca os demais', () => {
+        expect(renderTree(sampleAccounts, { ...plan, isDefault: true })).toContain('Padrão');
+        expect(renderTree()).not.toContain('>Padrão<');
+    });
+
     it('segue o padrão de UI de tabelas das demais telas sem a tag <table>', () => {
         const html = renderTree();
         expect(html).not.toContain('<table');

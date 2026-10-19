@@ -22,7 +22,13 @@ const { NewPlanDialog } = await import('./new-plan-dialog');
 const { AccountForm } = await import('./account-form');
 
 const plan = (id: string, description: string | null = 'Plano de serviços'): BillingPlan =>
-    ({ id, name: `Plano ${id}`, description, createdAt: '2026-01-01' }) as BillingPlan;
+    ({
+        id,
+        name: `Plano ${id}`,
+        description,
+        isDefault: false,
+        createdAt: '2026-01-01',
+    }) as BillingPlan;
 
 const render = (items: BillingPlan[]) =>
     renderToStaticMarkup(
@@ -32,6 +38,11 @@ const render = (items: BillingPlan[]) =>
     );
 
 describe('PlansTable', () => {
+    it('mostra o selo Padrão só no plano padrão', () => {
+        const html = render([{ ...plan('a'), isDefault: true }, plan('b')]);
+        expect((html.match(/>Padrão</g) ?? []).length).toBe(1);
+    });
+
     it('usa a lista no padrão das demais telas, sem tabela, com divisor entre os itens', () => {
         const html = render([plan('a'), plan('b')]);
         expect(html).not.toContain('<table');
