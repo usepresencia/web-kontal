@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.2](https://github.com/usepresencia/web-kontal/compare/v0.1.1...v0.1.2) (2026-10-19)
+
+### Features
+
+- **empresa:** adiciona o botão Voltar que limpa a sessão e leva ao login ([128f734](https://github.com/usepresencia/web-kontal/commit/128f7343005caeb88b14ccdd6b5968f92324a00b))
+
+### Bug Fixes
+
+- **ui:** mantém o loading de saída até a página trocar ([e5c130e](https://github.com/usepresencia/web-kontal/commit/e5c130e39c216ef864bfaa27ee84a07522ebc8f8))
+
 ### 0.1.1 (2026-10-19)
 
 ### Features
