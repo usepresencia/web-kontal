@@ -1,0 +1,52 @@
+export const TITLE_TYPE_LABELS = { INCOME: 'A receber', EXPENSE: 'A pagar' } as const;
+
+export const TITLE_STATUS_LABELS = {
+    OPEN: 'Em aberto',
+    SETTLED: 'Quitado',
+    WRITTEN_OFF: 'Baixado',
+} as const;
+
+export const PAYMENT_METHOD_LABELS = {
+    CASH: 'Dinheiro',
+    DEBIT: 'Débito',
+    CREDIT: 'Crédito',
+    PIX: 'Pix',
+} as const;
+
+export const SERIES_KIND_LABELS = { INSTALLMENT: 'Parcelado', RECURRING: 'Recorrente' } as const;
+
+export const SERIES_FREQUENCY_LABELS = {
+    WEEKLY: 'Semanal',
+    MONTHLY: 'Mensal',
+    YEARLY: 'Anual',
+} as const;
+
+/** Data `YYYY-MM-DD` no formato brasileiro, sem passar por fuso horário. */
+export function formatDate(isoDate: string): string {
+    const [year, month, day] = isoDate.split('-');
+    return `${day}/${month}/${year}`;
+}
+
+/** Textos da baixa conforme o tipo: pagamento no título a pagar e recebimento no título a receber; "parcela" no lugar de "título" quando é de um parcelamento. */
+export function entryLabels(type: 'INCOME' | 'EXPENSE', installment = false) {
+    const noun = installment ? 'parcela' : 'título';
+    return type === 'EXPENSE'
+        ? {
+              action: `Pagar ${noun}`,
+              create: 'Novo pagamento',
+              now: 'Pagar agora',
+              opening: 'Despesa inicial',
+              submit: 'Pagar',
+              pending: 'Pagando…',
+              overlay: 'Registrando pagamento…',
+          }
+        : {
+              action: `Receber ${noun}`,
+              create: 'Novo recebimento',
+              now: 'Receber agora',
+              opening: 'Saldo inicial',
+              submit: 'Receber',
+              pending: 'Recebendo…',
+              overlay: 'Registrando recebimento…',
+          };
+}

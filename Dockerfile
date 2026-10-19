@@ -1,20 +1,31 @@
-FROM node:18-alpine
-
+FROM node:20-alpine AS base
 WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
 
-COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
-RUN npm install
-RUN npm install --save-dev typescript
+FROM base AS deps
+COPY package.json package-lock.json ./
+RUN npm ci
 
+FROM base AS dev
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+EXPOSE 3002
+# Polling para o hot reload funcionar com volume montado no container
+ENV WATCHPACK_POLLING=true
+CMD ["npx", "next", "dev", "-H", "0.0.0.0", "-p", "3002"]
 
-EXPOSE 3000
+FROM base AS build
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+ENV SKIP_ENV_VALIDATION=1
+RUN npm run build
 
-# Clean any stale build artifacts (mounted from host) and ensure dev static dir exists to avoid ENOENT
-# Use polling in container for reliable file watching and avoid Turbopack issues in Docker
-ENV CHOKIDAR_USEPOLLING=1 \
-	WATCHPACK_POLLING=true \
-	NEXT_TELEMETRY_DISABLED=1
-
-# Clean any stale build artifacts and ensure dev static dir exists to avoid ENOENT
-CMD ["sh", "-c", "rm -rf .next && mkdir -p .next/static/development && npx next dev -H 0.0.0.0"]
+FROM base AS runner
+ENV NODE_ENV=production
+RUN addgroup -S app && adduser -S app -G app
+COPY --from=build --chown=app:app /app/.next ./.next
+COPY --from=build --chown=app:app /app/package.json ./package.json
+COPY --from=deps --chown=app:app /app/node_modules ./node_modules
+USER app
+EXPOSE 3002
+CMD ["npx", "next", "start", "-p", "3002"]
