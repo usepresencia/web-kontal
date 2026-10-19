@@ -3,6 +3,8 @@ import type { ZodError } from 'zod';
 /** Resultado de uma Server Action de formulário. */
 export type FormState = {
     ok: boolean;
+    /** Título curto do toast (ex.: "Título criado"); a frase vai em `message`. */
+    title?: string;
     message?: string;
     fieldErrors?: Record<string, string[]>;
 };

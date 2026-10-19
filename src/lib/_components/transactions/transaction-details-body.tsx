@@ -1,3 +1,4 @@
+import { Divider } from '@/lib/_components/divider';
 import { Badge } from '@/lib/_components/ui/badge';
 import { Button } from '@/lib/_components/ui/button';
 import { cn } from '@/lib/_utils/cn';
@@ -7,11 +8,11 @@ import {
     PAYMENT_METHOD_LABELS,
     TITLE_STATUS_LABELS,
     TITLE_TYPE_LABELS,
+    entryLabels,
     formatDate,
 } from '@/lib/_utils/title-labels';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
 import { Check, Copy } from 'lucide-react';
-import Link from 'next/link';
 
 type TransactionDetailsBodyProps = {
     title: Title;
@@ -20,6 +21,8 @@ type TransactionDetailsBodyProps = {
     entries: TitleEntry[] | null;
     copied: boolean;
     onCopy: () => void;
+    /** Avança para a etapa de baixa. */
+    onPay: () => void;
 };
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -38,6 +41,7 @@ export function TransactionDetailsBody({
     entries,
     copied,
     onCopy,
+    onPay,
 }: TransactionDetailsBodyProps) {
     const income = title.type === 'INCOME';
 
@@ -78,7 +82,8 @@ export function TransactionDetailsBody({
             </div>
 
             <dl className="grid grid-cols-2 gap-3">
-                <Field label="Preset">{title.presetName ?? '-'}</Field>
+                <Field label={income ? 'Cliente' : 'Fornecedor'}>{title.partyName ?? '-'}</Field>
+                <Field label="Histórico (preset)">{title.presetName ?? '-'}</Field>
                 <Field label="Juros mensais">
                     {fractionToPercent(title.feesPercentageMonthly)}%
                 </Field>
@@ -103,42 +108,44 @@ export function TransactionDetailsBody({
             </dl>
 
             <section className="space-y-2">
-                <h3 className="text-foreground text-sm font-semibold">Baixas</h3>
+                <h3 className="text-foreground text-sm font-semibold">Transações</h3>
                 {entries === null ? (
                     <p className="text-muted-foreground text-sm">Carregando…</p>
                 ) : entries.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">Nenhuma baixa registrada.</p>
+                    <p className="text-muted-foreground text-sm">Nenhuma transação registrada.</p>
                 ) : (
-                    <ul className="divide-border/40 divide-y">
-                        {entries.map(entry => (
-                            <li
-                                key={entry.id}
-                                className="flex items-center justify-between py-2 text-sm"
-                            >
-                                <span>
-                                    {formatDate(entry.paidAt)}
-                                    <span className="text-muted-foreground ml-2 text-xs">
-                                        {entry.kind === 'WRITE_OFF'
-                                            ? 'Perda'
-                                            : (PAYMENT_METHOD_LABELS[
-                                                  entry.paymentMethod as keyof typeof PAYMENT_METHOD_LABELS
-                                              ] ?? entry.paymentMethod)}
+                    <ul className="space-y-1 py-1">
+                        {entries.map((entry, index) => (
+                            <li key={entry.id}>
+                                {index > 0 && <Divider className="mx-2 my-1" />}
+                                <div className="flex items-center justify-between px-2 py-2 text-sm">
+                                    <span>
+                                        {formatDate(entry.paidAt)}
+                                        <span className="text-muted-foreground ml-2 text-xs">
+                                            {entry.kind === 'WRITE_OFF'
+                                                ? 'Perda'
+                                                : (PAYMENT_METHOD_LABELS[
+                                                      entry.paymentMethod as keyof typeof PAYMENT_METHOD_LABELS
+                                                  ] ?? entry.paymentMethod)}
+                                        </span>
                                     </span>
-                                </span>
-                                <span className="font-medium">
-                                    {formatAmount(entry.totalAmount)}
-                                </span>
+                                    <span className="font-medium">
+                                        {formatAmount(entry.totalAmount)}
+                                    </span>
+                                </div>
                             </li>
                         ))}
                     </ul>
                 )}
             </section>
 
-            <div className="flex justify-end">
-                <Button asChild>
-                    <Link href={`/operacoes/titulos/${title.id}`}>Abrir título completo</Link>
-                </Button>
-            </div>
+            {title.status === 'OPEN' && (
+                <div className="flex justify-end">
+                    <Button type="button" onClick={onPay}>
+                        {entryLabels(title.type, title.seriesIndex !== null).action}
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }

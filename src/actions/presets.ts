@@ -1,11 +1,11 @@
 'use server';
 
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { apiFetch } from '@/lib/api/client';
 import { stateFromApiError } from '@/lib/api/form-state';
 import { presetCreateSchema, presetSchema, presetUpdateSchema } from '@/lib/api/schemas/preset';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const INVALID_ID: FormState = { ok: false, message: 'Identificador inválido.' };
@@ -21,8 +21,8 @@ export async function createPresetAction(_prev: FormState, formData: FormData): 
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/configuracoes/presets');
-    redirect('/configuracoes/presets');
+    revalidatePath('/cadastros/plano-de-contas');
+    return { ok: true, ...SUCCESS.presetCreated };
 }
 
 /** Atualiza um preset; o plano dele não muda. */
@@ -40,8 +40,8 @@ export async function updatePresetAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/configuracoes/presets');
-    return { ok: true, message: 'Preset atualizado.' };
+    revalidatePath('/cadastros/plano-de-contas');
+    return { ok: true, ...SUCCESS.presetUpdated };
 }
 
 /** Exclui um preset. */
@@ -52,6 +52,6 @@ export async function deletePresetAction(presetId: string): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/configuracoes/presets');
+    revalidatePath('/cadastros/plano-de-contas');
     return { ok: true };
 }

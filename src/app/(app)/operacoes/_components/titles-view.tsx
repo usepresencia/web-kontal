@@ -3,18 +3,17 @@ import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
 import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
-import { Button } from '@/lib/_components/ui/button';
+import { FilterForm } from '@/lib/_components/filter-form';
 import { daysAgoLabel } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
 import { TITLE_STATUS_LABELS, formatDate } from '@/lib/_utils/title-labels';
 import { apiFetch } from '@/lib/api/client';
 import { TITLE_STATUSES, titlePageSchema } from '@/lib/api/schemas/title';
-import Link from 'next/link';
+import { NewTitleDialog } from './new-title-dialog';
 import { TitlesTable } from './titles-table';
 
 type TitlesViewProps = {
     type: 'INCOME' | 'EXPENSE';
-    basePath: string;
     heading: string;
     subtitle: string;
     searchParams: Record<string, string | string[] | undefined>;
@@ -25,13 +24,7 @@ const isoDate = (value: string | undefined) =>
     value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : undefined;
 
 /** Listagem de títulos de um tipo, com filtros de situação e vencimento e paginação. */
-export async function TitlesView({
-    type,
-    basePath,
-    heading,
-    subtitle,
-    searchParams,
-}: TitlesViewProps) {
+export async function TitlesView({ type, heading, subtitle, searchParams }: TitlesViewProps) {
     const { page, pageSize } = parsePageParams(searchParams);
     const status = TITLE_STATUSES.find(item => item === first(searchParams.status));
     const dueFrom = isoDate(first(searchParams.dueFrom));
@@ -57,12 +50,13 @@ export async function TitlesView({
                     <h1 className="text-2xl font-bold">{heading}</h1>
                     <p className="text-muted-foreground text-sm">{subtitle}</p>
                 </div>
-                <Button asChild>
-                    <Link href={`${basePath}/novo`}>Novo título</Link>
-                </Button>
+                <div className="flex items-center gap-2">
+                    <NewTitleDialog type={type} opening />
+                    <NewTitleDialog type={type} />
+                </div>
             </header>
 
-            <form method="get" className="flex flex-wrap items-end gap-3">
+            <FilterForm className="flex flex-wrap items-end gap-3">
                 <FilterField label="Situação">
                     <DropdownSelect
                         name="status"
@@ -94,7 +88,7 @@ export async function TitlesView({
                     />
                 </FilterField>
                 <FilterButton />
-            </form>
+            </FilterForm>
 
             {titles.items.length === 0 ? (
                 <EmptyState title="Nenhum título encontrado" />

@@ -14,13 +14,19 @@ import {
     Receipt,
     Repeat,
     Scale,
-    SlidersHorizontal,
+    Store,
+    Users,
     type LucideIcon,
 } from 'lucide-react';
 
 export type NavItem = { title: string; href: string; icon: LucideIcon };
 
-export type NavSection = { title: string; items: NavItem[] };
+export type NavSection = {
+    title: string;
+    items: NavItem[];
+    /** Seção só para o administrador da plataforma (`INTERNAL_ADMIN`). */
+    platformOnly?: boolean;
+};
 
 /** Menu lateral em grupos; cada tela de migração acrescenta o seu item na seção certa. */
 export const NAV_SECTIONS: NavSection[] = [
@@ -33,14 +39,14 @@ export const NAV_SECTIONS: NavSection[] = [
         items: [
             { title: 'Contas a pagar', href: '/operacoes/pagar', icon: ArrowUpCircle },
             { title: 'Contas a receber', href: '/operacoes/receber', icon: ArrowDownCircle },
-            { title: 'Baixas', href: '/operacoes/baixas', icon: Receipt },
-            { title: 'Séries', href: '/operacoes/series', icon: Repeat },
+            { title: 'Transações', href: '/operacoes/transacoes', icon: Receipt },
+            { title: 'Parcelamentos', href: '/operacoes/parcelamentos', icon: Repeat },
         ],
     },
     {
         title: 'Contabilidade',
         items: [
-            { title: 'Lançamentos', href: '/contabilidade/lancamentos', icon: BookPlus },
+            { title: 'Lançamentos contábeis', href: '/contabilidade/lancamentos', icon: BookPlus },
             { title: 'Fechamento', href: '/contabilidade/fechamento', icon: Lock },
         ],
     },
@@ -59,9 +65,26 @@ export const NAV_SECTIONS: NavSection[] = [
     {
         title: 'Cadastros',
         items: [
-            { title: 'Empresas', href: '/empresas', icon: Building2 },
-            { title: 'Plano de contas', href: '/configuracoes/planos', icon: ListTree },
-            { title: 'Presets', href: '/configuracoes/presets', icon: SlidersHorizontal },
+            {
+                title: 'Clientes e fornecedores',
+                href: '/cadastros/clientes-fornecedores',
+                icon: Users,
+            },
+            { title: 'Plano de contas', href: '/cadastros/plano-de-contas', icon: ListTree },
         ],
     },
+    {
+        title: 'Configurações',
+        items: [{ title: 'Minha empresa', href: '/configuracoes/minha-empresa', icon: Store }],
+    },
+    {
+        title: 'Plataforma',
+        platformOnly: true,
+        items: [{ title: 'Empresas da plataforma', href: '/plataforma/empresas', icon: Building2 }],
+    },
 ];
+
+/** Seções do menu que o usuário pode ver: as da plataforma só aparecem ao administrador. */
+export function visibleSections(isPlatformAdmin: boolean): NavSection[] {
+    return NAV_SECTIONS.filter(section => isPlatformAdmin || !section.platformOnly);
+}

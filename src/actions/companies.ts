@@ -1,6 +1,7 @@
 'use server';
 
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
+import { SUCCESS } from '@/lib/_utils/toast-messages';
 import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
 import { stateFromApiError } from '@/lib/api/form-state';
@@ -8,12 +9,21 @@ import {
     companyInputSchema,
     companySchema,
     signedLogoUploadSchema,
+    type Company,
     type SignedLogoUpload,
 } from '@/lib/api/schemas/company';
+import { isPlatformAdmin, requireSession } from '@/lib/auth/session';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
+/** Atualiza as telas que mostram a empresa ativa: Minha empresa, a lista da plataforma e o layout (barra lateral). */
+function revalidateCompanyViews(): void {
+    revalidatePath('/configuracoes/minha-empresa');
+    revalidatePath('/plataforma/empresas');
+    revalidatePath('/', 'layout');
+}
+
+const FORBIDDEN_MESSAGE = 'Apenas o administrador da plataforma pode fazer isso.';
 const FALLBACK_MESSAGE = 'Não foi possível concluir a operação. Tente novamente.';
 
 /** Cria uma empresa (apenas administrador da plataforma; a API confirma). */
@@ -21,6 +31,7 @@ export async function createCompanyAction(
     _prev: FormState,
     formData: FormData,
 ): Promise<FormState> {
+    if (!isPlatformAdmin(await requireSession())) return { ok: false, message: FORBIDDEN_MESSAGE };
     const parsed = companyInputSchema.safeParse(formDataToObject(formData));
     if (!parsed.success) return stateFromZodError(parsed.error);
 
@@ -33,8 +44,8 @@ export async function createCompanyAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas');
-    redirect('/empresas');
+    revalidatePath('/plataforma/empresas');
+    return { ok: true, ...SUCCESS.companyCreated };
 }
 
 /** Atualiza os dados da empresa ativa. */
@@ -50,12 +61,13 @@ export async function updateCompanyAction(
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas');
-    return { ok: true, message: 'Empresa atualizada.' };
+    revalidateCompanyViews();
+    return { ok: true, ...SUCCESS.companyUpdated };
 }
 
 /** Desativa uma empresa (apenas administrador da plataforma; a API confirma). */
 export async function deactivateCompanyAction(companyId: string): Promise<FormState> {
+    if (!isPlatformAdmin(await requireSession())) return { ok: false, message: FORBIDDEN_MESSAGE };
     if (!z.uuid().safeParse(companyId).success) return { ok: false, message: FALLBACK_MESSAGE };
 
     try {
@@ -66,7 +78,7 @@ export async function deactivateCompanyAction(companyId: string): Promise<FormSt
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas');
+    revalidatePath('/plataforma/empresas');
     return { ok: true };
 }
 
@@ -95,7 +107,7 @@ export async function saveLogoAction(url: string): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas/atual');
+    revalidateCompanyViews();
     return { ok: true };
 }
 
@@ -106,6 +118,16 @@ export async function removeLogoAction(): Promise<FormState> {
     } catch (error) {
         return stateFromApiError(error);
     }
-    revalidatePath('/empresas/atual');
+    revalidateCompanyViews();
     return { ok: true };
+}
+
+/** Empresa ativa, para o modal de edição; `null` se não puder ser lida. */
+export async function getCurrentCompanyAction(): Promise<Company | null> {
+    try {
+        return await apiFetch('/company', companySchema);
+    } catch (error) {
+        if (error instanceof ApiError && error.status < 500) return null;
+        throw error;
+    }
 }

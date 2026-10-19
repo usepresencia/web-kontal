@@ -1,3 +1,4 @@
+import { EntryForm } from '@/lib/_components/transactions/entry-form';
 import { formatAmount } from '@/lib/_utils/money';
 import { TITLE_TYPE_LABELS, formatDate } from '@/lib/_utils/title-labels';
 import { apiFetch } from '@/lib/api/client';
@@ -7,7 +8,6 @@ import { entryPageSchema, titleSchema } from '@/lib/api/schemas/title';
 import Link from 'next/link';
 import { z } from 'zod';
 import { StatusBadge } from '../../_components/status-badge';
-import { EntryForm } from './_components/entry-form';
 import { DeleteTitleButton, EntriesTable, WriteOffForm } from './_components/title-actions';
 import { TitleEditForm } from './_components/title-edit-form';
 
@@ -54,11 +54,8 @@ export default async function TitlePage({ params }: { params: Promise<{ id: stri
                         <>
                             {' '}
                             ·{' '}
-                            <Link
-                                href={`/operacoes/series/${title.seriesId}`}
-                                className="underline"
-                            >
-                                ver série
+                            <Link href="/operacoes/parcelamentos" className="underline">
+                                ver parcelamentos
                             </Link>
                         </>
                     )}
@@ -68,7 +65,7 @@ export default async function TitlePage({ params }: { params: Promise<{ id: stri
             <TitleEditForm title={title} />
 
             <section className="space-y-3">
-                <h2 className="font-display text-lg font-semibold">Baixas</h2>
+                <h2 className="font-display text-lg font-semibold">Transações</h2>
                 <EntriesTable titleId={id} entries={entries.items} />
             </section>
 

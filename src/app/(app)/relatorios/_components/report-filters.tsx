@@ -1,6 +1,7 @@
 import { DatePickerField } from '@/lib/_components/date-picker-field';
 import { FilterButton } from '@/lib/_components/filter-button';
 import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
+import { FilterForm } from '@/lib/_components/filter-form';
 import type { ReactNode } from 'react';
 
 type ReportFiltersProps = {
@@ -14,7 +15,7 @@ type ReportFiltersProps = {
 /** Filtros de um relatório, enviados por GET para a própria página. */
 export function ReportFilters({ mode, start, end, children }: ReportFiltersProps) {
     return (
-        <form method="get" className="flex flex-wrap items-end gap-3">
+        <FilterForm className="flex flex-wrap items-end gap-3">
             {mode === 'period' && (
                 <FilterField label="De">
                     <DatePickerField
@@ -32,7 +33,7 @@ export function ReportFilters({ mode, start, end, children }: ReportFiltersProps
                 />
             </FilterField>
             {children}
-            <FilterButton label="Gerar" />
-        </form>
+            <FilterButton />
+        </FilterForm>
     );
 }

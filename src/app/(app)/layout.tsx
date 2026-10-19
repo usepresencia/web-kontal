@@ -1,7 +1,7 @@
 import { Sidebar } from '@/lib/_components/shell/sidebar';
 import { apiFetch } from '@/lib/api/client';
 import { tenantsSchema } from '@/lib/api/schemas/tenant';
-import { requireSession } from '@/lib/auth/session';
+import { isPlatformAdmin, requireSession } from '@/lib/auth/session';
 import { readTenantId } from '@/lib/auth/session-cookies';
 import { redirect } from 'next/navigation';
 
@@ -19,6 +19,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="bg-sidebar flex h-screen flex-col overflow-hidden md:flex-row print:block print:h-auto print:overflow-visible">
             <Sidebar
                 userName={me.name}
+                isPlatformAdmin={isPlatformAdmin(me)}
                 companies={tenants.filter(tenant => tenant.isActive)}
                 currentCompanyId={company.companyId}
             />

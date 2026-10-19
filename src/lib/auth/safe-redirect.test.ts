@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { isSafeInternalPath } from './safe-redirect';
 
 describe('isSafeInternalPath', () => {
-    it.each(['/home', '/pages/company?x=1', '/empresas/abc-123', '/'])('aceita %s', path => {
-        expect(isSafeInternalPath(path)).toBe(true);
-    });
+    it.each(['/home', '/pages/company?x=1', '/plataforma/empresas/abc-123', '/'])(
+        'aceita %s',
+        path => {
+            expect(isSafeInternalPath(path)).toBe(true);
+        },
+    );
 
     it.each([
         '',

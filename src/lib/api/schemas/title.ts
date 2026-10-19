@@ -12,6 +12,8 @@ export const SERIES_FREQUENCIES = ['WEEKLY', 'MONTHLY', 'YEARLY'] as const;
 export const titleSchema = z.object({
     id: z.string(),
     presetId: z.string(),
+    partyId: z.string(),
+    partyName: z.string().nullable(),
     presetName: z.string().nullable(),
     seriesId: z.string().nullable(),
     seriesIndex: z.number().nullable(),
@@ -37,6 +39,7 @@ export const entrySchema = z.object({
     id: z.string(),
     titleId: z.string(),
     titleDescription: z.string().nullable().optional(),
+    titleType: z.enum(TITLE_TYPES).optional(),
     kind: z.enum(['PAYMENT', 'WRITE_OFF']),
     billingAccountId: z.string().nullable(),
     billingAccountName: z.string().nullable().optional(),
@@ -71,6 +74,8 @@ export type Series = z.infer<typeof seriesSchema>;
 export const seriesPageSchema = pageSchema(seriesSchema);
 
 export const seriesDetailSchema = seriesSchema.extend({ titles: z.array(titleSchema) });
+
+export type SeriesDetail = z.infer<typeof seriesDetailSchema>;
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida');
 
@@ -118,7 +123,12 @@ const optionalCount = z
 /** Cadastro de título simples, parcelado ou recorrente, como digitado no formulário. */
 export const titleCreateSchema = z
     .object({
-        presetId: z.uuid('Selecione o preset'),
+        partyId: z.uuid('Selecione o cliente ou fornecedor'),
+        presetId: z
+            .string()
+            .optional()
+            .transform(value => (value ? value : undefined))
+            .pipe(z.uuid('Selecione o preset').optional()),
         type: z.enum(TITLE_TYPES),
         description,
         amount,
@@ -143,8 +153,47 @@ export const titleCreateSchema = z
             .transform(value => value === 'true'),
         openingDate: optionalDate,
         settledAmount: optionalAmount,
+        payNow: z
+            .enum(['true'])
+            .optional()
+            .transform(value => value === 'true'),
+        paymentAccountId: z
+            .string()
+            .optional()
+            .transform(value => (value ? value : undefined)),
+        paymentMethod: z
+            .enum(PAYMENT_METHODS)
+            .optional()
+            .or(z.literal('').transform(() => undefined)),
+        paidAt: optionalDate,
     })
     .superRefine((value, ctx) => {
+        if (value.payNow) {
+            if (value.repeat !== 'NONE' || value.isOpening) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['payNow'],
+                    message: 'O pagamento ou recebimento na hora vale só para título simples',
+                });
+            }
+            if (!value.paymentAccountId || !z.uuid().safeParse(value.paymentAccountId).success) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['paymentAccountId'],
+                    message: 'Selecione a conta',
+                });
+            }
+            if (!value.paymentMethod) {
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['paymentMethod'],
+                    message: 'Selecione a forma de pagamento',
+                });
+            }
+            if (!value.paidAt) {
+                ctx.addIssue({ code: 'custom', path: ['paidAt'], message: 'Informe a data' });
+            }
+        }
         if (value.isOpening) {
             if (value.repeat !== 'NONE') {
                 ctx.addIssue({

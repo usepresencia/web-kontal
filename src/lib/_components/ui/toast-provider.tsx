@@ -17,8 +17,9 @@ export interface ToastOptions {
     variant?: Variant;
     duration?: number;
     position?: Position;
-    action?: { label: string; onClick: () => void };
+    actions?: { label: string; onClick: () => void; variant?: 'default' | 'outline' | 'ghost' };
     onDismiss?: () => void;
+    highlightTitle?: boolean;
 }
 
 export interface ToasterRef {
@@ -68,8 +69,9 @@ const CustomToaster = forwardRef<ToasterRef, { defaultPosition?: Position }>(
                 variant = 'default',
                 duration = 4000,
                 position = defaultPosition,
-                action,
+                actions,
                 onDismiss,
+                highlightTitle,
             }) {
                 const Icon = variantIcons[variant];
 
@@ -96,6 +98,9 @@ const CustomToaster = forwardRef<ToasterRef, { defaultPosition?: Position }>(
                                             className={cn(
                                                 'text-xs leading-none font-medium',
                                                 titleColor[variant],
+                                                highlightTitle &&
+                                                    variant === 'success' &&
+                                                    'text-primary',
                                             )}
                                         >
                                             {title}
@@ -106,16 +111,26 @@ const CustomToaster = forwardRef<ToasterRef, { defaultPosition?: Position }>(
                             </div>
 
                             <div className="flex items-center gap-2">
-                                {action && (
+                                {actions?.label && (
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            action.onClick();
+                                            actions.onClick();
                                             sonnerToast.dismiss(toastId);
                                         }}
-                                        className="border-border text-foreground hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-md border px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:outline"
+                                        className={cn(
+                                            'focus-visible:ring-ring cursor-pointer rounded-md px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:outline',
+                                            variant === 'success' &&
+                                                'bg-primary text-primary-foreground border border-transparent hover:opacity-90',
+                                            variant === 'error' &&
+                                                'border-destructive text-destructive hover:bg-destructive/10 border',
+                                            variant === 'warning' &&
+                                                'border-warning text-warning hover:bg-warning/10 border',
+                                            variant === 'default' &&
+                                                'border-border text-foreground hover:bg-muted border',
+                                        )}
                                     >
-                                        {action.label}
+                                        {actions.label}
                                     </button>
                                 )}
 

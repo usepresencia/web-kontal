@@ -1,39 +1,76 @@
 'use client';
 
-import { FormField } from '@/lib/_components/form-field';
+import type { PartyOption } from '@/actions/parties';
+import { AmountInput } from '@/lib/_components/amount-input';
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
+import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { SelectField } from '@/lib/_components/select-field';
-import { Button } from '@/lib/_components/ui/button';
+import { FieldError, PillInput, PillSelect } from '@/lib/_components/pill-fields';
+import { useActionToast } from '@/lib/_components/use-action-toast';
+import { toLocalIsoDate } from '@/lib/_utils/dates';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
-import { SERIES_FREQUENCY_LABELS, SERIES_KIND_LABELS } from '@/lib/_utils/title-labels';
+import {
+    PAYMENT_METHOD_LABELS,
+    SERIES_FREQUENCY_LABELS,
+    SERIES_KIND_LABELS,
+    entryLabels,
+} from '@/lib/_utils/title-labels';
 import { useActionState, useEffect, useState } from 'react';
+
+type Option = { value: string; label: string };
 
 type TitleFormProps = {
     action: (state: FormState, formData: FormData) => Promise<FormState>;
     type: 'INCOME' | 'EXPENSE';
-    presets: { value: string; label: string }[];
+    /** Clientes ou fornecedores do tipo do título, com o preset padrão de cada um. */
+    parties: PartyOption[];
+    presets: Option[];
     /** Contas de ativo ou despesa para a compra de ativo (só em título a pagar). */
-    destinationAccounts?: { value: string; label: string }[];
-    /** Quando é a home, o cadastro não navega: devolve ok e o chamador fecha o modal. */
-    returnTo?: '/home';
+    destinationAccounts?: Option[];
+    /** Contas financeiras onde a baixa na hora é registrada. */
+    financialAccounts?: Option[];
+    /** Cadastra o saldo ou a despesa inicial (título de implantação) no lugar de um título comum. */
+    opening?: boolean;
+    /** Cadastra um parcelamento ou recorrência: a repetição é obrigatória e não há baixa na hora. */
+    series?: boolean;
+    /** Chamado depois que o título é criado. */
     onSuccess?: () => void;
 };
 
 const toOptions = (labels: Record<string, string>) =>
     Object.entries(labels).map(([value, label]) => ({ value, label }));
 
-/** Formulário de título, com opção de parcelamento ou recorrência. */
+const PAYMENT_METHODS = toOptions(PAYMENT_METHOD_LABELS);
+
+const SERIES_OPTIONS: Option[] = toOptions(SERIES_KIND_LABELS);
+
+const REPEAT_OPTIONS: Option[] = [{ value: 'NONE', label: 'Sem repetição' }, ...SERIES_OPTIONS];
+
+/** Cadastro de título nos campos em pílula: com parcelamento, recorrência e baixa na hora, ou como saldo/despesa inicial. */
 export function TitleForm({
     action,
     type,
+    parties,
     presets,
     destinationAccounts = [],
-    returnTo,
+    financialAccounts = [],
+    opening = false,
+    series = false,
     onSuccess,
 }: TitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
-    const [repeat, setRepeat] = useState('NONE');
-    const [isOpening, setIsOpening] = useState(false);
+    useActionToast(state);
+    const [party, setParty] = useState('');
+    const [preset, setPreset] = useState(presets[0]?.value ?? '');
+    const [destination, setDestination] = useState('');
+    const [payNow, setPayNow] = useState(false);
+    const [account, setAccount] = useState('');
+    const [method, setMethod] = useState('PIX');
+    const [repeat, setRepeat] = useState(series ? 'INSTALLMENT' : 'NONE');
+    const [frequency, setFrequency] = useState('');
+    const labels = entryLabels(type);
+    const initialLabel = labels.opening.toLowerCase();
+    const canPayNow = !opening && repeat === 'NONE' && financialAccounts.length > 0;
     const errors = (field: string) => state.fieldErrors?.[field];
 
     useEffect(() => {
@@ -41,46 +78,96 @@ export function TitleForm({
     }, [state, onSuccess]);
 
     return (
-        <form action={formAction} className="space-y-6">
-            <FormPendingOverlay message="Salvando título…" />
+        <form action={formAction} className="space-y-4">
+            <FormPendingOverlay
+                message={
+                    opening
+                        ? `Salvando ${initialLabel}…`
+                        : series
+                          ? 'Salvando parcelamento…'
+                          : 'Salvando título…'
+                }
+            />
             <input type="hidden" name="type" value={type} />
-            {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
+            {opening && <input type="hidden" name="isOpening" value="true" />}
 
-            <div className="grid gap-4 md:grid-cols-2">
-                <SelectField
-                    label="Preset"
+            <AmountInput
+                name="amount"
+                label="Valor"
+                tone={type === 'EXPENSE' ? 'negative' : 'positive'}
+                errors={errors('amount')}
+            />
+
+            <div className="grid grid-cols-2 gap-3">
+                <PillSelect
+                    className={FILTER_PILL_CLASS}
+                    label={type === 'EXPENSE' ? 'Fornecedor' : 'Cliente'}
+                    name="partyId"
+                    value={party}
+                    onChange={value => {
+                        setParty(value);
+                        const standard = parties.find(
+                            item => item.value === value,
+                        )?.defaultPresetId;
+                        if (standard && presets.some(item => item.value === standard)) {
+                            setPreset(standard);
+                        }
+                    }}
+                    options={parties}
+                    placeholder="Selecione"
+                    errors={errors('partyId')}
+                />
+                <PillInput
+                    className={FILTER_PILL_CLASS}
+                    label="Descrição"
+                    name="description"
+                    required
+                    errors={errors('description')}
+                />
+                <PillSelect
+                    className={FILTER_PILL_CLASS}
+                    label="Histórico (preset)"
                     name="presetId"
+                    value={preset}
+                    onChange={setPreset}
                     options={presets}
                     errors={errors('presetId')}
                 />
-                <FormField
-                    label="Descrição"
-                    name="description"
-                    errors={errors('description')}
-                    required
-                />
-                <FormField
-                    label="Valor (R$)"
-                    name="amount"
-                    inputMode="decimal"
-                    placeholder="1.234,50"
-                    errors={errors('amount')}
-                    required
-                />
-                <FormField
+                <PillInput
+                    className={FILTER_PILL_CLASS}
                     label="Vencimento"
                     name="expirationDate"
                     type="date"
                     errors={errors('expirationDate')}
-                    required
                 />
-                <FormField
-                    label="Emissão (opcional)"
-                    name="issueDate"
-                    type="date"
-                    errors={errors('issueDate')}
-                />
-                <FormField
+                {opening ? (
+                    <>
+                        <PillInput
+                            className={FILTER_PILL_CLASS}
+                            label="Data de implantação"
+                            name="openingDate"
+                            type="date"
+                            errors={errors('openingDate')}
+                        />
+                        <PillInput
+                            className={FILTER_PILL_CLASS}
+                            label="Já baixado (R$, opcional)"
+                            name="settledAmount"
+                            inputMode="decimal"
+                            errors={errors('settledAmount')}
+                        />
+                    </>
+                ) : (
+                    <PillInput
+                        className={FILTER_PILL_CLASS}
+                        label="Emissão (opcional)"
+                        name="issueDate"
+                        type="date"
+                        errors={errors('issueDate')}
+                    />
+                )}
+                <PillInput
+                    className={FILTER_PILL_CLASS}
                     label="Juros mensais"
                     name="feesPercentageMonthly"
                     type="number"
@@ -91,98 +178,147 @@ export function TitleForm({
                     suffix="%"
                     errors={errors('feesPercentageMonthly')}
                 />
+                {!opening && type === 'EXPENSE' && destinationAccounts.length > 0 && (
+                    <PillSelect
+                        className={FILTER_PILL_CLASS}
+                        label="Conta de destino"
+                        name="destinationAccountId"
+                        value={destination}
+                        onChange={setDestination}
+                        options={destinationAccounts}
+                        allowEmpty
+                        emptyLabel="Despesa do preset (padrão)"
+                        placeholder="Despesa do preset (padrão)"
+                        errors={errors('destinationAccountId')}
+                    />
+                )}
+                {!opening && (
+                    <>
+                        <PillSelect
+                            className={FILTER_PILL_CLASS}
+                            label={series ? 'Tipo' : 'Repetição'}
+                            name="repeat"
+                            value={repeat}
+                            onChange={next => setRepeat(next || (series ? 'INSTALLMENT' : 'NONE'))}
+                            options={series ? SERIES_OPTIONS : REPEAT_OPTIONS}
+                            errors={errors('repeat')}
+                        />
+                        {repeat !== 'NONE' && (
+                            <>
+                                <PillSelect
+                                    className={FILTER_PILL_CLASS}
+                                    label="Frequência"
+                                    name="frequency"
+                                    value={frequency}
+                                    onChange={setFrequency}
+                                    options={toOptions(SERIES_FREQUENCY_LABELS)}
+                                    allowEmpty={repeat === 'INSTALLMENT'}
+                                    emptyLabel="Mensal (padrão)"
+                                    placeholder={
+                                        repeat === 'INSTALLMENT' ? 'Mensal (padrão)' : 'Selecione'
+                                    }
+                                    errors={errors('frequency')}
+                                />
+                                <PillInput
+                                    className={FILTER_PILL_CLASS}
+                                    label="Quantidade"
+                                    name="count"
+                                    type="number"
+                                    min={1}
+                                    errors={errors('count')}
+                                />
+                                <PillInput
+                                    className={FILTER_PILL_CLASS}
+                                    label="Ou data final"
+                                    name="until"
+                                    type="date"
+                                    errors={errors('until')}
+                                />
+                            </>
+                        )}
+                    </>
+                )}
             </div>
 
-            {type === 'EXPENSE' && destinationAccounts.length > 0 && (
-                <SelectField
-                    label="Conta de destino (compra de ativo)"
-                    name="destinationAccountId"
-                    options={destinationAccounts}
-                    allowEmpty
-                    placeholder="Despesa do preset (padrão)"
-                    errors={errors('destinationAccountId')}
-                />
+            {canPayNow && (
+                <div className="space-y-3">
+                    <label className="flex cursor-pointer items-center gap-3 pl-4 text-sm font-medium">
+                        <input
+                            type="checkbox"
+                            name="payNow"
+                            value="true"
+                            checked={payNow}
+                            onChange={event => setPayNow(event.target.checked)}
+                            className="accent-accent size-4"
+                        />
+                        {labels.now}
+                    </label>
+                    {payNow && (
+                        <div className="grid grid-cols-2 gap-3">
+                            <PillSelect
+                                className={FILTER_PILL_CLASS}
+                                label="Conta"
+                                name="paymentAccountId"
+                                value={account}
+                                onChange={setAccount}
+                                options={financialAccounts}
+                                placeholder="Conta"
+                                errors={errors('paymentAccountId')}
+                            />
+                            <PillInput
+                                className={FILTER_PILL_CLASS}
+                                label="Data"
+                                name="paidAt"
+                                type="date"
+                                defaultValue={toLocalIsoDate(new Date())}
+                                errors={errors('paidAt')}
+                            />
+                            <PillSelect
+                                className={FILTER_PILL_CLASS}
+                                label="Forma de pagamento"
+                                name="paymentMethod"
+                                value={method}
+                                onChange={setMethod}
+                                options={PAYMENT_METHODS}
+                                errors={errors('paymentMethod')}
+                            />
+                        </div>
+                    )}
+                    <FieldError errors={errors('payNow')} />
+                </div>
             )}
 
-            <fieldset className="space-y-4">
-                <legend className="font-display text-lg font-semibold">Implantação</legend>
-                <SelectField
-                    label="Título de implantação (saldo inicial)"
-                    name="isOpening"
-                    options={[
-                        { value: 'false', label: 'Não' },
-                        { value: 'true', label: 'Sim' },
-                    ]}
-                    defaultValue="false"
-                    onValueChange={value => setIsOpening(value === 'true')}
-                />
-                {isOpening && (
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <FormField
-                            label="Data de implantação"
-                            name="openingDate"
-                            type="date"
-                            errors={errors('openingDate')}
-                        />
-                        <FormField
-                            label="Já baixado (R$, opcional)"
-                            name="settledAmount"
-                            inputMode="decimal"
-                            errors={errors('settledAmount')}
-                        />
-                    </div>
-                )}
-            </fieldset>
-
-            <fieldset className="space-y-4">
-                <legend className="font-display text-lg font-semibold">Repetição</legend>
-                <SelectField
-                    label="Tipo de repetição"
-                    name="repeat"
-                    options={[
-                        { value: 'NONE', label: 'Sem repetição' },
-                        ...toOptions(SERIES_KIND_LABELS),
-                    ]}
-                    defaultValue="NONE"
-                    onValueChange={value => setRepeat(value || 'NONE')}
-                    errors={errors('repeat')}
-                />
-                {repeat !== 'NONE' && (
-                    <div className="grid gap-4 md:grid-cols-3">
-                        <SelectField
-                            label="Frequência"
-                            name="frequency"
-                            options={toOptions(SERIES_FREQUENCY_LABELS)}
-                            allowEmpty={repeat === 'INSTALLMENT'}
-                            placeholder={repeat === 'INSTALLMENT' ? 'Mensal (padrão)' : 'Selecione'}
-                            errors={errors('frequency')}
-                        />
-                        <FormField
-                            label="Quantidade"
-                            name="count"
-                            type="number"
-                            min={1}
-                            errors={errors('count')}
-                        />
-                        <FormField
-                            label="ou data final"
-                            name="until"
-                            type="date"
-                            errors={errors('until')}
-                        />
-                    </div>
-                )}
-            </fieldset>
-
-            {state.message && (
-                <p role="alert" className="text-negative text-sm">
-                    {state.message}
-                </p>
-            )}
-
-            <Button type="submit" disabled={pending}>
-                {pending ? 'Salvando…' : 'Criar'}
-            </Button>
+            <div className="flex justify-end">
+                <ConfirmSubmitButton
+                    confirmTitle={
+                        opening
+                            ? `Registrar ${initialLabel}`
+                            : series
+                              ? 'Criar parcelamento'
+                              : 'Criar título'
+                    }
+                    confirmDescription={
+                        opening
+                            ? `Registrar ${initialLabel} deste título?`
+                            : series
+                              ? 'Cadastrar este parcelamento e gerar as ocorrências?'
+                              : payNow
+                                ? `${labels.now} e cadastrar este título?`
+                                : 'Cadastrar este título?'
+                    }
+                    confirmLabel={opening ? 'Registrar' : 'Criar'}
+                    disabled={pending}
+                    className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
+                >
+                    {pending
+                        ? 'Salvando…'
+                        : opening
+                          ? `Registrar ${initialLabel}`
+                          : series
+                            ? 'Criar parcelamento'
+                            : 'Criar título'}
+                </ConfirmSubmitButton>
+            </div>
         </form>
     );
 }

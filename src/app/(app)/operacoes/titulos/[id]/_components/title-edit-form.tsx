@@ -1,9 +1,10 @@
 'use client';
 
 import { updateTitleAction } from '@/actions/titles';
+import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FormField } from '@/lib/_components/form-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { Button } from '@/lib/_components/ui/button';
+import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import { fractionToPercent } from '@/lib/_utils/percent';
 import type { Title } from '@/lib/api/schemas/title';
@@ -15,6 +16,7 @@ export function TitleEditForm({ title }: { title: Title }) {
         updateTitleAction.bind(null, title.id),
         INITIAL_FORM_STATE,
     );
+    useActionToast(state);
     const errors = (field: string) => state.fieldErrors?.[field];
 
     return (
@@ -49,17 +51,15 @@ export function TitleEditForm({ title }: { title: Title }) {
                     errors={errors('feesPercentageMonthly')}
                 />
             </div>
-            {state.message && (
-                <p
-                    role={state.ok ? 'status' : 'alert'}
-                    className={state.ok ? 'text-positive' : 'text-negative'}
-                >
-                    {state.message}
-                </p>
-            )}
-            <Button type="submit" variant="outline" disabled={pending}>
+            <ConfirmSubmitButton
+                confirmTitle="Salvar alterações"
+                confirmDescription="Atualizar os dados deste título?"
+                confirmLabel="Salvar"
+                variant="outline"
+                disabled={pending}
+            >
                 {pending ? 'Salvando…' : 'Salvar alterações'}
-            </Button>
+            </ConfirmSubmitButton>
         </form>
     );
 }

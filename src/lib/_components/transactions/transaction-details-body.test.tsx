@@ -7,6 +7,8 @@ const title: Title = {
     id: '3f1c2b4e-5a6d-4e7f-8a9b-0c1d2e3f4a5b',
     presetId: 'p',
     presetName: 'Padrão',
+    partyId: 'pt1',
+    partyName: 'Copel',
     seriesId: null,
     seriesIndex: null,
     type: 'EXPENSE',
@@ -45,11 +47,20 @@ const render = (entries: TitleEntry[] | null, overrides: Partial<Title> = {}) =>
             entries={entries}
             copied={false}
             onCopy={() => undefined}
+            onPay={() => undefined}
         />,
     );
 
 describe('TransactionDetailsBody', () => {
-    it('mostra os dados do título e o link para a página completa', () => {
+    it('separa as baixas com o divisor do padrão e afasta as linhas das bordas', () => {
+        const html = render([entry, { ...entry, id: 'e2' }]);
+        expect(html).toContain('role="separator"');
+        expect(html).toContain('from-primary/10');
+        expect(html).not.toContain('divide-y');
+        expect(html).toContain('space-y-1 py-1');
+    });
+
+    it('mostra os dados do título', () => {
         const html = render([]);
         expect(html).toContain('Aluguel da loja');
         expect(html).toContain('-R$ 3.200,00');
@@ -57,15 +68,36 @@ describe('TransactionDetailsBody', () => {
         expect(html).toContain('Em aberto');
         expect(html).toContain('10/11/2026');
         expect(html).toContain('2%');
-        expect(html).toContain(`/operacoes/titulos/${title.id}`);
+        expect(html).not.toContain('Abrir título completo');
     });
+
+    it('oferece "Pagar título" no título a pagar em aberto', () => {
+        const html = render([]);
+        expect(html).toContain('Pagar título');
+        expect(html).not.toContain('Baixar título');
+    });
+
+    it('oferece "Receber título" no título a receber em aberto', () => {
+        const html = render([], { type: 'INCOME' });
+        expect(html).toContain('Receber título');
+        expect(html).not.toContain('Baixar título');
+    });
+
+    it.each(['SETTLED', 'WRITTEN_OFF'] as const)(
+        'não oferece baixa quando o título está %s',
+        status => {
+            const html = render([], { status });
+            expect(html).not.toContain('Pagar título');
+            expect(html).not.toContain('Receber título');
+        },
+    );
 
     it('mostra "Carregando" enquanto as baixas não chegam', () => {
         expect(render(null)).toContain('Carregando');
     });
 
     it('avisa quando não há baixas', () => {
-        expect(render([])).toContain('Nenhuma baixa registrada');
+        expect(render([])).toContain('Nenhuma transação registrada');
     });
 
     it('lista as baixas com data, forma e valor', () => {
@@ -79,6 +111,11 @@ describe('TransactionDetailsBody', () => {
         const html = render([], { type: 'INCOME' });
         expect(html).toContain('+R$ 3.200,00');
         expect(html).toContain('A receber');
+    });
+
+    it('chama o botão de "Pagar parcela" quando o título é de um parcelamento', () => {
+        expect(render([], { seriesId: 's', seriesIndex: 2 })).toContain('Pagar parcela');
+        expect(render([])).toContain('Pagar título');
     });
 
     it('mostra a parcela quando o título é de uma série', () => {

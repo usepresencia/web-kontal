@@ -1,3 +1,4 @@
+import { BusyProvider } from '@/lib/_components/busy-provider';
 import type { Title } from '@/lib/api/schemas/title';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
@@ -14,6 +15,8 @@ const title = (id: string, description: string): Title => ({
     id,
     presetId: 'p',
     presetName: 'Padrão',
+    partyId: 'pt1',
+    partyName: 'Copel',
     seriesId: null,
     seriesIndex: null,
     type: 'EXPENSE',
@@ -38,7 +41,11 @@ const separators = (html: string) => (html.match(/role="separator"/g) ?? []).len
 
 describe('TransactionList', () => {
     it('põe um divisor com degradê e opacidade entre os itens, não depois do último', () => {
-        const html = renderToStaticMarkup(<TransactionList rows={rows(3)} />);
+        const html = renderToStaticMarkup(
+            <BusyProvider>
+                <TransactionList rows={rows(3)} />
+            </BusyProvider>,
+        );
         expect(separators(html)).toBe(2);
         expect(html).toContain('bg-gradient-to-r');
         expect(html).toContain('from-primary/10');
@@ -46,32 +53,56 @@ describe('TransactionList', () => {
     });
 
     it('começa o divisor no início do título, alinhado depois do ícone', () => {
-        const html = renderToStaticMarkup(<TransactionList rows={rows(2)} />);
+        const html = renderToStaticMarkup(
+            <BusyProvider>
+                <TransactionList rows={rows(2)} />
+            </BusyProvider>,
+        );
         const separator = html.match(/<div role="separator"[^>]*>/)?.[0] ?? '';
         expect(separator).toContain('ml-12');
     });
 
     it('afasta o divisor das linhas, para o hover não encostar nele', () => {
-        const html = renderToStaticMarkup(<TransactionList rows={rows(2)} />);
+        const html = renderToStaticMarkup(
+            <BusyProvider>
+                <TransactionList rows={rows(2)} />
+            </BusyProvider>,
+        );
         const separator = html.match(/<div role="separator"[^>]*>/)?.[0] ?? '';
         expect(separator).toContain('my-1');
     });
 
     it('mostra o ícone de pagamento no lugar das iniciais', () => {
-        const html = renderToStaticMarkup(<TransactionList rows={rows(2)} />);
+        const html = renderToStaticMarkup(
+            <BusyProvider>
+                <TransactionList rows={rows(2)} />
+            </BusyProvider>,
+        );
         expect(html).toContain('lucide-credit-card');
         expect(html).not.toContain('>CO<');
     });
 
     it('não põe divisor numa lista de um item só', () => {
-        expect(separators(renderToStaticMarkup(<TransactionList rows={rows(1)} />))).toBe(0);
+        expect(
+            separators(
+                renderToStaticMarkup(
+                    <BusyProvider>
+                        <TransactionList rows={rows(1)} />
+                    </BusyProvider>,
+                ),
+            ),
+        ).toBe(0);
     });
 
     it('mostra o texto de apoio quando informado', () => {
         const html = renderToStaticMarkup(
-            <TransactionList
-                rows={[{ title: title('a', 'Aluguel'), ago: 'hoje', caption: 'Vence 10/11/2026' }]}
-            />,
+            <BusyProvider>
+                <TransactionList
+                    rows={[
+                        { title: title('a', 'Aluguel'), ago: 'hoje', caption: 'Vence 10/11/2026' },
+                    ]}
+                />
+            </BusyProvider>,
         );
         expect(html).toContain('Vence 10/11/2026');
     });

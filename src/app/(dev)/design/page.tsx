@@ -5,7 +5,7 @@ const BRAND_COLORS = [
     { name: 'Ink', value: '--ink', className: 'bg-brand-ink text-brand-accent' },
     {
         name: 'Surface',
-        value: '--X',
+        value: '--surface',
         className: 'bg-brand-surface text-brand-ink border border-border',
     },
     { name: 'Accent', value: '--accent', className: 'bg-brand-accent text-brand-ink' },
