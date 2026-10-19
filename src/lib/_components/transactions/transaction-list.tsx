@@ -26,7 +26,7 @@ export function TransactionList({ rows }: { rows: TransactionRow[] }) {
                             {index > 0 && (
                                 <div
                                     role="separator"
-                                    className="from-primary/10 mr-3 ml-12 h-px bg-gradient-to-r from-50% to-transparent"
+                                    className="from-primary/10 my-1 mr-3 ml-12 h-px bg-gradient-to-r from-50% to-transparent"
                                 />
                             )}
                             <button
