@@ -12,8 +12,13 @@ import { HomeHeader } from './_components/home-header';
 import { KpiCard } from './_components/kpi-card';
 import { RecentTransactions } from './_components/recent-transactions';
 import { ResultCard } from './_components/result-card';
+import { UpcomingTitles } from './_components/upcoming-titles';
 
 const RECENT_COUNT = 5;
+const UPCOMING_COUNT = 5;
+
+const upcomingPath = (type: 'EXPENSE' | 'INCOME') =>
+    `/titles?type=${type}&status=OPEN&page=1&pageSize=50`;
 
 /** Executa a consulta e devolve o `fallback` em erro 4xx da API (ex.: empresa sem plano de contas). */
 async function orFallback<T>(request: Promise<T>, fallback: T): Promise<T> {
@@ -40,13 +45,22 @@ export default async function HomePage({
     const query = (Array.isArray(rawQuery) ? rawQuery[0] : rawQuery)?.slice(0, 100) ?? '';
     const now = new Date();
 
-    const [me, summary, previous, recentPage, openPage] = await Promise.all([
-        requireSession(),
-        loadDre(currentMonthRange(now)),
-        loadDre(previousMonthRange(now)),
-        orFallback(apiFetch('/titles?page=1&pageSize=50', titlePageSchema), null),
-        orFallback(apiFetch('/titles?page=1&pageSize=1&status=OPEN', titlePageSchema), null),
-    ]);
+    const [me, summary, previous, recentPage, openPage, payablePage, receivablePage] =
+        await Promise.all([
+            requireSession(),
+            loadDre(currentMonthRange(now)),
+            loadDre(previousMonthRange(now)),
+            orFallback(apiFetch('/titles?page=1&pageSize=50', titlePageSchema), null),
+            orFallback(apiFetch('/titles?page=1&pageSize=1&status=OPEN', titlePageSchema), null),
+            orFallback(apiFetch(upcomingPath('EXPENSE'), titlePageSchema), null),
+            orFallback(apiFetch(upcomingPath('INCOME'), titlePageSchema), null),
+        ]);
+
+    // A API ordena por vencimento; o filtro da busca é aplicado aqui, como nas transações recentes.
+    const upcoming = (page: typeof payablePage): Title[] =>
+        (page?.items ?? [])
+            .filter(title => matchesQuery(title.description, query))
+            .slice(0, UPCOMING_COUNT);
 
     // Não há ordenação por criação na API: pega uma página e ordena aqui.
     const recent: Title[] = [...(recentPage?.items ?? [])]
@@ -99,6 +113,25 @@ export default async function HomePage({
                     description="Configure o plano de contas da empresa para ver o resumo."
                 />
             )}
+
+            <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <UpcomingTitles
+                    heading="Próximos pagamentos"
+                    href="/operacoes/pagar"
+                    titles={upcoming(payablePage)}
+                    openCount={payablePage?.total ?? 0}
+                    emptyText="Nenhum pagamento em aberto."
+                    query={query}
+                />
+                <UpcomingTitles
+                    heading="Próximos recebimentos"
+                    href="/operacoes/receber"
+                    titles={upcoming(receivablePage)}
+                    openCount={receivablePage?.total ?? 0}
+                    emptyText="Nenhum recebimento em aberto."
+                    query={query}
+                />
+            </section>
 
             <RecentTransactions titles={recent} openCount={openPage?.total ?? 0} query={query} />
         </div>
