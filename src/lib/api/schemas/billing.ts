@@ -5,6 +5,7 @@ export const planSchema = z.object({
     id: z.string(),
     name: z.string(),
     description: z.string().nullable(),
+    isDefault: z.boolean(),
     createdAt: z.string(),
 });
 

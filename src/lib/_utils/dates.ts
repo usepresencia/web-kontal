@@ -60,6 +60,19 @@ export function daysAgoLabel(iso: string, now: Date): string {
     return `${days}d atrás`;
 }
 
+/** Situação do vencimento: "vence hoje", "vence amanhã", "vence em Nd", "venceu ontem" ou "venceu há Nd". */
+export function dueLabel(iso: string, now: Date): string {
+    const [year, month, day] = iso.slice(0, 10).split('-').map(Number);
+    const due = Date.UTC(year, month - 1, day);
+    const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const days = Math.round((due - today) / MS_PER_DAY);
+    if (days === 0) return 'vence hoje';
+    if (days === 1) return 'vence amanhã';
+    if (days > 1) return `vence em ${days}d`;
+    if (days === -1) return 'venceu ontem';
+    return `venceu há ${-days}d`;
+}
+
 /** Primeiro e último dia do mês anterior ao da data informada, como `YYYY-MM-DD`. */
 export function previousMonthRange(now: Date): { start: string; end: string } {
     return currentMonthRange(new Date(now.getFullYear(), now.getMonth() - 1, 1));
