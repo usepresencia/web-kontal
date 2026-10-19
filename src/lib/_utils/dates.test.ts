@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
     currentMonthRange,
     daysAgoLabel,
+    dueLabel,
     formatMonth,
     isoToLocalDate,
     monthAbbreviation,
@@ -88,6 +89,20 @@ describe('nextMonth', () => {
 describe('formatMonth', () => {
     it('converte YYYY-MM em MM/YYYY', () => {
         expect(formatMonth('2026-03')).toBe('03/2026');
+    });
+});
+
+describe('dueLabel', () => {
+    const now = new Date(2026, 9, 15, 20, 0);
+
+    it.each([
+        ['2026-10-15', 'vence hoje'],
+        ['2026-10-16', 'vence amanhã'],
+        ['2026-10-25', 'vence em 10d'],
+        ['2026-10-14', 'venceu ontem'],
+        ['2026-10-05', 'venceu há 10d'],
+    ])('%s é "%s"', (iso, expected) => {
+        expect(dueLabel(iso, now)).toBe(expected);
     });
 });
 
