@@ -2,6 +2,7 @@ import { DatePickerField } from '@/lib/_components/date-picker-field';
 import { DropdownSelect } from '@/lib/_components/dropdown-select';
 import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
+import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
 import { Button } from '@/lib/_components/ui/button';
 import { daysAgoLabel } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
@@ -62,12 +63,11 @@ export async function TitlesView({
             </header>
 
             <form method="get" className="flex flex-wrap items-end gap-3">
-                <div className="space-y-1 text-sm">
-                    <span className="text-muted-foreground">Situação</span>
+                <FilterField label="Situação">
                     <DropdownSelect
                         name="status"
                         defaultValue={status ?? ''}
-                        className="w-44"
+                        className={`${FILTER_PILL_CLASS} w-44`}
                         options={[
                             { value: '', label: 'Todas' },
                             ...TITLE_STATUSES.map(item => ({
@@ -76,20 +76,23 @@ export async function TitlesView({
                             })),
                         ]}
                     />
-                </div>
-                <div className="space-y-1 text-sm">
-                    <span className="text-muted-foreground">Vencimento de</span>
+                </FilterField>
+                <FilterField label="Vencimento de">
                     <DatePickerField
                         name="dueFrom"
                         defaultValue={dueFrom}
                         clearable
-                        className="w-44"
+                        className={`${FILTER_PILL_CLASS} w-44`}
                     />
-                </div>
-                <div className="space-y-1 text-sm">
-                    <span className="text-muted-foreground">até</span>
-                    <DatePickerField name="dueTo" defaultValue={dueTo} clearable className="w-44" />
-                </div>
+                </FilterField>
+                <FilterField label="até">
+                    <DatePickerField
+                        name="dueTo"
+                        defaultValue={dueTo}
+                        clearable
+                        className={`${FILTER_PILL_CLASS} w-44`}
+                    />
+                </FilterField>
                 <FilterButton />
             </form>
 
