@@ -2,7 +2,13 @@ import { cookieNames } from '@/lib/auth/cookie-options';
 import { buildSecurityHeaders } from '@/lib/security/csp';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PUBLIC_PATHS = ['/sso-callback', '/api/session/expired', '/acesso-negado', '/design'];
+const PUBLIC_PATHS = [
+    '/sso-callback',
+    '/api/session/expired',
+    '/api/health',
+    '/acesso-negado',
+    '/design',
+];
 
 const isPublic = (pathname: string) =>
     PUBLIC_PATHS.some(path => pathname === path || pathname.startsWith(`${path}/`));
