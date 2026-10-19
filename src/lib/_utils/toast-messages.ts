@@ -20,6 +20,10 @@ export const SUCCESS = {
     periodReopened: done('Período reaberto', 'O período foi reaberto com sucesso.'),
     planCreated: done('Plano criado', 'O plano foi criado com sucesso.'),
     planUpdated: done('Plano atualizado', 'O plano foi atualizado com sucesso.'),
+    planDefaulted: done(
+        'Plano padrão definido',
+        'O plano foi definido como padrão da empresa com sucesso.',
+    ),
     planDeleted: done('Plano excluído', 'O plano foi excluído com sucesso.'),
     accountCreated: done('Conta criada', 'A conta foi criada com sucesso.'),
     accountUpdated: done('Conta atualizada', 'A conta foi atualizada com sucesso.'),

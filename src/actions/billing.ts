@@ -57,6 +57,19 @@ export async function updatePlanAction(
     return { ok: true, ...SUCCESS.planUpdated };
 }
 
+/** Torna o plano o padrão da empresa, usado nos relatórios e no fechamento. */
+export async function setDefaultPlanAction(planId: string): Promise<FormState> {
+    if (!isUuid(planId)) return INVALID_ID;
+    try {
+        await apiFetch(`/billing-plans/${planId}/default`, planSchema, { method: 'POST' });
+    } catch (error) {
+        return stateFromApiError(error);
+    }
+    revalidatePath('/cadastros/plano-de-contas');
+    revalidatePath(`/cadastros/plano-de-contas/${planId}`);
+    return { ok: true };
+}
+
 /** Exclui um plano de contas. */
 export async function deletePlanAction(planId: string): Promise<FormState> {
     if (!isUuid(planId)) return INVALID_ID;
