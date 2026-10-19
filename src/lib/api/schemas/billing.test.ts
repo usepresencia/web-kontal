@@ -88,6 +88,12 @@ describe('accountUpdateSchema', () => {
         ).toBe(false);
     });
 
+    it('envia o novo pai e trata o vazio como raiz', () => {
+        const base = { name: 'A', accountType: 'ANALYTIC', isActive: 'true' };
+        expect(accountUpdateSchema.parse({ ...base, parentId: 'abc' }).parentId).toBe('abc');
+        expect(accountUpdateSchema.parse({ ...base, parentId: '' }).parentId).toBeNull();
+    });
+
     it('recusa status fora de true/false', () => {
         expect(
             accountUpdateSchema.safeParse({ name: 'A', accountType: 'ANALYTIC', isActive: 'x' })

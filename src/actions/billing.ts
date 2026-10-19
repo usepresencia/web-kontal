@@ -53,6 +53,7 @@ export async function updatePlanAction(
         return stateFromApiError(error);
     }
     revalidatePath('/cadastros/plano-de-contas');
+    revalidatePath(`/cadastros/plano-de-contas/${planId}`);
     return { ok: true, ...SUCCESS.planUpdated };
 }
 
@@ -86,6 +87,7 @@ export async function createAccountAction(
     } catch (error) {
         return stateFromApiError(error);
     }
+    revalidatePath('/cadastros/plano-de-contas');
     revalidatePath(`/cadastros/plano-de-contas/${planId}`);
     return { ok: true, ...SUCCESS.accountCreated };
 }
@@ -109,6 +111,7 @@ export async function updateAccountAction(
     } catch (error) {
         return stateFromApiError(error);
     }
+    revalidatePath('/cadastros/plano-de-contas');
     revalidatePath(`/cadastros/plano-de-contas/${planId}`);
     return { ok: true, ...SUCCESS.accountUpdated };
 }
@@ -121,6 +124,7 @@ export async function deleteAccountAction(planId: string, accountId: string): Pr
     } catch (error) {
         return stateFromApiError(error);
     }
+    revalidatePath('/cadastros/plano-de-contas');
     revalidatePath(`/cadastros/plano-de-contas/${planId}`);
     return { ok: true };
 }

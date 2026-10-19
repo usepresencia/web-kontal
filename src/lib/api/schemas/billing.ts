@@ -71,6 +71,7 @@ export const accountCreateSchema = z.object({
 
 export const accountUpdateSchema = z.object({
     name: accountName,
+    parentId: optionalNullable,
     accountType: z.enum(['ANALYTIC', 'SYNTHETIC']),
     dreCategory: optionalNullable,
     balanceCategory: optionalNullable,

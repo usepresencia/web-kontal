@@ -22,6 +22,8 @@ import { useActionState, useEffect, useState, type ReactNode } from 'react';
 type AccountFormProps = {
     planId: string;
     accounts: BillingAccount[];
+    /** Conta pai pré-selecionada ao criar subconta. */
+    defaultParentId?: string;
     /** Conta em edição; ausente para criar. */
     account?: BillingAccount;
     /** Ação extra à esquerda do botão de salvar (ex.: excluir). */
@@ -35,10 +37,27 @@ const toOptions = (labels: Record<string, string>, allowed?: string[]) =>
         .filter(([value]) => !allowed || allowed.includes(value))
         .map(([value, label]) => ({ value, label }));
 
+/** Ids da conta e de todas as suas descendentes, que não podem ser o novo pai dela. */
+function subtreeIds(accounts: BillingAccount[], rootId: string): Set<string> {
+    const ids = new Set([rootId]);
+    let grew = true;
+    while (grew) {
+        grew = false;
+        for (const item of accounts) {
+            if (item.parentId && ids.has(item.parentId) && !ids.has(item.id)) {
+                ids.add(item.id);
+                grew = true;
+            }
+        }
+    }
+    return ids;
+}
+
 /** Conta do plano nos campos em pílula: criação e edição. */
 export function AccountForm({
     planId,
     accounts,
+    defaultParentId,
     account,
     footerStart,
     onSuccess,
@@ -49,21 +68,25 @@ export function AccountForm({
         : createAccountAction.bind(null, planId);
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
     useActionToast(state);
-    const [parent, setParent] = useState('');
+    const defaultParent = accounts.find(item => item.id === defaultParentId);
+    const [parent, setParent] = useState(
+        account ? (account.parentId ?? '') : (defaultParentId ?? ''),
+    );
     const [type, setType] = useState<string>(account?.accountType ?? 'ANALYTIC');
-    const [nature, setNature] = useState(account?.nature ?? '');
+    const [nature, setNature] = useState(account?.nature ?? defaultParent?.nature ?? '');
     const [dre, setDre] = useState(account?.dreCategory ?? '');
     const [balance, setBalance] = useState(account?.balanceCategory ?? '');
     const [cost, setCost] = useState(account?.costBehavior ?? '');
     const [active, setActive] = useState(account?.isActive === false ? 'false' : 'true');
     const errors = (field: string) => state.fieldErrors?.[field];
+    const blockedParents = account ? subtreeIds(accounts, account.id) : new Set<string>();
 
     useEffect(() => {
         if (state.ok) onSuccess?.();
     }, [state, onSuccess]);
 
     const parents = accounts
-        .filter(item => item.accountType === 'SYNTHETIC')
+        .filter(item => item.accountType === 'SYNTHETIC' && !blockedParents.has(item.id))
         .map(item => ({ value: item.id, label: `${item.code} ${item.name}` }));
 
     return (
@@ -78,20 +101,18 @@ export function AccountForm({
                     required
                     errors={errors('name')}
                 />
-                {!editing && (
-                    <PillSelect
-                        className={FILTER_PILL_CLASS}
-                        label="Conta pai"
-                        name="parentId"
-                        value={parent}
-                        onChange={setParent}
-                        options={parents}
-                        allowEmpty
-                        emptyLabel="Sem conta pai"
-                        placeholder="Sem conta pai"
-                        errors={errors('parentId')}
-                    />
-                )}
+                <PillSelect
+                    className={FILTER_PILL_CLASS}
+                    label="Conta pai"
+                    name="parentId"
+                    value={parent}
+                    onChange={setParent}
+                    options={parents}
+                    allowEmpty
+                    emptyLabel="Sem conta pai"
+                    placeholder="Sem conta pai"
+                    errors={errors('parentId')}
+                />
                 <PillSelect
                     className={FILTER_PILL_CLASS}
                     label="Tipo"

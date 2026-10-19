@@ -6,13 +6,11 @@ import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
 import type { Page } from '@/lib/_utils/pagination';
 import type { BillingPlan } from '@/lib/api/schemas/billing';
 import { ChevronRight, ListTree } from 'lucide-react';
-import { useState } from 'react';
-import { PlanDialog } from './plan-dialog';
+import Link from 'next/link';
 
-/** Lista paginada de planos de contas no padrão das demais telas; cada linha abre o modal do plano. */
+/** Lista paginada de planos de contas no padrão das demais telas; cada linha avança para os detalhes do plano. */
 export function PlansTable({ page }: { page: Page<BillingPlan> }) {
     const pagination = usePaginationQuery();
-    const [selected, setSelected] = useState<BillingPlan | null>(null);
 
     return (
         <section className="bg-card space-y-4 rounded-2xl p-5 shadow-sm">
@@ -20,10 +18,8 @@ export function PlansTable({ page }: { page: Page<BillingPlan> }) {
                 {page.items.map((plan, index) => (
                     <li key={plan.id}>
                         {index > 0 && <Divider className="my-1 mr-3 ml-12" />}
-                        <button
-                            type="button"
-                            onClick={() => setSelected(plan)}
-                            aria-haspopup="dialog"
+                        <Link
+                            href={`/cadastros/plano-de-contas/${plan.id}`}
                             className="group hover:bg-muted/50 focus-visible:ring-ring -mx-3 flex w-[calc(100%+1.5rem)] items-center gap-3 rounded-xl px-3 py-2 text-left focus-visible:ring-2 focus-visible:outline-none"
                         >
                             <div className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-full">
@@ -41,7 +37,7 @@ export function PlansTable({ page }: { page: Page<BillingPlan> }) {
                                 className="text-muted-foreground size-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
                                 aria-hidden="true"
                             />
-                        </button>
+                        </Link>
                     </li>
                 ))}
             </ul>
@@ -53,7 +49,6 @@ export function PlansTable({ page }: { page: Page<BillingPlan> }) {
                 onPageSizeChange={pagination.onPageSizeChange}
                 pageSizeLabel="Planos por página:"
             />
-            <PlanDialog plan={selected} onClose={() => setSelected(null)} />
         </section>
     );
 }
