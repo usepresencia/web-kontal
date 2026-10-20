@@ -11,7 +11,7 @@ import { daysAgoLabel, transactionDate } from '@/lib/_utils/dates';
 import { formatAmount } from '@/lib/_utils/money';
 import { notify } from '@/lib/_utils/notify';
 import type { Page } from '@/lib/_utils/pagination';
-import { PAYMENT_METHOD_LABELS, TITLE_TYPE_LABELS, formatDate } from '@/lib/_utils/title-labels';
+import { PAYMENT_METHOD_LABELS, formatDate } from '@/lib/_utils/title-labels';
 import type { Title, TitleEntry } from '@/lib/api/schemas/title';
 import { ChevronRight, Clock, CreditCard } from 'lucide-react';
 import { useState } from 'react';
@@ -67,7 +67,6 @@ export function TransactionsTable({ page }: { page: Page<TitleEntry> }) {
                                         {entry.titleDescription}
                                     </p>
                                     <p className="text-muted-foreground flex items-center gap-2 text-xs">
-                                        {entry.titleType && TITLE_TYPE_LABELS[entry.titleType]}
                                         <span className="bg-muted rounded-full px-2 py-0.5 text-[11px]">
                                             {entryMethodLabel(entry)}
                                         </span>

@@ -11,7 +11,7 @@ vi.mock('@/actions/titles', () => ({ getTitleEntriesAction: vi.fn() }));
 const { TransactionList } = await import('./transaction-list');
 type TransactionRow = Parameters<typeof TransactionList>[0]['rows'][number];
 
-const title = (id: string, description: string): Title => ({
+const title = (id: string, description: string, overrides: Partial<Title> = {}): Title => ({
     id,
     presetId: 'p',
     presetName: 'Padrão',
@@ -29,6 +29,7 @@ const title = (id: string, description: string): Title => ({
     expirationDate: '2026-11-01',
     feesPercentageMonthly: 0,
     createdAt: '2026-10-01T10:00:00.000Z',
+    ...overrides,
 });
 
 const rows = (count: number): TransactionRow[] =>
@@ -105,5 +106,32 @@ describe('TransactionList', () => {
             </BusyProvider>,
         );
         expect(html).toContain('Vence 10/11/2026');
+    });
+
+    const renderRow = (overrides: Partial<Title>) =>
+        renderToStaticMarkup(
+            <BusyProvider>
+                <TransactionList
+                    rows={[{ title: title('a', 'Aluguel', overrides), ago: 'hoje' }]}
+                />
+            </BusyProvider>,
+        );
+
+    it('mostra "A pagar" e "A receber" no título em aberto', () => {
+        expect(renderRow({ type: 'EXPENSE', status: 'OPEN' })).toContain('A pagar');
+        expect(renderRow({ type: 'INCOME', status: 'OPEN' })).toContain('A receber');
+    });
+
+    it('deixa só o selo de situação no título já quitado', () => {
+        const html = renderRow({ type: 'EXPENSE', status: 'SETTLED' });
+        expect(html).toContain('Quitado');
+        expect(html).not.toContain('A pagar');
+        expect(renderRow({ type: 'INCOME', status: 'SETTLED' })).not.toContain('A receber');
+    });
+
+    it('deixa só o selo de situação no título baixado por perda', () => {
+        const html = renderRow({ type: 'INCOME', status: 'WRITTEN_OFF' });
+        expect(html).toContain('Baixado');
+        expect(html).not.toContain('A receber');
     });
 });

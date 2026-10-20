@@ -70,4 +70,9 @@ describe('TransactionsTable', () => {
     it('chama a baixa por perda de "Perda"', () => {
         expect(render([entry('a', { kind: 'WRITE_OFF', paymentMethod: null })])).toContain('Perda');
     });
+
+    it('não repete "A pagar" nem "A receber" numa baixa já registrada', () => {
+        expect(render([entry('a')])).not.toContain('A pagar');
+        expect(render([entry('a', { titleType: 'INCOME' })])).not.toContain('A receber');
+    });
 });
