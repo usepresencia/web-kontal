@@ -9,8 +9,14 @@ import { ChevronRight, Clock, CreditCard } from 'lucide-react';
 import { useState } from 'react';
 import { TransactionDialog } from './transaction-dialog';
 
-/** Linha da lista: o título, há quanto tempo foi criado e o texto de apoio à direita (padrão: o mesmo tempo). */
+/** Linha da lista: o título, há quanto tempo foi a transação e o texto de apoio à direita (padrão: o mesmo tempo). */
 export type TransactionRow = { title: Title; ago: string; caption?: string };
+
+/** Subtítulo da linha: a contraparte e, só no título em aberto, se é a pagar ou a receber. */
+function rowCaption(title: Title): string {
+    const kind = title.status === 'OPEN' ? TITLE_TYPE_LABELS[title.type] : null;
+    return [title.partyName, kind].filter(Boolean).join(' · ');
+}
 
 /** Lista das transações; cada linha abre o modal de detalhes e mostra o chevron ao passar o mouse. */
 export function TransactionList({ rows }: { rows: TransactionRow[] }) {
@@ -46,8 +52,7 @@ export function TransactionList({ rows }: { rows: TransactionRow[] }) {
                                         {title.description}
                                     </p>
                                     <p className="text-muted-foreground flex items-center gap-2 text-xs">
-                                        {title.partyName && `${title.partyName} · `}
-                                        {TITLE_TYPE_LABELS[title.type]}
+                                        {rowCaption(title)}
                                         <span className="bg-muted rounded-full px-2 py-0.5 text-[11px]">
                                             {TITLE_STATUS_LABELS[title.status]}
                                         </span>

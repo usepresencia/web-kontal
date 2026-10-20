@@ -1,5 +1,10 @@
 import { EmptyState } from '@/lib/_components/empty-state';
-import { currentMonthRange, monthAbbreviation, previousMonthRange } from '@/lib/_utils/dates';
+import {
+    currentMonthRange,
+    monthAbbreviation,
+    previousMonthRange,
+    transactionDate,
+} from '@/lib/_utils/dates';
 import { matchesQuery, percentChange, shareOfTotal } from '@/lib/_utils/kpi';
 import { formatAmount } from '@/lib/_utils/money';
 import { apiFetch } from '@/lib/api/client';
@@ -62,10 +67,14 @@ export default async function HomePage({
             .filter(title => matchesQuery(title.description, query))
             .slice(0, UPCOMING_COUNT);
 
-    // Não há ordenação por criação na API: pega uma página e ordena aqui.
+    // Não há ordenação por data da transação na API: pega uma página e ordena aqui.
     const recent: Title[] = [...(recentPage?.items ?? [])]
         .filter(title => matchesQuery(title.description, query))
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .sort(
+            (a, b) =>
+                transactionDate(b).localeCompare(transactionDate(a)) ||
+                b.createdAt.localeCompare(a.createdAt),
+        )
         .slice(0, RECENT_COUNT);
 
     const previousLabel = monthAbbreviation(Number(previousMonthRange(now).start.slice(5, 7)) - 1);
