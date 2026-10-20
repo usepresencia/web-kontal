@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/usepresencia/web-kontal/compare/v0.1.2...v0.1.3) (2026-10-20)
+
+### Features
+
+- **seo:** adiciona metadados de compartilhamento, og:image e bloqueio de indexação ([dd1bfa1](https://github.com/usepresencia/web-kontal/commit/dd1bfa1a6471608e2b5bd12ee435b4ea0c632a90))
+
 ### [0.1.2](https://github.com/usepresencia/web-kontal/compare/v0.1.1...v0.1.2) (2026-10-19)
 
 ### Features
