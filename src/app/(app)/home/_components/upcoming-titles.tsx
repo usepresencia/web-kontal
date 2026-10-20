@@ -1,5 +1,5 @@
 import { TransactionList } from '@/lib/_components/transactions/transaction-list';
-import { daysAgoLabel, dueLabel } from '@/lib/_utils/dates';
+import { daysAgoLabel, dueLabel, transactionDate } from '@/lib/_utils/dates';
 import type { Title } from '@/lib/api/schemas/title';
 import Link from 'next/link';
 
@@ -26,7 +26,7 @@ export function UpcomingTitles({
     const now = new Date();
     const rows = titles.map(title => ({
         title,
-        ago: daysAgoLabel(title.createdAt, now),
+        ago: daysAgoLabel(transactionDate(title), now),
         caption: dueLabel(title.expirationDate, now),
     }));
 

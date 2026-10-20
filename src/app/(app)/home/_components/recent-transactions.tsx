@@ -1,6 +1,6 @@
 import { NewTransactionDialog } from '@/lib/_components/transactions/new-transaction-dialog';
 import { TransactionList } from '@/lib/_components/transactions/transaction-list';
-import { daysAgoLabel } from '@/lib/_utils/dates';
+import { daysAgoLabel, transactionDate } from '@/lib/_utils/dates';
 import type { Title } from '@/lib/api/schemas/title';
 import Link from 'next/link';
 
@@ -14,7 +14,7 @@ type RecentTransactionsProps = {
 /** Últimas transações (títulos): iniciais, descrição, tipo, situação, valor e há quanto tempo. */
 export function RecentTransactions({ titles, openCount, query }: RecentTransactionsProps) {
     const now = new Date();
-    const rows = titles.map(title => ({ title, ago: daysAgoLabel(title.createdAt, now) }));
+    const rows = titles.map(title => ({ title, ago: daysAgoLabel(transactionDate(title), now) }));
 
     return (
         <section className="bg-card rounded-2xl p-5 shadow-sm">
