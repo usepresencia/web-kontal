@@ -6,6 +6,7 @@ const PUBLIC_PATHS = [
     '/sso-callback',
     '/api/session/expired',
     '/api/health',
+    '/robots.txt',
     '/acesso-negado',
     '/design',
 ];

@@ -1,7 +1,7 @@
 import { BusyProvider } from '@/lib/_components/busy-provider';
 import { FlashToast } from '@/lib/_components/flash-toast';
 import { ToastProvider } from '@/lib/_components/ui/toast-provider';
-import type { Metadata } from 'next';
+import { rootMetadata } from '@/lib/config/metadata';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { headers } from 'next/headers';
 import './globals.css';
@@ -18,10 +18,7 @@ const inter = Inter({
     display: 'swap',
 });
 
-export const metadata: Metadata = {
-    title: 'Kontal',
-    description: 'Gestão financeira e contábil para pequenas empresas e escritórios.',
-};
+export const metadata = rootMetadata;
 
 export default async function RootLayout({
     children,
