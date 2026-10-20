@@ -11,6 +11,7 @@ import {
     parsePeriodParams,
     previousMonthRange,
     toLocalIsoDate,
+    transactionDate,
 } from './dates';
 
 describe('currentMonthRange', () => {
@@ -160,5 +161,21 @@ describe('isoToLocalDate', () => {
         const date = isoToLocalDate('2026-10-16');
         expect([date.getFullYear(), date.getMonth(), date.getDate()]).toEqual([2026, 9, 16]);
         expect(toLocalIsoDate(date)).toBe('2026-10-16');
+    });
+});
+
+describe('transactionDate', () => {
+    it('usa a data de emissão do título', () => {
+        expect(transactionDate({ issueDate: '2026-10-16' })).toBe('2026-10-16');
+    });
+
+    it('usa a data de implantação quando o título é de saldo inicial', () => {
+        expect(transactionDate({ issueDate: '2026-10-16', openingDate: '2026-01-01' })).toBe(
+            '2026-01-01',
+        );
+    });
+
+    it('ignora a data de implantação nula', () => {
+        expect(transactionDate({ issueDate: '2026-10-16', openingDate: null })).toBe('2026-10-16');
     });
 });

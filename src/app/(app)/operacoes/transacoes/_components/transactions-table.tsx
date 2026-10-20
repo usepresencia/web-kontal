@@ -7,7 +7,7 @@ import { Pagination } from '@/lib/_components/pagination';
 import { TransactionDialog } from '@/lib/_components/transactions/transaction-dialog';
 import { usePaginationQuery } from '@/lib/_hooks/use-pagination-query';
 import { cn } from '@/lib/_utils/cn';
-import { daysAgoLabel } from '@/lib/_utils/dates';
+import { daysAgoLabel, transactionDate } from '@/lib/_utils/dates';
 import { formatAmount } from '@/lib/_utils/money';
 import { notify } from '@/lib/_utils/notify';
 import type { Page } from '@/lib/_utils/pagination';
@@ -107,7 +107,7 @@ export function TransactionsTable({ page }: { page: Page<TitleEntry> }) {
             />
             <TransactionDialog
                 title={selected}
-                ago={selected ? daysAgoLabel(selected.createdAt, new Date()) : ''}
+                ago={selected ? daysAgoLabel(transactionDate(selected), new Date()) : ''}
                 onClose={() => setSelected(null)}
             />
         </section>

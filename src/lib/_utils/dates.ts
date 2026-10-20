@@ -108,3 +108,8 @@ export function isoToLocalDate(iso: string): Date {
     const [year, month, day] = iso.split('-').map(Number);
     return new Date(year, month - 1, day);
 }
+
+/** Data da transação do título: a de implantação, quando houver, ou a de emissão. */
+export function transactionDate(title: { issueDate: string; openingDate?: string | null }): string {
+    return title.openingDate ?? title.issueDate;
+}

@@ -8,7 +8,7 @@ import { TransactionDialog } from '@/lib/_components/transactions/transaction-di
 import { Button } from '@/lib/_components/ui/button';
 import { Dialog, DialogContent, DialogHeader, MODAL_CLASS } from '@/lib/_components/ui/dialog';
 import { cn } from '@/lib/_utils/cn';
-import { daysAgoLabel } from '@/lib/_utils/dates';
+import { daysAgoLabel, transactionDate } from '@/lib/_utils/dates';
 import { formatAmount } from '@/lib/_utils/money';
 import {
     SERIES_FREQUENCY_LABELS,
@@ -135,7 +135,7 @@ export function SeriesDialog({ series, onClose }: SeriesDialogProps) {
             </DialogContent>
             <TransactionDialog
                 title={picked}
-                ago={picked ? daysAgoLabel(picked.createdAt, new Date()) : ''}
+                ago={picked ? daysAgoLabel(transactionDate(picked), new Date()) : ''}
                 onClose={() => {
                     setPicked(null);
                     load();

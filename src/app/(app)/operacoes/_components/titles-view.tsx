@@ -4,7 +4,7 @@ import { EmptyState } from '@/lib/_components/empty-state';
 import { FilterButton } from '@/lib/_components/filter-button';
 import { FILTER_PILL_CLASS, FilterField } from '@/lib/_components/filter-field';
 import { FilterForm } from '@/lib/_components/filter-form';
-import { daysAgoLabel } from '@/lib/_utils/dates';
+import { daysAgoLabel, transactionDate } from '@/lib/_utils/dates';
 import { parsePageParams } from '@/lib/_utils/pagination';
 import { TITLE_STATUS_LABELS, formatDate } from '@/lib/_utils/title-labels';
 import { apiFetch } from '@/lib/api/client';
@@ -39,7 +39,7 @@ export async function TitlesView({ type, heading, subtitle, searchParams }: Titl
     const now = new Date();
     const rows = titles.items.map(title => ({
         title,
-        ago: daysAgoLabel(title.createdAt, now),
+        ago: daysAgoLabel(transactionDate(title), now),
         caption: `Vence ${formatDate(title.expirationDate)}`,
     }));
 
