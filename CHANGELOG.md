@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.4](https://github.com/usepresencia/web-kontal/compare/v0.1.3...v0.1.4) (2026-10-20)
+
+### Bug Fixes
+
+- **titulos:** exibe a data da transação no lugar da data de criação ([7a25c7b](https://github.com/usepresencia/web-kontal/commit/7a25c7b0651439ffc76c532064b0ba70875b6177))
+- **titulos:** mostra a pagar e a receber só no título em aberto ([91b5c7e](https://github.com/usepresencia/web-kontal/commit/91b5c7e45911a41c3ffc4be81c3b12d11449b448))
+
 ### [0.1.3](https://github.com/usepresencia/web-kontal/compare/v0.1.2...v0.1.3) (2026-10-20)
 
 ### Features
