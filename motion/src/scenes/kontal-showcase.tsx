@@ -88,7 +88,7 @@ function Dashboard() {
 export function KontalShowcase() {
     const frame = useCurrentFrame();
     const introOpacity = interpolate(frame, [0, 25, 150, 205], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-    const outroOpacity = interpolate(frame, [0, 80, 220], [0, 1, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+    const outroOpacity = interpolate(frame, [1530, 1610, 1750], [0, 1, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
     return <AbsoluteFill style={{ background: ink, color: surface, fontFamily: font, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', width: 1250, height: 1250, borderRadius: '50%', background: accent, opacity: 0.07, filter: 'blur(160px)', top: -450, right: -300 }} />
         <Sequence from={0} durationInFrames={220}><AbsoluteFill style={{ opacity: introOpacity, justifyContent: 'center', alignItems: 'center' }}><div style={{ fontFamily: display, fontSize: 130, fontWeight: 700 }}>Kontal<span style={{ color: accent }}>.</span></div><div style={{ fontSize: 34, marginTop: 22, color: '#c5c5b9' }}>Rigor sem peso.</div></AbsoluteFill></Sequence>
