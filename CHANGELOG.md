@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.7](https://github.com/usepresencia/web-kontal/compare/v0.1.6...v0.1.7) (2026-10-24)
+
+### Features
+
+- **cadastros:** autopreenche o endereço a partir do CEP ([de30fa1](https://github.com/usepresencia/web-kontal/commit/de30fa1958db5e4122fb1a9890a32dcb1e3fc174))
+
+### Bug Fixes
+
+- **ui:** centraliza o gradiente do divisor no dropdown de busca ([767bdba](https://github.com/usepresencia/web-kontal/commit/767bdbae2377b9ee5fb13de49c65d465ec5058c9))
+- **ui:** usa "Atualizar" no botão dos formulários em edição ([d978d70](https://github.com/usepresencia/web-kontal/commit/d978d704b2a096274eed2f5f57b2430dd8e79d53))
+
 ### [0.1.6](https://github.com/usepresencia/web-kontal/compare/v0.1.5...v0.1.6) (2026-10-24)
 
 ### Features
