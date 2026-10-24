@@ -18,8 +18,7 @@ export default async function ChartOfAccountsPage({
             <header>
                 <h1 className="text-2xl font-bold">Plano de contas</h1>
                 <p className="text-muted-foreground text-sm">
-                    Gerencie os planos, as contas e os presets (históricos padrão) que a
-                    contabilidade usa
+                    Gerencie os planos, as contas e os históricos padrão que a contabilidade usa
                 </p>
             </header>
             <SectionTabs
@@ -27,7 +26,7 @@ export default async function ChartOfAccountsPage({
                 active={tab}
                 tabs={[
                     { key: 'planos', label: 'Planos e contas', href: BASE },
-                    { key: 'presets', label: 'Presets', href: `${BASE}?aba=presets` },
+                    { key: 'presets', label: 'Históricos padrão', href: `${BASE}?aba=presets` },
                 ]}
             />
             {tab === 'presets' ? (

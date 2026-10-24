@@ -44,7 +44,15 @@ describe('getTitleFormOptionsAction', () => {
     it('devolve só os presets e as contas de destino de um título a pagar', async () => {
         const { getTitleFormOptionsAction } = await import('./titles');
         apiFetch
-            .mockResolvedValueOnce({ items: [{ id: 'p1', name: 'Padrão' }] })
+            .mockResolvedValueOnce({
+                items: [
+                    {
+                        id: 'p1',
+                        name: 'Padrão',
+                        accounts: { expense: { id: 'a1', name: 'Caixa' } },
+                    },
+                ],
+            })
             .mockResolvedValueOnce({
                 items: [
                     {
@@ -77,7 +85,7 @@ describe('getTitleFormOptionsAction', () => {
             items: [{ id: 'pt1', kind: 'SUPPLIER', name: 'Copel', defaultPresetId: 'p1' }],
         });
         expect(await getTitleFormOptionsAction('EXPENSE')).toEqual({
-            presets: [{ value: 'p1', label: 'Padrão' }],
+            presets: [{ value: 'p1', label: 'Padrão', defaultAccountId: 'a1' }],
             destinationAccounts: [{ value: 'a1', label: '1.1 Caixa' }],
             financialAccounts: [{ value: 'a1', label: '1.1 Caixa' }],
             parties: [{ value: 'pt1', label: 'Copel', defaultPresetId: 'p1' }],

@@ -59,12 +59,12 @@ describe('PresetsTable', () => {
 });
 
 describe('NewPresetDialog', () => {
-    it('mostra o botão "Novo preset" com o + antes do texto', () => {
+    it('mostra o botão "Novo histórico padrão" com o + antes do texto', () => {
         const html = renderToStaticMarkup(
             <BusyProvider>
                 <NewPresetDialog plans={[]} />
             </BusyProvider>,
         );
-        expect(html.indexOf('lucide-plus')).toBeLessThan(html.indexOf('Novo preset'));
+        expect(html.indexOf('lucide-plus')).toBeLessThan(html.indexOf('Novo histórico padrão'));
     });
 });

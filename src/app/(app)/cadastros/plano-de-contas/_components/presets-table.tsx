@@ -57,7 +57,7 @@ export function PresetsTable({ page }: { page: Page<Preset> }) {
                 total={page.total}
                 onPageChange={pagination.onPageChange}
                 onPageSizeChange={pagination.onPageSizeChange}
-                pageSizeLabel="Presets por página:"
+                pageSizeLabel="Históricos padrão por página:"
             />
             <PresetDialog preset={selected} onClose={() => setSelected(null)} />
         </section>

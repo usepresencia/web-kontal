@@ -79,7 +79,7 @@ export function NewSeriesDialog() {
                                 ? 'Nenhum fornecedor cadastrado'
                                 : 'Nenhum cliente cadastrado'
                         }
-                        description="Cadastre o cliente ou fornecedor, com o preset padrão, antes de criar títulos."
+                        description="Cadastre o cliente ou fornecedor, com o histórico padrão, antes de criar títulos."
                         action={
                             <Button asChild variant="outline">
                                 <Link href="/cadastros/clientes-fornecedores">
@@ -90,12 +90,12 @@ export function NewSeriesDialog() {
                     />
                 ) : options.presets.length === 0 ? (
                     <EmptyState
-                        title="Nenhum preset ativo"
-                        description="Cadastre um preset antes de criar parcelamentos."
+                        title="Nenhum histórico padrão ativo"
+                        description="Cadastre um histórico padrão antes de criar parcelamentos."
                         action={
                             <Button asChild variant="outline">
                                 <Link href="/cadastros/plano-de-contas?aba=presets">
-                                    Novo preset
+                                    Novo histórico padrão
                                 </Link>
                             </Button>
                         }

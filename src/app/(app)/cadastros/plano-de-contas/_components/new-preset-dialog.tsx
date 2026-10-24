@@ -51,13 +51,13 @@ export function NewPresetDialog({ plans }: { plans: BillingPlan[] }) {
             <DialogTrigger asChild>
                 <Button>
                     <Plus aria-hidden="true" />
-                    Novo preset
+                    Novo histórico padrão
                 </Button>
             </DialogTrigger>
             <DialogContent className={MODAL_CLASS}>
                 <DialogHeader className="space-y-0.5">
                     <DialogTitle className="font-display text-xl font-bold tracking-tight">
-                        Novo preset
+                        Novo histórico padrão
                     </DialogTitle>
                     <DialogDescription className="text-sm">
                         Escolha o plano de contas e defina a conta de cada papel do lançamento.
