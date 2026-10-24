@@ -16,6 +16,7 @@ import {
 import type { BillingAccount } from '@/lib/api/schemas/billing';
 import type { Preset } from '@/lib/api/schemas/preset';
 import { useActionState, useEffect, useState, type ReactNode } from 'react';
+import { accountOptionLabel } from './account-option-label';
 
 type PresetFormProps = {
     action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -100,7 +101,7 @@ export function PresetForm({
                         onChange={value => setRoles(current => ({ ...current, [role]: value }))}
                         options={accountsForRole(accounts, role).map(account => ({
                             value: account.id,
-                            label: `${account.code} ${account.name}`,
+                            label: accountOptionLabel(account),
                         }))}
                         allowEmpty={!REQUIRED_ROLES.includes(role)}
                         errors={errors(`accounts.${role}`) ?? errors('accounts')}

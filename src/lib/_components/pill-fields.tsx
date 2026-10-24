@@ -9,7 +9,7 @@ import {
     SelectValue,
 } from '@/lib/_components/ui/select';
 import { cn } from '@/lib/_utils/cn';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 
 export const PILL_CLASS =
     'bg-background border-border h-10 rounded-full border px-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring';
@@ -97,7 +97,7 @@ type PillSelectProps = {
     name: string;
     value: string;
     onChange: (value: string) => void;
-    options: { value: string; label: string }[];
+    options: { value: string; label: ReactNode }[];
     placeholder?: string;
     /** Permite escolher "Nenhum" (valor vazio). */
     allowEmpty?: boolean;

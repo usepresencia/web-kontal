@@ -18,6 +18,7 @@ import {
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import type { BillingAccount } from '@/lib/api/schemas/billing';
 import { useActionState, useEffect, useState, type ReactNode } from 'react';
+import { accountOptionLabel } from './account-option-label';
 
 type AccountFormProps = {
     planId: string;
@@ -87,7 +88,7 @@ export function AccountForm({
 
     const parents = accounts
         .filter(item => item.accountType === 'SYNTHETIC' && !blockedParents.has(item.id))
-        .map(item => ({ value: item.id, label: `${item.code} ${item.name}` }));
+        .map(item => ({ value: item.id, label: accountOptionLabel(item) }));
 
     return (
         <form action={formAction} className="space-y-4">
