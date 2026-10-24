@@ -188,13 +188,13 @@ export function PartyForm({
             <div className="flex items-center justify-between gap-3">
                 <div>{footerStart}</div>
                 <ConfirmSubmitButton
-                    confirmTitle={party ? 'Salvar cadastro' : 'Criar cadastro'}
+                    confirmTitle={party ? 'Atualizar cadastro' : 'Criar cadastro'}
                     confirmDescription="Confirmar e salvar as informações do cliente ou fornecedor?"
                     confirmLabel="Confirmar"
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending ? 'Salvando…' : party ? 'Salvar cadastro' : 'Criar cadastro'}
+                    {pending ? 'Salvando…' : party ? 'Atualizar cadastro' : 'Criar cadastro'}
                 </ConfirmSubmitButton>
             </div>
         </form>
