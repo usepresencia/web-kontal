@@ -8,7 +8,7 @@ describe('Divider', () => {
         expect(html).toContain('role="separator"');
         expect(html).toContain('from-primary/10');
         expect(html).toContain('to-transparent');
-        expect(html).toContain('bg-gradient-to-r');
+        expect(html).toContain('bg-linear-to-r');
     });
 
     it('aceita classes extras para o recuo', () => {
