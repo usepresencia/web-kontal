@@ -161,6 +161,8 @@ type ComboboxOption = {
     label: ReactNode;
     /** Texto usado na busca (nome, código etc.); por padrão, o próprio `label` quando é string. */
     searchText?: string;
+    /** Recuo em px só na lista aberta (ex.: nível na árvore do plano de contas); não afeta o valor selecionado. */
+    indent?: number;
 };
 
 type PillComboboxProps = {
@@ -297,6 +299,11 @@ export function PillCombobox({
                                     aria-selected={option.value === value}
                                     onClick={() => choose(option.value)}
                                     className="hover:bg-muted/50 flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2 text-left text-sm"
+                                    style={
+                                        option.indent
+                                            ? { paddingLeft: 12 + option.indent }
+                                            : undefined
+                                    }
                                 >
                                     <span className="min-w-0 flex-1 truncate">{option.label}</span>
                                     {option.value === value && (

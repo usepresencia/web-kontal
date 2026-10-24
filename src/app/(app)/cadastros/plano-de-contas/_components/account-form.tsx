@@ -18,7 +18,7 @@ import {
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import type { BillingAccount } from '@/lib/api/schemas/billing';
 import { useActionState, useEffect, useState, type ReactNode } from 'react';
-import { accountOptionLabel } from './account-option-label';
+import { accountOptionIndent, accountOptionLabel } from './account-option-label';
 
 type AccountFormProps = {
     planId: string;
@@ -92,6 +92,7 @@ export function AccountForm({
             value: item.id,
             label: accountOptionLabel(item),
             searchText: `${item.code} ${item.name}`,
+            indent: accountOptionIndent(item),
         }));
 
     return (
