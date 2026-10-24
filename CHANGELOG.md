@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.8](https://github.com/usepresencia/web-kontal/compare/v0.1.7...v0.1.8) (2026-10-24)
+
+### Bug Fixes
+
+- **titulos:** troca o botão para "Pagar/Receber título" com baixa na hora ([56970f4](https://github.com/usepresencia/web-kontal/commit/56970f4677438e01a4961781bd59907e51c763fb))
+
 ### [0.1.7](https://github.com/usepresencia/web-kontal/compare/v0.1.6...v0.1.7) (2026-10-24)
 
 ### Features
