@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.5](https://github.com/usepresencia/web-kontal/compare/v0.1.4...v0.1.5) (2026-10-24)
+
+### Features
+
+- **titulos:** pré-seleciona a conta real de destino do histórico padrão ([a41997f](https://github.com/usepresencia/web-kontal/commit/a41997f72d7d3810d8cb9a55b03ccd2878b37526))
+- **ui:** recua as opções de conta pela hierarquia do plano de contas ([ec9706d](https://github.com/usepresencia/web-kontal/commit/ec9706db8f198225d27d1f35ddeeaff67cb14d94))
+- **ui:** renomeia preset para histórico padrão e busca nos seletores ([9979571](https://github.com/usepresencia/web-kontal/commit/997957116bc1b9005987acaaa4daa18c7043b5b3))
+
+### Bug Fixes
+
+- **ui:** alinha o nome das contas nos seletores do plano de contas ([941cf00](https://github.com/usepresencia/web-kontal/commit/941cf0002b416d9513a6fa61a2619d83db6562d7))
+- **ui:** usa a classe canônica z-110 do Tailwind v4 no Popover ([9e45532](https://github.com/usepresencia/web-kontal/commit/9e45532c53c06d990fbdbd4c164a907275f8bd8a))
+
 ### [0.1.4](https://github.com/usepresencia/web-kontal/compare/v0.1.3...v0.1.4) (2026-10-20)
 
 ### Bug Fixes
