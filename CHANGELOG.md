@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.9](https://github.com/usepresencia/web-kontal/compare/v0.1.8...v0.1.9) (2026-10-24)
+
+### Bug Fixes
+
+- **titulos:** inverte emissão e vencimento e tira o "(opcional)" ([8a08a53](https://github.com/usepresencia/web-kontal/commit/8a08a532b627c9fd5c751f7d7c5681bd5a9f3691))
+
 ### [0.1.8](https://github.com/usepresencia/web-kontal/compare/v0.1.7...v0.1.8) (2026-10-24)
 
 ### Bug Fixes
