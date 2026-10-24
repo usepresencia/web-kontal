@@ -4,7 +4,7 @@ import { createAccountAction, updateAccountAction } from '@/actions/billing';
 import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
+import { PillCombobox, PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { useActionToast } from '@/lib/_components/use-action-toast';
 import {
     ACCOUNT_TYPE_LABELS,
@@ -18,6 +18,7 @@ import {
 import { INITIAL_FORM_STATE } from '@/lib/_utils/form';
 import type { BillingAccount } from '@/lib/api/schemas/billing';
 import { useActionState, useEffect, useState, type ReactNode } from 'react';
+import { accountOptionLabel } from './account-option-label';
 
 type AccountFormProps = {
     planId: string;
@@ -87,7 +88,11 @@ export function AccountForm({
 
     const parents = accounts
         .filter(item => item.accountType === 'SYNTHETIC' && !blockedParents.has(item.id))
-        .map(item => ({ value: item.id, label: `${item.code} ${item.name}` }));
+        .map(item => ({
+            value: item.id,
+            label: accountOptionLabel(item),
+            searchText: `${item.code} ${item.name}`,
+        }));
 
     return (
         <form action={formAction} className="space-y-4">
@@ -101,7 +106,7 @@ export function AccountForm({
                     required
                     errors={errors('name')}
                 />
-                <PillSelect
+                <PillCombobox
                     className={FILTER_PILL_CLASS}
                     label="Conta pai"
                     name="parentId"

@@ -28,9 +28,15 @@ export const SUCCESS = {
     accountCreated: done('Conta criada', 'A conta foi criada com sucesso.'),
     accountUpdated: done('Conta atualizada', 'A conta foi atualizada com sucesso.'),
     accountDeleted: done('Conta excluída', 'A conta foi excluída com sucesso.'),
-    presetCreated: done('Preset criado', 'O preset foi criado com sucesso.'),
-    presetUpdated: done('Preset atualizado', 'O preset foi atualizado com sucesso.'),
-    presetDeleted: done('Preset excluído', 'O preset foi excluído com sucesso.'),
+    presetCreated: done('Histórico padrão criado', 'O histórico padrão foi criado com sucesso.'),
+    presetUpdated: done(
+        'Histórico padrão atualizado',
+        'O histórico padrão foi atualizado com sucesso.',
+    ),
+    presetDeleted: done(
+        'Histórico padrão excluído',
+        'O histórico padrão foi excluído com sucesso.',
+    ),
     partyCreated: done('Cadastro criado', 'O cliente ou fornecedor foi criado com sucesso.'),
     partyUpdated: done(
         'Cadastro atualizado',

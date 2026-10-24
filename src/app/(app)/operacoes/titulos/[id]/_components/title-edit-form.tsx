@@ -25,7 +25,7 @@ export function TitleEditForm({ title }: { title: Title }) {
             <h2 className="font-display text-lg font-semibold">Dados do título</h2>
             <div className="grid gap-4 md:grid-cols-3">
                 <FormField
-                    label="Descrição"
+                    label="Título"
                     name="description"
                     defaultValue={title.description}
                     errors={errors('description')}

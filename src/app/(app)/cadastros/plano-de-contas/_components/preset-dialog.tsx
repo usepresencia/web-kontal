@@ -40,7 +40,7 @@ export function PresetDialog({ preset, onClose }: PresetDialogProps) {
         <Dialog open={preset !== null} onOpenChange={open => !open && onClose()}>
             <DialogContent className={MODAL_CLASS}>
                 <DialogHeader>
-                    <StepTitle>{preset?.name ?? 'Preset'}</StepTitle>
+                    <StepTitle>{preset?.name ?? 'Histórico padrão'}</StepTitle>
                     {preset?.billingPlanName && (
                         <p className="text-muted-foreground pl-1 text-sm">
                             Plano: {preset.billingPlanName}
@@ -62,7 +62,7 @@ export function PresetDialog({ preset, onClose }: PresetDialogProps) {
                                     className="rounded-full px-6 font-semibold"
                                     onClick={() => setConfirming(true)}
                                 >
-                                    Excluir preset
+                                    Excluir histórico padrão
                                 </Button>
                             }
                             onSuccess={onClose}
@@ -70,14 +70,14 @@ export function PresetDialog({ preset, onClose }: PresetDialogProps) {
                         <ConfirmationDialog
                             open={confirming}
                             onOpenChange={setConfirming}
-                            title="Excluir preset"
-                            description={`Excluir o preset ${preset.name}? Presets usados em títulos não podem ser excluídos.`}
+                            title="Excluir histórico padrão"
+                            description={`Excluir o histórico padrão ${preset.name}? Históricos padrão usados em títulos não podem ser excluídos.`}
                             confirmLabel="Excluir"
                             variant="destructive"
                             onConfirm={async () => {
                                 const result = await run(
                                     () => deletePresetAction(preset.id),
-                                    'Excluindo preset…',
+                                    'Excluindo histórico padrão…',
                                 );
                                 notifyResult(
                                     result,

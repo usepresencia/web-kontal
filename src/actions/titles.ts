@@ -267,7 +267,8 @@ export async function getTitleEntriesAction(titleId: string): Promise<TitleEntry
 export type TitleFormOptions = {
     /** Clientes ou fornecedores ativos do tipo do título, com o preset padrão de cada um. */
     parties: PartyOption[];
-    presets: { value: string; label: string }[];
+    /** `defaultAccountId` é a despesa do histórico padrão, para pré-preencher a conta de destino. */
+    presets: { value: string; label: string; defaultAccountId: string | null }[];
     destinationAccounts: { value: string; label: string }[];
     /** Contas financeiras (ativo analítico ativo) para a baixa na hora. */
     financialAccounts: { value: string; label: string }[];
@@ -301,7 +302,11 @@ export async function getTitleFormOptionsAction(
 
     return {
         parties,
-        presets: presets.items.map(preset => ({ value: preset.id, label: preset.name })),
+        presets: presets.items.map(preset => ({
+            value: preset.id,
+            label: preset.name,
+            defaultAccountId: preset.accounts?.expense?.id ?? null,
+        })),
         destinationAccounts:
             type === 'EXPENSE'
                 ? analytic

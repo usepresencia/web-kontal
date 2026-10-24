@@ -10,7 +10,7 @@ const render = (type: 'INCOME' | 'EXPENSE') =>
                 action={vi.fn()}
                 type={type}
                 parties={[{ value: 'pt1', label: 'Copel', defaultPresetId: 'p1' }]}
-                presets={[{ value: 'p1', label: 'Padrão' }]}
+                presets={[{ value: 'p1', label: 'Padrão', defaultAccountId: null }]}
                 destinationAccounts={[{ value: 'a1', label: '1.2 Estoque' }]}
                 financialAccounts={[{ value: 'c1', label: '1.1 Caixa' }]}
             />
@@ -57,6 +57,27 @@ describe('TitleForm', () => {
         expect(html).not.toContain('openingDate');
         expect(html).not.toContain('Implantação');
     });
+
+    it('pré-seleciona a despesa do histórico padrão na conta de destino', () => {
+        const html = renderToStaticMarkup(
+            <BusyProvider>
+                <TitleForm
+                    action={vi.fn()}
+                    type="EXPENSE"
+                    parties={[{ value: 'pt1', label: 'Copel', defaultPresetId: 'p1' }]}
+                    presets={[{ value: 'p1', label: 'Padrão', defaultAccountId: 'a1' }]}
+                    destinationAccounts={[{ value: 'a1', label: '1.2 Estoque' }]}
+                    financialAccounts={[{ value: 'c1', label: '1.1 Caixa' }]}
+                />
+            </BusyProvider>,
+        );
+        expect(html).toMatch(/<input[^>]*name="destinationAccountId"[^>]*value="a1"/);
+    });
+
+    it('deixa a conta de destino vazia quando o histórico padrão não tem despesa definida', () => {
+        const html = render('EXPENSE');
+        expect(html).toMatch(/<input[^>]*name="destinationAccountId"[^>]*value=""/);
+    });
 });
 
 const renderOpening = (type: 'INCOME' | 'EXPENSE') =>
@@ -66,7 +87,7 @@ const renderOpening = (type: 'INCOME' | 'EXPENSE') =>
                 action={vi.fn()}
                 type={type}
                 parties={[{ value: 'pt1', label: 'Copel', defaultPresetId: 'p1' }]}
-                presets={[{ value: 'p1', label: 'Padrão' }]}
+                presets={[{ value: 'p1', label: 'Padrão', defaultAccountId: null }]}
                 financialAccounts={[{ value: 'c1', label: '1.1 Caixa' }]}
                 opening
             />
@@ -106,7 +127,7 @@ const renderSeries = (type: 'INCOME' | 'EXPENSE') =>
                 action={vi.fn()}
                 type={type}
                 parties={[{ value: 'pt1', label: 'Copel', defaultPresetId: 'p1' }]}
-                presets={[{ value: 'p1', label: 'Padrão' }]}
+                presets={[{ value: 'p1', label: 'Padrão', defaultAccountId: null }]}
                 financialAccounts={[{ value: 'c1', label: '1.1 Caixa' }]}
                 series
             />
@@ -130,12 +151,12 @@ describe('TitleForm como parcelamento', () => {
         expect(renderSeries('EXPENSE')).toContain('Criar parcelamento');
     });
 
-    it('pede o fornecedor no título a pagar e o cliente no a receber, com o histórico (preset) depois', () => {
+    it('pede o fornecedor no título a pagar e o cliente no a receber, com o histórico padrão depois', () => {
         const expense = render('EXPENSE');
         expect(expense).toContain('name="partyId"');
         expect(expense).toContain('Fornecedor');
         expect(render('INCOME')).toContain('Cliente');
-        expect(expense).toContain('Histórico (preset)');
+        expect(expense).toContain('Histórico padrão');
         expect(expense.indexOf('name="partyId"')).toBeLessThan(expense.indexOf('name="presetId"'));
     });
 
