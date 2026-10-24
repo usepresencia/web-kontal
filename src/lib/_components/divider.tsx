@@ -5,10 +5,7 @@ export function Divider({ className }: { className?: string }) {
     return (
         <div
             role="separator"
-            className={cn(
-                'from-primary/10 h-px bg-gradient-to-r from-50% to-transparent',
-                className,
-            )}
+            className={cn('from-primary/10 h-px bg-linear-to-r from-50% to-transparent', className)}
         />
     );
 }

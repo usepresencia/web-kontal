@@ -48,7 +48,7 @@ describe('TransactionList', () => {
             </BusyProvider>,
         );
         expect(separators(html)).toBe(2);
-        expect(html).toContain('bg-gradient-to-r');
+        expect(html).toContain('bg-linear-to-r');
         expect(html).toContain('from-primary/10');
         expect(html).toContain('to-transparent');
     });
