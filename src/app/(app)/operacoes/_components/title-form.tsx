@@ -155,15 +155,15 @@ export function TitleForm({
                     options={presets}
                     errors={errors('presetId')}
                 />
-                <PillInput
-                    className={FILTER_PILL_CLASS}
-                    label="Vencimento"
-                    name="expirationDate"
-                    type="date"
-                    errors={errors('expirationDate')}
-                />
                 {opening ? (
                     <>
+                        <PillInput
+                            className={FILTER_PILL_CLASS}
+                            label="Vencimento"
+                            name="expirationDate"
+                            type="date"
+                            errors={errors('expirationDate')}
+                        />
                         <PillInput
                             className={FILTER_PILL_CLASS}
                             label="Data de implantação"
@@ -180,13 +180,22 @@ export function TitleForm({
                         />
                     </>
                 ) : (
-                    <PillInput
-                        className={FILTER_PILL_CLASS}
-                        label="Emissão (opcional)"
-                        name="issueDate"
-                        type="date"
-                        errors={errors('issueDate')}
-                    />
+                    <>
+                        <PillInput
+                            className={FILTER_PILL_CLASS}
+                            label="Emissão"
+                            name="issueDate"
+                            type="date"
+                            errors={errors('issueDate')}
+                        />
+                        <PillInput
+                            className={FILTER_PILL_CLASS}
+                            label="Vencimento"
+                            name="expirationDate"
+                            type="date"
+                            errors={errors('expirationDate')}
+                        />
+                    </>
                 )}
                 <PillInput
                     className={FILTER_PILL_CLASS}
