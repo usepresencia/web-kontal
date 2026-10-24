@@ -88,3 +88,26 @@ export async function apiFetch<S extends z.ZodType>(
     }
     return parsed.data;
 }
+
+type PagedResult<T> = { items: T[]; page: number; pageSize: number; total: number };
+
+/**
+ * Busca todas as páginas de uma listagem paginada (até 100 por página, o máximo da api-kontal).
+ * Use sempre que precisar da lista inteira, e não só da primeira página.
+ */
+export async function apiFetchAllPages<S extends z.ZodType<PagedResult<unknown>>>(
+    basePath: string,
+    schema: S,
+): Promise<z.infer<S>['items']> {
+    const sep = basePath.includes('?') ? '&' : '?';
+    const pageUrl = (page: number) => `${basePath}${sep}page=${page}&pageSize=100`;
+
+    const first = await apiFetch(pageUrl(1), schema);
+    const pageCount = Math.ceil(first.total / first.pageSize);
+    if (pageCount <= 1) return first.items;
+
+    const rest = await Promise.all(
+        Array.from({ length: pageCount - 1 }, (_, i) => apiFetch(pageUrl(i + 2), schema)),
+    );
+    return [...first.items, ...rest.flatMap(page => page.items)];
+}

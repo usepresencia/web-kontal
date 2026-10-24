@@ -4,7 +4,7 @@ import { getTitlePartiesAction, type PartyOption } from '@/actions/parties';
 import { flash } from '@/lib/_utils/flash-server';
 import { formDataToObject, stateFromZodError, type FormState } from '@/lib/_utils/form';
 import { SUCCESS } from '@/lib/_utils/toast-messages';
-import { apiFetch } from '@/lib/api/client';
+import { apiFetch, apiFetchAllPages } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
 import { stateFromApiError } from '@/lib/api/form-state';
 import { accountPageSchema } from '@/lib/api/schemas/billing';
@@ -287,12 +287,12 @@ export async function getTitleFormOptionsAction(
 ): Promise<TitleFormOptions> {
     if (type !== 'INCOME' && type !== 'EXPENSE') return EMPTY_OPTIONS;
 
-    const [presets, accounts, parties] = await Promise.all([
+    const [presets, accountItems, parties] = await Promise.all([
         apiFetch('/presets?page=1&pageSize=100&isActive=true', presetPageSchema),
-        apiFetch('/billing-accounts?page=1&pageSize=100', accountPageSchema),
+        apiFetchAllPages('/billing-accounts', accountPageSchema),
         getTitlePartiesAction(type),
     ]);
-    const analytic = accounts.items.filter(
+    const analytic = accountItems.filter(
         account => account.accountType === 'ANALYTIC' && account.isActive,
     );
     const toOption = (account: (typeof analytic)[number]) => ({

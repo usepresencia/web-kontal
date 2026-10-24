@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('server-only', () => ({}));
 
 const apiFetch = vi.fn();
-vi.mock('@/lib/api/client', () => ({ apiFetch }));
+const apiFetchAllPages = vi.fn();
+vi.mock('@/lib/api/client', () => ({ apiFetch, apiFetchAllPages }));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 vi.mock('next/navigation', () => ({
     redirect: (url: string) => {
@@ -54,36 +55,34 @@ describe('getTitleFormOptionsAction', () => {
                 ],
             })
             .mockResolvedValueOnce({
-                items: [
-                    {
-                        id: 'a1',
-                        code: '1.1',
-                        name: 'Caixa',
-                        accountType: 'ANALYTIC',
-                        isActive: true,
-                        nature: 'ASSET',
-                    },
-                    {
-                        id: 'a2',
-                        code: '2.1',
-                        name: 'Fornecedores',
-                        accountType: 'ANALYTIC',
-                        isActive: true,
-                        nature: 'LIABILITY',
-                    },
-                    {
-                        id: 'a3',
-                        code: '3',
-                        name: 'Sintética',
-                        accountType: 'SYNTHETIC',
-                        isActive: true,
-                        nature: 'EXPENSE',
-                    },
-                ],
+                items: [{ id: 'pt1', kind: 'SUPPLIER', name: 'Copel', defaultPresetId: 'p1' }],
             });
-        apiFetch.mockResolvedValueOnce({
-            items: [{ id: 'pt1', kind: 'SUPPLIER', name: 'Copel', defaultPresetId: 'p1' }],
-        });
+        apiFetchAllPages.mockResolvedValueOnce([
+            {
+                id: 'a1',
+                code: '1.1',
+                name: 'Caixa',
+                accountType: 'ANALYTIC',
+                isActive: true,
+                nature: 'ASSET',
+            },
+            {
+                id: 'a2',
+                code: '2.1',
+                name: 'Fornecedores',
+                accountType: 'ANALYTIC',
+                isActive: true,
+                nature: 'LIABILITY',
+            },
+            {
+                id: 'a3',
+                code: '3',
+                name: 'Sintética',
+                accountType: 'SYNTHETIC',
+                isActive: true,
+                nature: 'EXPENSE',
+            },
+        ]);
         expect(await getTitleFormOptionsAction('EXPENSE')).toEqual({
             presets: [{ value: 'p1', label: 'Padrão', defaultAccountId: 'a1' }],
             destinationAccounts: [{ value: 'a1', label: '1.1 Caixa' }],
@@ -92,23 +91,54 @@ describe('getTitleFormOptionsAction', () => {
         });
     });
 
+    it('busca todas as páginas de contas, não só as 100 primeiras', async () => {
+        const { getTitleFormOptionsAction } = await import('./titles');
+        apiFetch
+            .mockResolvedValueOnce({
+                items: [
+                    {
+                        id: 'p1',
+                        name: 'Padrão',
+                        accounts: { expense: { id: 'a101', name: 'Conta além da 1ª página' } },
+                    },
+                ],
+            })
+            .mockResolvedValueOnce({ items: [] });
+        apiFetchAllPages.mockResolvedValueOnce([
+            {
+                id: 'a101',
+                code: '5.1',
+                name: 'Conta além da 1ª página',
+                accountType: 'ANALYTIC',
+                isActive: true,
+                nature: 'EXPENSE',
+            },
+        ]);
+        const result = await getTitleFormOptionsAction('EXPENSE');
+        expect(result.presets).toEqual([
+            { value: 'p1', label: 'Padrão', defaultAccountId: 'a101' },
+        ]);
+        expect(result.destinationAccounts).toEqual([
+            { value: 'a101', label: '5.1 Conta além da 1ª página' },
+        ]);
+        expect(apiFetchAllPages).toHaveBeenCalledWith('/billing-accounts', expect.anything());
+    });
+
     it('não oferece contas de destino em título a receber, só as financeiras', async () => {
         const { getTitleFormOptionsAction } = await import('./titles');
         apiFetch
             .mockResolvedValueOnce({ items: [{ id: 'p1', name: 'Padrão' }] })
-            .mockResolvedValueOnce({
-                items: [
-                    {
-                        id: 'a1',
-                        code: '1.1',
-                        name: 'Caixa',
-                        accountType: 'ANALYTIC',
-                        isActive: true,
-                        nature: 'ASSET',
-                    },
-                ],
-            });
-        apiFetch.mockResolvedValueOnce({ items: [] });
+            .mockResolvedValueOnce({ items: [] });
+        apiFetchAllPages.mockResolvedValueOnce([
+            {
+                id: 'a1',
+                code: '1.1',
+                name: 'Caixa',
+                accountType: 'ANALYTIC',
+                isActive: true,
+                nature: 'ASSET',
+            },
+        ]);
         const result = await getTitleFormOptionsAction('INCOME');
         expect(result.destinationAccounts).toEqual([]);
         expect(result.financialAccounts).toEqual([{ value: 'a1', label: '1.1 Caixa' }]);
