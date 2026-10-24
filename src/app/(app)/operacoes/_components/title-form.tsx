@@ -5,7 +5,7 @@ import { AmountInput } from '@/lib/_components/amount-input';
 import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { FieldError, PillInput, PillSelect } from '@/lib/_components/pill-fields';
+import { FieldError, PillCombobox, PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { useActionToast } from '@/lib/_components/use-action-toast';
 import { toLocalIsoDate } from '@/lib/_utils/dates';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
@@ -99,7 +99,7 @@ export function TitleForm({
             />
 
             <div className="grid grid-cols-2 gap-3">
-                <PillSelect
+                <PillCombobox
                     className={FILTER_PILL_CLASS}
                     label={type === 'EXPENSE' ? 'Fornecedor' : 'Cliente'}
                     name="partyId"
@@ -119,14 +119,14 @@ export function TitleForm({
                 />
                 <PillInput
                     className={FILTER_PILL_CLASS}
-                    label="Descrição"
+                    label="Título"
                     name="description"
                     required
                     errors={errors('description')}
                 />
-                <PillSelect
+                <PillCombobox
                     className={FILTER_PILL_CLASS}
-                    label="Histórico (preset)"
+                    label="Histórico padrão"
                     name="presetId"
                     value={preset}
                     onChange={setPreset}
@@ -179,7 +179,7 @@ export function TitleForm({
                     errors={errors('feesPercentageMonthly')}
                 />
                 {!opening && type === 'EXPENSE' && destinationAccounts.length > 0 && (
-                    <PillSelect
+                    <PillCombobox
                         className={FILTER_PILL_CLASS}
                         label="Conta de destino"
                         name="destinationAccountId"
@@ -187,8 +187,8 @@ export function TitleForm({
                         onChange={setDestination}
                         options={destinationAccounts}
                         allowEmpty
-                        emptyLabel="Despesa do preset (padrão)"
-                        placeholder="Despesa do preset (padrão)"
+                        emptyLabel="Despesa do histórico padrão"
+                        placeholder="Despesa do histórico padrão"
                         errors={errors('destinationAccountId')}
                     />
                 )}

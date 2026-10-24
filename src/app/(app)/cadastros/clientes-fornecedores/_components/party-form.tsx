@@ -3,7 +3,7 @@
 import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
+import { PillCombobox, PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { useActionToast } from '@/lib/_components/use-action-toast';
 import { useCnpjLookup } from '@/lib/_hooks/use-cnpj-lookup';
 import { maskCep, maskCpfCnpj } from '@/lib/_utils/document';
@@ -136,16 +136,16 @@ export function PartyForm({
                 )}
                 {field('E-mail', 'email', { type: 'email' })}
                 {field('Telefone', 'phone', { type: 'tel' })}
-                <PillSelect
+                <PillCombobox
                     className={FILTER_PILL_CLASS}
-                    label="Preset padrão"
+                    label="Histórico padrão"
                     name="defaultPresetId"
                     value={preset}
                     onChange={setPreset}
                     options={presets}
                     allowEmpty
-                    emptyLabel="Sem preset padrão"
-                    placeholder="Sem preset padrão"
+                    emptyLabel="Sem histórico padrão"
+                    placeholder="Sem histórico padrão"
                     errors={errors('defaultPresetId')}
                 />
                 {party && (

@@ -38,7 +38,7 @@ export async function PresetsTab({
                         <input
                             name="search"
                             defaultValue={search ?? ''}
-                            placeholder="Nome do preset"
+                            placeholder="Nome do histórico padrão"
                             className={`${FILTER_PILL_CLASS} placeholder:text-muted-foreground focus-visible:ring-ring w-56 text-sm outline-none focus-visible:ring-2`}
                         />
                     </FilterField>
@@ -48,8 +48,8 @@ export async function PresetsTab({
             </div>
             {presets.items.length === 0 ? (
                 <EmptyState
-                    title="Nenhum preset encontrado"
-                    description="Crie um preset para definir as contas de cada tipo de lançamento."
+                    title="Nenhum histórico padrão encontrado"
+                    description="Crie um histórico padrão para definir as contas de cada tipo de lançamento."
                 />
             ) : (
                 <PresetsTable page={presets} />

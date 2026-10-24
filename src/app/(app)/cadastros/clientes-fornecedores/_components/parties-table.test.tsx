@@ -86,9 +86,9 @@ describe('PartyForm', () => {
         </BusyProvider>,
     );
 
-    it('usa pílulas, pede confirmação e oferece o preset padrão e o endereço opcional', () => {
+    it('usa pílulas, pede confirmação e oferece o histórico padrão e o endereço opcional', () => {
         expect(html).toContain('rounded-full');
-        expect(html).toContain('Preset padrão');
+        expect(html).toContain('Histórico padrão');
         expect(html).toContain('Endereço (opcional)');
         expect(html).not.toContain('type="submit"');
     });

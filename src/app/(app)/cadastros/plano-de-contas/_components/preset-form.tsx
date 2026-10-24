@@ -3,7 +3,7 @@
 import { ConfirmSubmitButton } from '@/lib/_components/confirm-submit-button';
 import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
-import { PillInput, PillSelect } from '@/lib/_components/pill-fields';
+import { PillCombobox, PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { useActionToast } from '@/lib/_components/use-action-toast';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import {
@@ -53,7 +53,7 @@ export function PresetForm({
 
     return (
         <form action={formAction} className="space-y-4">
-            <FormPendingOverlay message="Salvando preset…" />
+            <FormPendingOverlay message="Salvando histórico padrão…" />
             {!preset && <input type="hidden" name="billingPlanId" value={billingPlanId} />}
 
             <div className="grid grid-cols-2 gap-3">
@@ -92,7 +92,7 @@ export function PresetForm({
             </p>
             <div className="grid grid-cols-2 gap-3">
                 {PRESET_ROLES.map((role: PresetRole) => (
-                    <PillSelect
+                    <PillCombobox
                         key={role}
                         className={FILTER_PILL_CLASS}
                         label={`${PRESET_ROLE_LABELS[role]}${REQUIRED_ROLES.includes(role) ? ' *' : ''}`}
@@ -102,6 +102,7 @@ export function PresetForm({
                         options={accountsForRole(accounts, role).map(account => ({
                             value: account.id,
                             label: accountOptionLabel(account),
+                            searchText: `${account.code} ${account.name}`,
                         }))}
                         allowEmpty={!REQUIRED_ROLES.includes(role)}
                         errors={errors(`accounts.${role}`) ?? errors('accounts')}
@@ -112,13 +113,17 @@ export function PresetForm({
             <div className="flex items-center justify-between gap-3">
                 <div>{footerStart}</div>
                 <ConfirmSubmitButton
-                    confirmTitle={preset ? 'Salvar preset' : 'Criar preset'}
-                    confirmDescription="Confirmar e salvar as informações do preset?"
+                    confirmTitle={preset ? 'Salvar histórico padrão' : 'Criar histórico padrão'}
+                    confirmDescription="Confirmar e salvar as informações do histórico padrão?"
                     confirmLabel="Confirmar"
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending ? 'Salvando…' : preset ? 'Salvar preset' : 'Criar preset'}
+                    {pending
+                        ? 'Salvando…'
+                        : preset
+                          ? 'Salvar histórico padrão'
+                          : 'Criar histórico padrão'}
                 </ConfirmSubmitButton>
             </div>
         </form>

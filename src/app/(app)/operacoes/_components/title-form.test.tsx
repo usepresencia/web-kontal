@@ -130,12 +130,12 @@ describe('TitleForm como parcelamento', () => {
         expect(renderSeries('EXPENSE')).toContain('Criar parcelamento');
     });
 
-    it('pede o fornecedor no título a pagar e o cliente no a receber, com o histórico (preset) depois', () => {
+    it('pede o fornecedor no título a pagar e o cliente no a receber, com o histórico padrão depois', () => {
         const expense = render('EXPENSE');
         expect(expense).toContain('name="partyId"');
         expect(expense).toContain('Fornecedor');
         expect(render('INCOME')).toContain('Cliente');
-        expect(expense).toContain('Histórico (preset)');
+        expect(expense).toContain('Histórico padrão');
         expect(expense.indexOf('name="partyId"')).toBeLessThan(expense.indexOf('name="presetId"'));
     });
 
