@@ -18,13 +18,14 @@ import {
 import { useActionState, useEffect, useState } from 'react';
 
 type Option = { value: string; label: string };
+type PresetOption = Option & { defaultAccountId: string | null };
 
 type TitleFormProps = {
     action: (state: FormState, formData: FormData) => Promise<FormState>;
     type: 'INCOME' | 'EXPENSE';
     /** Clientes ou fornecedores do tipo do título, com o preset padrão de cada um. */
     parties: PartyOption[];
-    presets: Option[];
+    presets: PresetOption[];
     /** Contas de ativo ou despesa para a compra de ativo (só em título a pagar). */
     destinationAccounts?: Option[];
     /** Contas financeiras onde a baixa na hora é registrada. */
@@ -60,9 +61,17 @@ export function TitleForm({
 }: TitleFormProps) {
     const [state, formAction, pending] = useActionState(action, INITIAL_FORM_STATE);
     useActionToast(state);
+    /** Despesa do histórico padrão, se o plano já tiver uma definida e ela estiver entre as contas de destino. */
+    const defaultDestinationFor = (presetId: string) => {
+        const accountId = presets.find(item => item.value === presetId)?.defaultAccountId;
+        return accountId && destinationAccounts.some(item => item.value === accountId)
+            ? accountId
+            : '';
+    };
+
     const [party, setParty] = useState('');
     const [preset, setPreset] = useState(presets[0]?.value ?? '');
-    const [destination, setDestination] = useState('');
+    const [destination, setDestination] = useState(() => defaultDestinationFor(preset));
     const [payNow, setPayNow] = useState(false);
     const [account, setAccount] = useState('');
     const [method, setMethod] = useState('PIX');
@@ -111,6 +120,7 @@ export function TitleForm({
                         )?.defaultPresetId;
                         if (standard && presets.some(item => item.value === standard)) {
                             setPreset(standard);
+                            setDestination(defaultDestinationFor(standard));
                         }
                     }}
                     options={parties}
@@ -129,7 +139,10 @@ export function TitleForm({
                     label="Histórico padrão"
                     name="presetId"
                     value={preset}
-                    onChange={setPreset}
+                    onChange={value => {
+                        setPreset(value);
+                        setDestination(defaultDestinationFor(value));
+                    }}
                     options={presets}
                     errors={errors('presetId')}
                 />
@@ -187,8 +200,8 @@ export function TitleForm({
                         onChange={setDestination}
                         options={destinationAccounts}
                         allowEmpty
-                        emptyLabel="Despesa do histórico padrão"
-                        placeholder="Despesa do histórico padrão"
+                        emptyLabel="Selecione a conta"
+                        placeholder="Selecione a conta"
                         errors={errors('destinationAccountId')}
                     />
                 )}
