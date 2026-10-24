@@ -5,6 +5,7 @@ import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { PillCombobox, PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { useActionToast } from '@/lib/_components/use-action-toast';
+import { useCepLookup } from '@/lib/_hooks/use-cep-lookup';
 import { useCnpjLookup } from '@/lib/_hooks/use-cnpj-lookup';
 import { maskCep, maskCpfCnpj, maskPhone } from '@/lib/_utils/document';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
@@ -74,6 +75,7 @@ export function PartyForm({
     }));
 
     const lookup = useCnpjLookup(party?.document, setValues);
+    const cepLookup = useCepLookup(address?.zipCode, setValues);
 
     const errors = (field: string) => state.fieldErrors?.[field];
 
@@ -85,6 +87,12 @@ export function PartyForm({
         const masked = maskCpfCnpj(raw);
         setField('document', masked);
         lookup(masked.replace(/\D/g, ''));
+    };
+
+    const handleZipCodeChange = (raw: string) => {
+        const masked = maskCep(raw);
+        setField('address.zipCode', masked);
+        cepLookup(masked.replace(/\D/g, ''));
     };
 
     useEffect(() => {
@@ -175,7 +183,7 @@ export function PartyForm({
                     inputMode: 'numeric',
                     placeholder: '00000-000',
                     maxLength: 9,
-                    onChange: e => setField('address.zipCode', maskCep(e.target.value)),
+                    onChange: e => handleZipCodeChange(e.target.value),
                 })}
                 {field('Rua', 'address.street')}
                 {field('Número', 'address.number')}
@@ -188,13 +196,13 @@ export function PartyForm({
             <div className="flex items-center justify-between gap-3">
                 <div>{footerStart}</div>
                 <ConfirmSubmitButton
-                    confirmTitle={party ? 'Salvar cadastro' : 'Criar cadastro'}
+                    confirmTitle={party ? 'Atualizar cadastro' : 'Criar cadastro'}
                     confirmDescription="Confirmar e salvar as informações do cliente ou fornecedor?"
                     confirmLabel="Confirmar"
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending ? 'Salvando…' : party ? 'Salvar cadastro' : 'Criar cadastro'}
+                    {pending ? 'Salvando…' : party ? 'Atualizar cadastro' : 'Criar cadastro'}
                 </ConfirmSubmitButton>
             </div>
         </form>

@@ -5,6 +5,7 @@ import { FILTER_PILL_CLASS } from '@/lib/_components/filter-field';
 import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { FieldError, PillInput } from '@/lib/_components/pill-fields';
 import { useActionToast } from '@/lib/_components/use-action-toast';
+import { useCepLookup } from '@/lib/_hooks/use-cep-lookup';
 import { useCnpjLookup } from '@/lib/_hooks/use-cnpj-lookup';
 import { maskCep, maskCnpj } from '@/lib/_utils/document';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
@@ -61,6 +62,7 @@ export function CompanyForm({ action, company, onSuccess }: CompanyFormProps) {
     }));
 
     const lookup = useCnpjLookup(company?.cnpj, setValues);
+    const cepLookup = useCepLookup(company?.address.zipCode, setValues);
 
     const errors = (field: string) => state.fieldErrors?.[field];
 
@@ -72,6 +74,12 @@ export function CompanyForm({ action, company, onSuccess }: CompanyFormProps) {
         const masked = maskCnpj(raw);
         setField('cnpj', masked);
         lookup(masked.replace(/\D/g, ''));
+    };
+
+    const handleZipCodeChange = (raw: string) => {
+        const masked = maskCep(raw);
+        setField('address.zipCode', masked);
+        cepLookup(masked.replace(/\D/g, ''));
     };
 
     const field = (
@@ -123,7 +131,7 @@ export function CompanyForm({ action, company, onSuccess }: CompanyFormProps) {
                     placeholder: '00000-000',
                     maxLength: 9,
                     required: true,
-                    onChange: e => setField('address.zipCode', maskCep(e.target.value)),
+                    onChange: e => handleZipCodeChange(e.target.value),
                 })}
                 {field('Rua', 'address.street', { required: true })}
                 {field('Número', 'address.number', { required: true })}
@@ -142,13 +150,13 @@ export function CompanyForm({ action, company, onSuccess }: CompanyFormProps) {
 
             <div className="flex justify-end">
                 <ConfirmSubmitButton
-                    confirmTitle={company ? 'Salvar empresa' : 'Cadastrar empresa'}
+                    confirmTitle={company ? 'Atualizar empresa' : 'Cadastrar empresa'}
                     confirmDescription="Confirmar e salvar as informações da empresa?"
                     confirmLabel="Confirmar"
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending ? 'Salvando…' : company ? 'Salvar empresa' : 'Cadastrar empresa'}
+                    {pending ? 'Salvando…' : company ? 'Atualizar empresa' : 'Cadastrar empresa'}
                 </ConfirmSubmitButton>
             </div>
         </form>

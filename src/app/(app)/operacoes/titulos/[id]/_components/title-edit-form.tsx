@@ -52,13 +52,13 @@ export function TitleEditForm({ title }: { title: Title }) {
                 />
             </div>
             <ConfirmSubmitButton
-                confirmTitle="Salvar alterações"
+                confirmTitle="Atualizar título"
                 confirmDescription="Atualizar os dados deste título?"
-                confirmLabel="Salvar"
+                confirmLabel="Atualizar"
                 variant="outline"
                 disabled={pending}
             >
-                {pending ? 'Salvando…' : 'Salvar alterações'}
+                {pending ? 'Salvando…' : 'Atualizar título'}
             </ConfirmSubmitButton>
         </form>
     );

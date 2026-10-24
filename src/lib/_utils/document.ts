@@ -148,3 +148,36 @@ export async function fetchCnpjData(cnpj: string): Promise<CnpjLookupData | null
         return null;
     }
 }
+
+export type CepLookupData = {
+    zipCode: string;
+    street: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+};
+
+/** Normaliza a resposta da BrasilAPI (CEP v2) para os campos de endereço do formulário. */
+export function parseCepResponse(data: Record<string, unknown>): CepLookupData {
+    return {
+        zipCode: maskCep(str(data.cep)),
+        street: str(data.street),
+        neighborhood: str(data.neighborhood),
+        city: str(data.city),
+        state: str(data.state),
+    };
+}
+
+/** Consulta o endereço do CEP na BrasilAPI (`https://brasilapi.com.br/api/cep/v2/{cep}`). */
+export async function fetchCepData(cep: string): Promise<CepLookupData | null> {
+    const digits = cep.replace(/\D/g, '');
+    if (digits.length !== 8) return null;
+    try {
+        const res = await fetch(`https://brasilapi.com.br/api/cep/v2/${digits}`);
+        if (!res.ok) return null;
+        const data = (await res.json()) as Record<string, unknown>;
+        return parseCepResponse(data);
+    } catch {
+        return null;
+    }
+}

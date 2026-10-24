@@ -114,7 +114,7 @@ export function PresetForm({
             <div className="flex items-center justify-between gap-3">
                 <div>{footerStart}</div>
                 <ConfirmSubmitButton
-                    confirmTitle={preset ? 'Salvar histórico padrão' : 'Criar histórico padrão'}
+                    confirmTitle={preset ? 'Atualizar histórico padrão' : 'Criar histórico padrão'}
                     confirmDescription="Confirmar e salvar as informações do histórico padrão?"
                     confirmLabel="Confirmar"
                     disabled={pending}
@@ -123,7 +123,7 @@ export function PresetForm({
                     {pending
                         ? 'Salvando…'
                         : preset
-                          ? 'Salvar histórico padrão'
+                          ? 'Atualizar histórico padrão'
                           : 'Criar histórico padrão'}
                 </ConfirmSubmitButton>
             </div>

@@ -6,6 +6,7 @@ import {
     maskCpf,
     maskCpfCnpj,
     maskPhone,
+    parseCepResponse,
     parseCnpjResponse,
 } from './document';
 
@@ -119,5 +120,35 @@ describe('parseCnpjResponse', () => {
             nome_fantasia: '',
         });
         expect(parsed.name).toBe('EMPRESA SEM FANTASIA LTDA');
+    });
+});
+
+describe('parseCepResponse', () => {
+    it('extrai e aplica a máscara ao CEP da resposta da BrasilAPI (CEP v2)', () => {
+        const parsed = parseCepResponse({
+            cep: '01310100',
+            state: 'SP',
+            city: 'São Paulo',
+            neighborhood: 'Bela Vista',
+            street: 'Avenida Paulista',
+            service: 'viacep',
+        });
+        expect(parsed).toEqual({
+            zipCode: '01310-100',
+            street: 'Avenida Paulista',
+            neighborhood: 'Bela Vista',
+            city: 'São Paulo',
+            state: 'SP',
+        });
+    });
+
+    it('devolve texto vazio para campos ausentes', () => {
+        expect(parseCepResponse({ cep: '01310100' })).toEqual({
+            zipCode: '01310-100',
+            street: '',
+            neighborhood: '',
+            city: '',
+            state: '',
+        });
     });
 });
