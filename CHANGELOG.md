@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.6](https://github.com/usepresencia/web-kontal/compare/v0.1.5...v0.1.6) (2026-10-24)
+
+### Features
+
+- **cadastros:** aplica máscara de telefone no cliente/fornecedor ([95a5b3f](https://github.com/usepresencia/web-kontal/commit/95a5b3fdcbb8ce32ebb7af0687eba099b9b3459a))
+
+### Bug Fixes
+
+- **titulos:** busca todas as contas para a conta de destino do preset ([db5e944](https://github.com/usepresencia/web-kontal/commit/db5e944a5a0d8fb10ecac0fba87494c13158e431))
+- **ui:** tira o recuo por nível do valor selecionado no combobox ([d57cad6](https://github.com/usepresencia/web-kontal/commit/d57cad67b09e21fff6aaf432c6dd2c965ddc6b47))
+- **ui:** usa a classe canônica bg-linear-to-r do Tailwind v4 no Divider ([19dc6ef](https://github.com/usepresencia/web-kontal/commit/19dc6efaf8b49211d5be9b5c4fdea855923e4e03))
+
 ### [0.1.5](https://github.com/usepresencia/web-kontal/compare/v0.1.4...v0.1.5) (2026-10-24)
 
 ### Features
