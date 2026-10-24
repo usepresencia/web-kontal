@@ -58,6 +58,15 @@ describe('TitleForm', () => {
         expect(html).not.toContain('Implantação');
     });
 
+    it('pede a emissão antes do vencimento, sem "(opcional)" no rótulo', () => {
+        const html = render('EXPENSE');
+        expect(html).not.toContain('Emissão (opcional)');
+        expect(html).toContain('>Emissão<');
+        expect(html.indexOf('name="issueDate"')).toBeLessThan(
+            html.indexOf('name="expirationDate"'),
+        );
+    });
+
     it('pré-seleciona a despesa do histórico padrão na conta de destino', () => {
         const html = renderToStaticMarkup(
             <BusyProvider>
