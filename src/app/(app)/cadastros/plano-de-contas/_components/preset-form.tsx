@@ -16,7 +16,7 @@ import {
 import type { BillingAccount } from '@/lib/api/schemas/billing';
 import type { Preset } from '@/lib/api/schemas/preset';
 import { useActionState, useEffect, useState, type ReactNode } from 'react';
-import { accountOptionLabel } from './account-option-label';
+import { accountOptionIndent, accountOptionLabel } from './account-option-label';
 
 type PresetFormProps = {
     action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -103,6 +103,7 @@ export function PresetForm({
                             value: account.id,
                             label: accountOptionLabel(account),
                             searchText: `${account.code} ${account.name}`,
+                            indent: accountOptionIndent(account),
                         }))}
                         allowEmpty={!REQUIRED_ROLES.includes(role)}
                         errors={errors(`accounts.${role}`) ?? errors('accounts')}

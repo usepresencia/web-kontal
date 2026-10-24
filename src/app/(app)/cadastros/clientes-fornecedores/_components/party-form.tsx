@@ -6,7 +6,7 @@ import { FormPendingOverlay } from '@/lib/_components/form-pending-overlay';
 import { PillCombobox, PillInput, PillSelect } from '@/lib/_components/pill-fields';
 import { useActionToast } from '@/lib/_components/use-action-toast';
 import { useCnpjLookup } from '@/lib/_hooks/use-cnpj-lookup';
-import { maskCep, maskCpfCnpj } from '@/lib/_utils/document';
+import { maskCep, maskCpfCnpj, maskPhone } from '@/lib/_utils/document';
 import { INITIAL_FORM_STATE, type FormState } from '@/lib/_utils/form';
 import { PARTY_KIND_LABELS, type Party, type PartyKind } from '@/lib/api/schemas/party';
 import { useActionState, useEffect, useState, type ComponentProps, type ReactNode } from 'react';
@@ -63,7 +63,7 @@ export function PartyForm({
         socialReason: party?.socialReason ?? '',
         document: maskCpfCnpj(party?.document ?? ''),
         email: party?.email ?? '',
-        phone: party?.phone ?? '',
+        phone: maskPhone(party?.phone ?? ''),
         'address.zipCode': maskCep(address?.zipCode ?? ''),
         'address.street': address?.street ?? '',
         'address.number': address?.number ?? '',
@@ -135,7 +135,13 @@ export function PartyForm({
                     />
                 )}
                 {field('E-mail', 'email', { type: 'email' })}
-                {field('Telefone', 'phone', { type: 'tel' })}
+                {field('Telefone', 'phone', {
+                    type: 'tel',
+                    inputMode: 'numeric',
+                    placeholder: '(00) 00000-0000',
+                    maxLength: 15,
+                    onChange: e => setField('phone', maskPhone(e.target.value)),
+                })}
                 <PillCombobox
                     className={FILTER_PILL_CLASS}
                     label="Histórico padrão"

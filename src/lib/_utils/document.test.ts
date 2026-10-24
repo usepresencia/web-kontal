@@ -5,6 +5,7 @@ import {
     maskCnpj,
     maskCpf,
     maskCpfCnpj,
+    maskPhone,
     parseCnpjResponse,
 } from './document';
 
@@ -48,6 +49,30 @@ describe('maskCpf, maskCnpj e maskCpfCnpj', () => {
     });
 });
 
+describe('maskPhone', () => {
+    it('aplica máscara progressiva enquanto digita', () => {
+        expect(maskPhone('')).toBe('');
+        expect(maskPhone('1')).toBe('(1');
+        expect(maskPhone('11')).toBe('(11');
+        expect(maskPhone('113')).toBe('(11) 3');
+        expect(maskPhone('113000')).toBe('(11) 3000');
+        expect(maskPhone('1130004')).toBe('(11) 3000-4');
+    });
+
+    it('formata fixo (10 dígitos) com 4 dígitos antes do traço', () => {
+        expect(maskPhone('1130004000')).toBe('(11) 3000-4000');
+    });
+
+    it('formata celular (11 dígitos) com 5 dígitos antes do traço', () => {
+        expect(maskPhone('11987654321')).toBe('(11) 98765-4321');
+    });
+
+    it('ignora o que não é dígito e corta além de 11 dígitos', () => {
+        expect(maskPhone('(11) 98765-4321')).toBe('(11) 98765-4321');
+        expect(maskPhone('119876543219999')).toBe('(11) 98765-4321');
+    });
+});
+
 describe('parseCnpjResponse', () => {
     it('extrai dados do formato padrão da BrasilAPI', () => {
         const parsed = parseCnpjResponse({
@@ -75,7 +100,7 @@ describe('parseCnpjResponse', () => {
             cnae: '6201501',
             taxRegime: 'Simples Nacional',
             email: 'contato@kontal.com.br',
-            phone: '1130004000',
+            phone: '(11) 3000-4000',
             address: {
                 zipCode: '01310-100',
                 street: 'AVENIDA PAULISTA',

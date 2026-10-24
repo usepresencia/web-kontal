@@ -16,10 +16,16 @@ vi.mock('next/navigation', () => ({
     },
 }));
 
-const { apiFetch } = await import('./client');
+const { apiFetch, apiFetchAllPages } = await import('./client');
 const { ApiError } = await import('./errors');
 
 const schema = z.object({ id: z.string(), name: z.string() });
+const pageSchema = z.object({
+    items: z.array(schema),
+    page: z.number(),
+    pageSize: z.number(),
+    total: z.number(),
+});
 
 function mockFetch(status: number, body: unknown) {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify(body), { status }));
@@ -101,5 +107,51 @@ describe('apiFetch', () => {
         expect(init.method).toBe('POST');
         expect(init.body).toBe('{"name":"A"}');
         expect((init.headers as Record<string, string>)['Content-Type']).toBe('application/json');
+    });
+});
+
+describe('apiFetchAllPages', () => {
+    it('devolve só a primeira página quando o total já cabe nela', async () => {
+        const fetchMock = mockFetch(200, {
+            items: [{ id: '1', name: 'A' }],
+            page: 1,
+            pageSize: 100,
+            total: 1,
+        });
+        expect(await apiFetchAllPages('/x', pageSchema)).toEqual([{ id: '1', name: 'A' }]);
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('busca as páginas seguintes e junta os itens de todas', async () => {
+        const fetchMock = vi.fn(async (url: string) => {
+            const page = new URL(url).searchParams.get('page');
+            const body =
+                page === '1'
+                    ? { items: [{ id: '1', name: 'A' }], page: 1, pageSize: 1, total: 3 }
+                    : page === '2'
+                      ? { items: [{ id: '2', name: 'B' }], page: 2, pageSize: 1, total: 3 }
+                      : { items: [{ id: '3', name: 'C' }], page: 3, pageSize: 1, total: 3 };
+            return new Response(JSON.stringify(body), { status: 200 });
+        });
+        vi.stubGlobal('fetch', fetchMock);
+
+        expect(await apiFetchAllPages('/x', pageSchema)).toEqual([
+            { id: '1', name: 'A' },
+            { id: '2', name: 'B' },
+            { id: '3', name: 'C' },
+        ]);
+        expect(fetchMock).toHaveBeenCalledTimes(3);
+    });
+
+    it('preserva outros parâmetros já presentes na URL', async () => {
+        const fetchMock = mockFetch(200, {
+            items: [{ id: '1', name: 'A' }],
+            page: 1,
+            pageSize: 100,
+            total: 1,
+        });
+        await apiFetchAllPages('/x?isActive=true', pageSchema);
+        const [url] = fetchMock.mock.calls[0] as unknown as [string];
+        expect(url).toBe('http://api.test/api/v1/x?isActive=true&page=1&pageSize=100');
     });
 });
