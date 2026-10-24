@@ -47,13 +47,13 @@ export function PlanForm({ action, plan, onSuccess }: PlanFormProps) {
             </div>
             <div className="flex justify-end">
                 <ConfirmSubmitButton
-                    confirmTitle={plan ? 'Salvar plano' : 'Criar plano'}
+                    confirmTitle={plan ? 'Atualizar plano' : 'Criar plano'}
                     confirmDescription="Confirmar e salvar as informações do plano?"
                     confirmLabel="Confirmar"
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending ? 'Salvando…' : plan ? 'Salvar plano' : 'Criar plano'}
+                    {pending ? 'Salvando…' : plan ? 'Atualizar plano' : 'Criar plano'}
                 </ConfirmSubmitButton>
             </div>
         </form>

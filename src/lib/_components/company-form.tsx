@@ -142,13 +142,13 @@ export function CompanyForm({ action, company, onSuccess }: CompanyFormProps) {
 
             <div className="flex justify-end">
                 <ConfirmSubmitButton
-                    confirmTitle={company ? 'Salvar empresa' : 'Cadastrar empresa'}
+                    confirmTitle={company ? 'Atualizar empresa' : 'Cadastrar empresa'}
                     confirmDescription="Confirmar e salvar as informações da empresa?"
                     confirmLabel="Confirmar"
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending ? 'Salvando…' : company ? 'Salvar empresa' : 'Cadastrar empresa'}
+                    {pending ? 'Salvando…' : company ? 'Atualizar empresa' : 'Cadastrar empresa'}
                 </ConfirmSubmitButton>
             </div>
         </form>

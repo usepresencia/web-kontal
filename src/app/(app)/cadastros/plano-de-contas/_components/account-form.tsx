@@ -205,13 +205,13 @@ export function AccountForm({
             <div className="flex items-center justify-between gap-3">
                 <div>{footerStart}</div>
                 <ConfirmSubmitButton
-                    confirmTitle={editing ? 'Salvar conta' : 'Criar conta'}
+                    confirmTitle={editing ? 'Atualizar conta' : 'Criar conta'}
                     confirmDescription="Confirmar e salvar as informações da conta?"
-                    confirmLabel="Salvar"
+                    confirmLabel={editing ? 'Atualizar' : 'Criar'}
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending ? 'Salvando…' : editing ? 'Salvar conta' : 'Criar conta'}
+                    {pending ? 'Salvando…' : editing ? 'Atualizar conta' : 'Criar conta'}
                 </ConfirmSubmitButton>
             </div>
         </form>
