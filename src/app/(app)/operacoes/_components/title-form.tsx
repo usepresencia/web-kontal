@@ -81,6 +81,13 @@ export function TitleForm({
     const initialLabel = labels.opening.toLowerCase();
     const canPayNow = !opening && repeat === 'NONE' && financialAccounts.length > 0;
     const errors = (field: string) => state.fieldErrors?.[field];
+    const submitTitle = opening
+        ? `Registrar ${initialLabel}`
+        : series
+          ? 'Criar parcelamento'
+          : payNow
+            ? labels.action
+            : 'Criar título';
 
     useEffect(() => {
         if (state.ok) onSuccess?.();
@@ -94,7 +101,9 @@ export function TitleForm({
                         ? `Salvando ${initialLabel}…`
                         : series
                           ? 'Salvando parcelamento…'
-                          : 'Salvando título…'
+                          : payNow
+                            ? labels.pending
+                            : 'Salvando título…'
                 }
             />
             <input type="hidden" name="type" value={type} />
@@ -303,13 +312,7 @@ export function TitleForm({
 
             <div className="flex justify-end">
                 <ConfirmSubmitButton
-                    confirmTitle={
-                        opening
-                            ? `Registrar ${initialLabel}`
-                            : series
-                              ? 'Criar parcelamento'
-                              : 'Criar título'
-                    }
+                    confirmTitle={submitTitle}
                     confirmDescription={
                         opening
                             ? `Registrar ${initialLabel} deste título?`
@@ -319,17 +322,11 @@ export function TitleForm({
                                 ? `${labels.now} e cadastrar este título?`
                                 : 'Cadastrar este título?'
                     }
-                    confirmLabel={opening ? 'Registrar' : 'Criar'}
+                    confirmLabel={opening ? 'Registrar' : payNow ? labels.submit : 'Criar'}
                     disabled={pending}
                     className="bg-accent text-accent-foreground hover:bg-accent/90 h-10 rounded-full px-6 font-semibold"
                 >
-                    {pending
-                        ? 'Salvando…'
-                        : opening
-                          ? `Registrar ${initialLabel}`
-                          : series
-                            ? 'Criar parcelamento'
-                            : 'Criar título'}
+                    {pending ? (payNow ? labels.pending : 'Salvando…') : submitTitle}
                 </ConfirmSubmitButton>
             </div>
         </form>
