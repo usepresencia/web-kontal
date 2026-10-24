@@ -1,7 +1,6 @@
 'use client';
 
 import { DatePickerField } from '@/lib/_components/date-picker-field';
-import { Divider } from '@/lib/_components/divider';
 import { Popover, PopoverContent, PopoverTrigger } from '@/lib/_components/ui/popover';
 import {
     Select,
@@ -270,7 +269,10 @@ export function PillCombobox({
                             className="placeholder:text-muted-foreground w-full rounded-md px-2 py-1.5 text-sm outline-none"
                         />
                     </div>
-                    <Divider className="via-border from-transparent to-transparent" />
+                    <div
+                        role="separator"
+                        className="via-border h-px bg-linear-to-r from-transparent to-transparent"
+                    />
                     <div className="max-h-60 space-y-0.5 overflow-y-auto p-1.5">
                         {allowEmpty && (
                             <button
