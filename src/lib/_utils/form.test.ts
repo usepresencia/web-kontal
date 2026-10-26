@@ -49,6 +49,8 @@ describe('stateFromZodError', () => {
         expect(stateFromZodError(result.error)).toEqual({
             ok: false,
             fieldErrors: { name: ['Obrigatório'], 'a.b': ['Curto'] },
+            title: 'Confira os campos',
+            message: 'Alguns campos têm pendências; veja os destaques no formulário.',
         });
     });
 });
