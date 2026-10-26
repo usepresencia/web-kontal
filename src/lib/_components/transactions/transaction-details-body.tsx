@@ -36,8 +36,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function EntrySeparator() {
     return (
-        <span aria-hidden="true" className="text-border">
-            |
+        <span aria-hidden="true" className="text-muted-foreground">
+            ·
         </span>
     );
 }
