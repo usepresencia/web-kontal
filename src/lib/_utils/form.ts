@@ -41,5 +41,10 @@ export function stateFromZodError(error: ZodError): FormState {
         const path = issue.path.join('.') || '_';
         (fieldErrors[path] ??= []).push(issue.message);
     }
-    return { ok: false, fieldErrors };
+    return {
+        ok: false,
+        fieldErrors,
+        title: 'Confira os campos',
+        message: 'Alguns campos têm pendências; veja os destaques no formulário.',
+    };
 }
