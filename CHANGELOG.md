@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.13](https://github.com/usepresencia/web-kontal/compare/v0.1.12...v0.1.13) (2026-10-26)
+
+### Features
+
+- **transacoes:** mostra data, método e conta financeira em cada baixa ([70ddd04](https://github.com/usepresencia/web-kontal/commit/70ddd0411ce7492485c44b9459004452a107e1ef))
+
+### Bug Fixes
+
+- **seguranca:** põe o nonce da CSP em toda <style> criada em runtime ([e9f46ed](https://github.com/usepresencia/web-kontal/commit/e9f46ed96f2aff93268135a2734272d82eccf4c8))
+
 ### [0.1.12](https://github.com/usepresencia/web-kontal/compare/v0.1.11...v0.1.12) (2026-10-26)
 
 ### Bug Fixes
