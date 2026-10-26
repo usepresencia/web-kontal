@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.11](https://github.com/usepresencia/web-kontal/compare/v0.1.10...v0.1.11) (2026-10-26)
+
+### Bug Fixes
+
+- **forms:** avisa com toast quando a validação local falha ([ae0d73a](https://github.com/usepresencia/web-kontal/commit/ae0d73a04d028a1b347d91c7b5be49276b2c7490))
+
 ### [0.1.10](https://github.com/usepresencia/web-kontal/compare/v0.1.9...v0.1.10) (2026-10-26)
 
 ### Bug Fixes
