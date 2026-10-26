@@ -1,5 +1,41 @@
 import { describe, expect, it } from 'vitest';
-import { buildCsp, buildSecurityHeaders } from './csp';
+import { buildCsp, buildSecurityHeaders, styleNonceScript } from './csp';
+
+describe('styleNonceScript', () => {
+    class FakeElement {
+        attrs: Record<string, string> = {};
+        constructor(public tag: string) {}
+        setAttribute(name: string, value: string) {
+            this.attrs[name] = value;
+        }
+    }
+    class FakeDocument {
+        createElement(tag: string) {
+            return new FakeElement(tag);
+        }
+    }
+
+    const run = (nonce: string) => {
+        const Document = class extends FakeDocument {};
+        new Function('Document', styleNonceScript(nonce))(Document);
+        return new Document();
+    };
+
+    it('põe o nonce em toda <style> criada', () => {
+        const doc = run('abc');
+        expect((doc.createElement('style') as FakeElement).attrs.nonce).toBe('abc');
+        expect((doc.createElement('STYLE') as FakeElement).attrs.nonce).toBe('abc');
+    });
+
+    it('não mexe nos outros elementos', () => {
+        expect((run('abc').createElement('div') as FakeElement).attrs.nonce).toBeUndefined();
+    });
+
+    it('trata o nonce como dado, sem injetar código', () => {
+        const doc = run("x');alert(1);('");
+        expect((doc.createElement('style') as FakeElement).attrs.nonce).toBe("x');alert(1);('");
+    });
+});
 
 const directives = (csp: string) =>
     Object.fromEntries(csp.split('; ').map(part => [part.split(' ')[0], part]));

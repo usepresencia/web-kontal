@@ -2,6 +2,7 @@ import { BusyProvider } from '@/lib/_components/busy-provider';
 import { FlashToast } from '@/lib/_components/flash-toast';
 import { ToastProvider } from '@/lib/_components/ui/toast-provider';
 import { rootMetadata } from '@/lib/config/metadata';
+import { styleNonceScript } from '@/lib/security/csp';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { headers } from 'next/headers';
 import Script from 'next/script';
@@ -32,10 +33,8 @@ export default async function RootLayout({
     return (
         <html lang="pt-BR" className={`${spaceGrotesk.variable} ${inter.variable}`}>
             <body className="bg-background text-foreground antialiased">
-                {/* O Radix (Dialog/Popover) trava o scroll injetando um <style>; sem o nonce, a
-                CSP de produção bloqueia essa tag. react-style-singleton lê esse global. */}
                 <Script id="csp-nonce" strategy="beforeInteractive" nonce={nonce}>
-                    {`window.__webpack_nonce__=${JSON.stringify(nonce)};`}
+                    {styleNonceScript(nonce)}
                 </Script>
                 <BusyProvider>{children}</BusyProvider>
                 <ToastProvider />
