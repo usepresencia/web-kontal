@@ -9,7 +9,7 @@ import { matchesQuery, percentChange, shareOfTotal } from '@/lib/_utils/kpi';
 import { formatAmount } from '@/lib/_utils/money';
 import { apiFetch } from '@/lib/api/client';
 import { ApiError } from '@/lib/api/errors';
-import { dreSummarySchema, type DreSummary } from '@/lib/api/schemas/dre';
+import { cashSummarySchema, type CashSummary } from '@/lib/api/schemas/cash-summary';
 import { titlePageSchema, type Title } from '@/lib/api/schemas/title';
 import { requireSession } from '@/lib/auth/session';
 import { TrendingDown, TrendingUp } from 'lucide-react';
@@ -35,9 +35,10 @@ async function orFallback<T>(request: Promise<T>, fallback: T): Promise<T> {
     }
 }
 
-const loadDre = (range: { start: string; end: string }): Promise<DreSummary | null> =>
+/** Resumo de caixa (regime de caixa: só o que foi pago/recebido no período, não o emitido). */
+const loadCashSummary = (range: { start: string; end: string }): Promise<CashSummary | null> =>
     orFallback(
-        apiFetch(`/reports/dre?start=${range.start}&end=${range.end}`, dreSummarySchema),
+        apiFetch(`/reports/cash-flow?start=${range.start}&end=${range.end}`, cashSummarySchema),
         null,
     );
 
@@ -53,8 +54,8 @@ export default async function HomePage({
     const [me, summary, previous, recentPage, openPage, payablePage, receivablePage] =
         await Promise.all([
             requireSession(),
-            loadDre(currentMonthRange(now)),
-            loadDre(previousMonthRange(now)),
+            loadCashSummary(currentMonthRange(now)),
+            loadCashSummary(previousMonthRange(now)),
             orFallback(apiFetch('/titles?page=1&pageSize=50', titlePageSchema), null),
             orFallback(apiFetch('/titles?page=1&pageSize=1&status=OPEN', titlePageSchema), null),
             orFallback(apiFetch(upcomingPath('EXPENSE'), titlePageSchema), null),
@@ -97,23 +98,23 @@ export default async function HomePage({
                 <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                     <KpiCard
                         title="Receitas"
-                        value={formatAmount(summary.totals.revenues)}
+                        value={formatAmount(summary.totals.inflows)}
                         tone="positive"
                         icon={TrendingUp}
-                        description="no mês corrente"
-                        change={changeOf(summary.totals.revenues, previous?.totals.revenues, true)}
+                        description="recebido no mês corrente"
+                        change={changeOf(summary.totals.inflows, previous?.totals.inflows, true)}
                     />
                     <KpiCard
                         title="Despesas"
-                        value={formatAmount(summary.totals.expenses)}
+                        value={formatAmount(summary.totals.outflows)}
                         tone="negative"
                         icon={TrendingDown}
-                        description="no mês corrente"
-                        change={changeOf(summary.totals.expenses, previous?.totals.expenses, false)}
+                        description="pago no mês corrente"
+                        change={changeOf(summary.totals.outflows, previous?.totals.outflows, false)}
                     />
                     <ResultCard
-                        amount={summary.totals.result}
-                        share={shareOfTotal(summary.totals.revenues, summary.totals.expenses)}
+                        amount={summary.totals.net}
+                        share={shareOfTotal(summary.totals.inflows, summary.totals.outflows)}
                     />
                 </section>
             ) : (
