@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.12](https://github.com/usepresencia/web-kontal/compare/v0.1.11...v0.1.12) (2026-10-26)
+
+### Bug Fixes
+
+- **seguranca:** repassa o nonce da CSP pro scroll-lock do Radix ([fb00b24](https://github.com/usepresencia/web-kontal/commit/fb00b24733917fd9653e77340e25d2ba1977ee80))
+
 ### [0.1.11](https://github.com/usepresencia/web-kontal/compare/v0.1.10...v0.1.11) (2026-10-26)
 
 ### Bug Fixes
