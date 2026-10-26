@@ -30,6 +30,14 @@ export function buildCsp({ nonce, isDev }: CspInput): string {
     ].join('; ');
 }
 
+/**
+ * Script que faz toda `<style>` criada em tempo de execução nascer com o nonce. Sonner e Radix
+ * injetam CSS assim; sem o nonce a CSP de produção bloqueia (o toast some, o scroll-lock falha).
+ */
+export function styleNonceScript(nonce: string): string {
+    return `(function(n){var c=Document.prototype.createElement;Document.prototype.createElement=function(t,o){var e=c.call(this,t,o);if(String(t).toLowerCase()==='style')e.setAttribute('nonce',n);return e};})(${JSON.stringify(nonce)});`;
+}
+
 /** Cabeçalhos de segurança aplicados a toda resposta de página. */
 export function buildSecurityHeaders({
     pathname,
