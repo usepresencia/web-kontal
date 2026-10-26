@@ -100,11 +100,19 @@ describe('TransactionDetailsBody', () => {
         expect(render([])).toContain('Nenhuma transação registrada');
     });
 
-    it('lista as baixas com data, forma e valor', () => {
-        const html = render([entry]);
-        expect(html).toContain('01/10/2026');
-        expect(html).toContain('Pix');
-        expect(html).toContain('R$ 100,00');
+    it('lista as baixas com data, forma, conta financeira e valor, nessa ordem', () => {
+        const html = render([{ ...entry, billingAccountName: 'Banco Inter' }]);
+        const order = ['01/10/2026', 'Pix', 'Banco Inter', 'R$ 100,00'].map(text =>
+            html.indexOf(text),
+        );
+        expect(order.every(index => index >= 0)).toBe(true);
+        expect([...order].sort((a, b) => a - b)).toEqual(order);
+    });
+
+    it('mostra traço quando a baixa não tem conta financeira', () => {
+        const html = render([{ ...entry, kind: 'WRITE_OFF', billingAccountName: null }]);
+        expect(html).toContain('Perda');
+        expect(html).toMatch(/truncate text-xs">-</);
     });
 
     it('usa o sinal e a cor de receita no título a receber', () => {

@@ -34,6 +34,14 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     );
 }
 
+function EntrySeparator() {
+    return (
+        <span aria-hidden="true" className="text-muted-foreground">
+            ·
+        </span>
+    );
+}
+
 /** Conteúdo do modal de detalhes da transação (sem hooks, para testar com renderToStaticMarkup). */
 export function TransactionDetailsBody({
     title,
@@ -118,18 +126,25 @@ export function TransactionDetailsBody({
                         {entries.map((entry, index) => (
                             <li key={entry.id}>
                                 {index > 0 && <Divider className="mx-2 my-1" />}
-                                <div className="flex items-center justify-between px-2 py-2 text-sm">
-                                    <span>
-                                        {formatDate(entry.paidAt)}
-                                        <span className="text-muted-foreground ml-2 text-xs">
+                                <div className="flex items-center justify-between gap-3 px-2 py-2 text-sm">
+                                    <span className="flex min-w-0 items-center gap-2">
+                                        <span className="shrink-0">{formatDate(entry.paidAt)}</span>
+                                        <EntrySeparator />
+                                        <span className="text-muted-foreground shrink-0 text-xs">
                                             {entry.kind === 'WRITE_OFF'
                                                 ? 'Perda'
                                                 : (PAYMENT_METHOD_LABELS[
                                                       entry.paymentMethod as keyof typeof PAYMENT_METHOD_LABELS
-                                                  ] ?? entry.paymentMethod)}
+                                                  ] ??
+                                                  entry.paymentMethod ??
+                                                  '-')}
+                                        </span>
+                                        <EntrySeparator />
+                                        <span className="text-muted-foreground truncate text-xs">
+                                            {entry.billingAccountName ?? '-'}
                                         </span>
                                     </span>
-                                    <span className="font-medium">
+                                    <span className="shrink-0 font-medium">
                                         {formatAmount(entry.totalAmount)}
                                     </span>
                                 </div>
